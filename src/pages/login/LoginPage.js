@@ -10,7 +10,6 @@ import {
   Button,
   Row,
   Spinner,
-  Alert,
   ListGroup,
   ListGroupItem
 } from 'reactstrap';
