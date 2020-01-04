@@ -3,12 +3,12 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 
-function AuthRoute({ component: Component, token, ...rest }) {
+function AuthRoute({ component: Component, isAuthenticated, ...rest }) {
   return (
     <Route
       {...rest}
       render={props => {
-        if (token !== '') {
+        if (isAuthenticated) {
           return <Component {...props} />;
         }
 

@@ -3,27 +3,30 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
-// import DashboardPage from './pages/dashboard';
+import DashboardPage from './pages/dashboard';
 import LoginPage from './pages/login';
 import AuthRoute from './AuthRoute';
-import AppLayout from './AppLayout';
 
-const App = ({ token }) => {
+const App = ({ isAuthenticated }) => {
   return (
     <Router>
       <Switch>
         <Route path="/" exact component={LoginPage} />
-        <AuthRoute path="/app" component={AppLayout} token={token} />
+        <AuthRoute
+          path="/dashboard"
+          component={DashboardPage}
+          isAuthenticated={isAuthenticated}
+        />
       </Switch>
     </Router>
   );
 };
 
 App.propTypes = {
-  token: PropTypes.string.isRequired
+  isAuthenticated: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
-  token: state.user.get('token')
+  isAuthenticated: state.auth.get('isAuthenticated')
 });
 export default connect(mapStateToProps)(App);

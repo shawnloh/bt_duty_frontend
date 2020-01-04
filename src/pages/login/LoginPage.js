@@ -10,10 +10,12 @@ import {
   Button,
   Row,
   Spinner,
-  Alert
+  Alert,
+  ListGroup,
+  ListGroupItem
 } from 'reactstrap';
-import { withRouter, Redirect } from 'react-router-dom';
-import { login } from '../../actions/userActions';
+import { Redirect } from 'react-router-dom';
+import { login } from './actions';
 
 class LoginPage extends PureComponent {
   constructor(props) {
@@ -28,8 +30,7 @@ class LoginPage extends PureComponent {
     const { target } = event;
     const { value, name } = target;
     this.setState({
-      [name]: value,
-      authenticated: false
+      [name]: value
     });
   };
 
@@ -43,34 +44,38 @@ class LoginPage extends PureComponent {
   checkError = () => {
     const { errors } = this.props;
     if (errors.length > 0) {
-      return errors.map(error => {
-        return (
-          <Row key={error}>
-            <Alert color="danger" className="w-100">
-              {error}
-            </Alert>
-          </Row>
-        );
-      });
+      return (
+        <Row className="mx-auto mb-2">
+          <ListGroup className="mx-auto">
+            {errors.map(error => {
+              return (
+                <ListGroupItem key={error} color="danger">
+                  {error}
+                </ListGroupItem>
+              );
+            })}
+          </ListGroup>
+        </Row>
+      );
     }
     return null;
   };
 
   render() {
     const { username, password } = this.state;
-    const { isLoading, token } = this.props;
+    const { isLoading, isAuthenticated } = this.props;
 
-    return token !== '' ? (
-      <Redirect to="/app" />
+    return isAuthenticated ? (
+      <Redirect to="/dashboard" />
     ) : (
       <Container
-        className="d-flex justify-content-center align-items-center"
+        className="d-flex justify-content-center align-items-center flex-column"
         style={{ height: '100vh' }}
       >
-        <Form onSubmit={this.handleSubmit}>
-          {this.checkError()}
+        {this.checkError()}
 
-          <FormGroup row>
+        <Form onSubmit={this.handleSubmit}>
+          <FormGroup row className="mx-auto">
             <Label for="usernameInput">Username:</Label>
             <Input
               type="text"
@@ -79,9 +84,10 @@ class LoginPage extends PureComponent {
               placeholder="johndoe"
               onChange={this.handleChange}
               value={username}
+              required
             />
           </FormGroup>
-          <FormGroup row>
+          <FormGroup row className="mx-auto">
             <Label for="passwordInput">Password:</Label>
             <Input
               type="password"
@@ -89,9 +95,10 @@ class LoginPage extends PureComponent {
               id="passwordInput"
               onChange={this.handleChange}
               value={password}
+              required
             />
           </FormGroup>
-          <Row className="align-items-center justify-content-center">
+          <Row className="align-items-center justify-content-center mx-auto">
             {isLoading ? (
               <Spinner size="md" color="primary" />
             ) : (
@@ -109,19 +116,19 @@ LoginPage.propTypes = {
   authenticate: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
   errors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  token: PropTypes.string.isRequired
+  isAuthenticated: PropTypes.bool.isRequired
 };
 
-const mapStateToProps = state => ({
-  isLoading: state.user.get('isLoading'),
-  errors: state.user.get('errors'),
-  token: state.user.get('token')
-});
+const mapStateToProps = state => {
+  return {
+    isLoading: state.pages.login.get('isLoading'),
+    errors: state.pages.login.get('errors'),
+    isAuthenticated: state.auth.get('isAuthenticated')
+  };
+};
 
 const mapDispatchToProps = {
   authenticate: login
 };
 
-export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(LoginPage)
-);
+export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);

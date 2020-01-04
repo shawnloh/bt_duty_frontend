@@ -1,31 +1,26 @@
 import { Map } from 'immutable';
-import { LOGIN, LOGIN_FAIL, LOGIN_SUCCESS } from '../actions/constants';
+import { LOGIN, LOGIN_SUCCESS, LOGIN_FAIL } from './constants';
 
 const initialState = Map({
-  username: '',
-  token: '',
-  errors: [],
-  isLoading: false
+  isLoading: false,
+  errors: []
 });
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
     case LOGIN:
       return state.merge({
-        errors: [],
-        token: '',
-        username: payload.username,
-        isLoading: true
+        isLoading: true,
+        errors: []
       });
     case LOGIN_SUCCESS:
       return state.merge({
-        token: payload,
         isLoading: false
       });
     case LOGIN_FAIL:
       return state.merge({
-        errors: payload,
-        isLoading: false
+        isLoading: false,
+        errors: payload
       });
     default:
       return state;

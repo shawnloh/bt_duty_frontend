@@ -1,8 +1,16 @@
 import { all } from 'redux-saga/effects';
-import userSaga from './userSaga';
+
+// GLOBAL SAGAS
+import authSaga from './authSaga';
+
+// PAGES SAGAS
+import loginPageSaga from '../pages/login/saga';
+
+const pageSagas = [loginPageSaga()];
+const globalSagas = [authSaga()];
 
 function* rootSagas() {
-  yield all([userSaga()]);
+  yield all([...globalSagas, ...pageSagas]);
 }
 
 export default rootSagas;

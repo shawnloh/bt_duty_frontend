@@ -1,17 +1,39 @@
 import { combineReducers } from 'redux';
-import { LOG_OUT } from '../actions/constants';
-import userReducer from './userReducer';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import immutableTransform from 'redux-persist-transform-immutable';
+import { LOG_OUT_SUCCESS } from '../actions/constants';
+
+// GLOBAL REDUCERS
+import authReducer from './authReducer';
+
+// PAGE REDUCERS
+import loginReducer from '../pages/login/reducer';
+
+const pages = combineReducers({
+  login: loginReducer
+});
 
 const appReducer = combineReducers({
-  user: userReducer
+  auth: authReducer,
+  pages
 });
 
 const rootReducer = (state, action) => {
   let newState = state;
-  if (action.type === LOG_OUT) {
+  if (action.type === LOG_OUT_SUCCESS) {
     newState = undefined;
   }
   return appReducer(newState, action);
 };
 
-export default rootReducer;
+const persistConfig = {
+  transforms: [immutableTransform()],
+  key: 'root',
+  storage,
+  blacklist: ['pages']
+};
+
+const persistedRootReducer = persistReducer(persistConfig, rootReducer);
+
+export default persistedRootReducer;

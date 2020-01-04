@@ -1,11 +1,8 @@
 import { create } from 'apisauce';
 
-const config = {
+const api = create({
   baseURL: '/api',
-  headers: {
-    'Content-Type': 'application/json'
-  }
-};
-const api = create(config);
+  withCredentials: true
+});
 
 export default api;
