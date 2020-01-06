@@ -1,32 +1,23 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-
-import DashboardPage from './pages/dashboard';
-import LoginPage from './pages/login';
 import AuthRoute from './AuthRoute';
 
-const App = ({ isAuthenticated }) => {
+import LoginPage from './pages/login';
+import LoadingPage from './pages/loading';
+import DashboardPage from './pages/dashboard';
+import RanksPage from './pages/ranks';
+
+const App = () => {
   return (
     <Router>
       <Switch>
         <Route path="/" exact component={LoginPage} />
-        <AuthRoute
-          path="/dashboard"
-          component={DashboardPage}
-          isAuthenticated={isAuthenticated}
-        />
+        <AuthRoute path="/app" component={LoadingPage} />
+        <AuthRoute path="/dashboard" component={DashboardPage} />
+        <AuthRoute path="/ranks" component={RanksPage} />
       </Switch>
     </Router>
   );
 };
 
-App.propTypes = {
-  isAuthenticated: PropTypes.bool.isRequired
-};
-
-const mapStateToProps = state => ({
-  isAuthenticated: state.auth.get('isAuthenticated')
-});
-export default connect(mapStateToProps)(App);
+export default App;

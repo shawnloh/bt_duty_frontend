@@ -65,7 +65,7 @@ class LoginPage extends PureComponent {
     const { isLoading, isAuthenticated } = this.props;
 
     return isAuthenticated ? (
-      <Redirect to="/dashboard" />
+      <Redirect to="/app" />
     ) : (
       <Container
         className="d-flex justify-content-center align-items-center flex-column"

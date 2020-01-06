@@ -5,12 +5,8 @@ import AccountService from '../services/accounts';
 
 function* logout() {
   try {
-    const response = yield call(AccountService.logout);
-    if (response.ok) {
-      yield put(logoutSuccess());
-    } else {
-      yield put(logoutFailure());
-    }
+    yield call(AccountService.logout);
+    yield put(logoutSuccess());
   } catch (error) {
     yield put(logoutFailure());
   }

@@ -6,16 +6,26 @@ import { LOG_OUT_SUCCESS } from '../actions/constants';
 
 // GLOBAL REDUCERS
 import authReducer from './authReducer';
+import ranksReducer from './ranksReducer';
+import platoonsReducer from './platoonsReducer';
+import eventsReducer from './eventsReducer';
+import personnelsReducer from './personnelsReducer';
 
 // PAGE REDUCERS
 import loginReducer from '../pages/login/reducer';
+import loadingReducer from '../pages/loading/reducer';
 
 const pages = combineReducers({
-  login: loginReducer
+  login: loginReducer,
+  loading: loadingReducer
 });
 
 const appReducer = combineReducers({
   auth: authReducer,
+  ranks: ranksReducer,
+  platoons: platoonsReducer,
+  events: eventsReducer,
+  personnels: personnelsReducer,
   pages
 });
 

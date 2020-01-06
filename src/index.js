@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import createStore from './stores/createStore';
 
 const { store, persistor } = createStore();
+
 render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>

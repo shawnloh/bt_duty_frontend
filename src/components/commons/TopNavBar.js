@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink as Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
   Collapse,
@@ -26,11 +26,18 @@ const TopNavBar = ({ username, logout }) => {
       <Collapse isOpen={isOpen} navbar>
         <Nav className="mr-auto" navbar>
           <NavItem>
-            <NavLink href="/components/">Components</NavLink>
+            <NavLink tag={Link} to="/app" activeClassName="active" exact>
+              Loading
+            </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="https://github.com/reactstrap/reactstrap">
-              GitHub
+            <NavLink tag={Link} to="/dashboard" activeClassName="active" exact>
+              Dashboard
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink tag={Link} to="/ranks" activeClassName="active" exact>
+              Ranks
             </NavLink>
           </NavItem>
           <UncontrolledDropdown nav inNavbar>
