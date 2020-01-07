@@ -26,11 +26,6 @@ const TopNavBar = ({ username, logout }) => {
       <Collapse isOpen={isOpen} navbar>
         <Nav className="mr-auto" navbar>
           <NavItem>
-            <NavLink tag={Link} to="/app" activeClassName="active" exact>
-              Loading
-            </NavLink>
-          </NavItem>
-          <NavItem>
             <NavLink tag={Link} to="/dashboard" activeClassName="active" exact>
               Dashboard
             </NavLink>
@@ -58,9 +53,7 @@ const TopNavBar = ({ username, logout }) => {
               Hello, {username}
             </DropdownToggle>
             <DropdownMenu right>
-              <Link to="/" onClick={logout}>
-                <DropdownItem>Logout</DropdownItem>
-              </Link>
+              <DropdownItem onClick={logout}>Logout</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown>
         </Nav>

@@ -12,12 +12,14 @@ import eventsReducer from './eventsReducer';
 import personnelsReducer from './personnelsReducer';
 
 // PAGE REDUCERS
-import loginReducer from '../pages/login/reducer';
-import loadingReducer from '../pages/loading/reducer';
+import loginPageReducer from '../pages/login/reducer';
+import loadingPageReducer from '../pages/loading/reducer';
+import ranksPageReducer from '../pages/ranks/reducer';
 
 const pages = combineReducers({
-  login: loginReducer,
-  loading: loadingReducer
+  login: loginPageReducer,
+  loading: loadingPageReducer,
+  ranks: ranksPageReducer
 });
 
 const appReducer = combineReducers({

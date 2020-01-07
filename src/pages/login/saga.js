@@ -1,4 +1,4 @@
-import { takeLatest, put, call } from 'redux-saga/effects';
+import { takeLatest, put, call, delay } from 'redux-saga/effects';
 import { LOGIN } from './constants';
 import { loginFailure, loginSuccess } from './actions';
 import AccountService from '../../services/accounts';
@@ -7,6 +7,7 @@ function* login(action) {
   try {
     const { username, password } = action.payload;
     const response = yield call(AccountService.login, username, password);
+    yield delay(500);
     if (!response.ok) {
       yield put(loginFailure(response.data.errors));
     } else {

@@ -7,8 +7,8 @@ import { loadApp as loadAppAction } from './actions';
 
 class LoadingPage extends PureComponent {
   componentDidMount() {
-    const { loadApp, appLoaded } = this.props;
-    if (!appLoaded) {
+    const { loadApp, appLoaded, isAuthenticated } = this.props;
+    if (!appLoaded && isAuthenticated) {
       loadApp();
     }
   }
@@ -16,7 +16,7 @@ class LoadingPage extends PureComponent {
   render() {
     const { isLoading, appLoaded } = this.props;
     if (!isLoading && appLoaded) {
-      return <Redirect to="/dashboard" />;
+      return <Redirect to="/dashboard" exact />;
     }
     return (
       <Container
@@ -41,12 +41,14 @@ class LoadingPage extends PureComponent {
 LoadingPage.propTypes = {
   loadApp: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
-  appLoaded: PropTypes.bool.isRequired
+  appLoaded: PropTypes.bool.isRequired,
+  isAuthenticated: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
   isLoading: state.pages.loading.get('isLoading'),
-  appLoaded: state.pages.loading.get('appLoaded')
+  appLoaded: state.pages.loading.get('appLoaded'),
+  isAuthenticated: state.auth.get('isAuthenticated')
 });
 
 const mapDispatchToProps = {

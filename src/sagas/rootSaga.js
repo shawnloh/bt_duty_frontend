@@ -6,8 +6,9 @@ import authSaga from './authSaga';
 // PAGES SAGAS
 import loginPageSaga from '../pages/login/saga';
 import loadingPageSaga from '../pages/loading/saga';
+import ranksPageSaga from '../pages/ranks/saga';
 
-const pageSagas = [loginPageSaga(), loadingPageSaga()];
+const pageSagas = [loginPageSaga(), loadingPageSaga(), ranksPageSaga()];
 const globalSagas = [authSaga()];
 
 function* rootSagas() {

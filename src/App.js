@@ -1,5 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect
+} from 'react-router-dom';
 import AuthRoute from './AuthRoute';
 
 import LoginPage from './pages/login';
@@ -11,10 +16,11 @@ const App = () => {
   return (
     <Router>
       <Switch>
-        <Route path="/" exact component={LoginPage} />
-        <AuthRoute path="/app" component={LoadingPage} />
-        <AuthRoute path="/dashboard" component={DashboardPage} />
-        <AuthRoute path="/ranks" component={RanksPage} />
+        <Redirect from="/" to="/login" exact />
+        <Route path="/login" exact component={LoginPage} />
+        <AuthRoute path="/app" exact component={LoadingPage} />
+        <AuthRoute path="/dashboard" exact component={DashboardPage} />
+        <AuthRoute path="/ranks" exact component={RanksPage} />
       </Switch>
     </Router>
   );

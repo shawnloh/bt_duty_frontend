@@ -1,3 +1,1 @@
-import RanksPage from './Ranks';
-
-export default RanksPage;
+export { default } from './Ranks';

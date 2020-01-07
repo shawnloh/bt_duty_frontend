@@ -1,3 +1,1 @@
-import Dashboard from './DashboardPage';
-
-export default Dashboard;
+export { default } from './DashboardPage';

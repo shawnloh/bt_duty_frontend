@@ -9,18 +9,14 @@ function AuthRoute({ component: Component, isAuthenticated, ...rest }) {
     <Route
       {...rest}
       render={props => {
+        if (isAuthenticated === undefined) {
+          return null;
+        }
         if (isAuthenticated) {
           return <Component {...props} />;
         }
 
-        return (
-          <Redirect
-            to={{
-              pathname: '/',
-              state: { from: props.location }
-            }}
-          />
-        );
+        return <Redirect exact to="/" />;
       }}
     />
   );
