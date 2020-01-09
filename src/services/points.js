@@ -1,33 +1,33 @@
 import api from '../utils/api';
 
-class PlatoonService {
-  static getPlatoons() {
+class PointsService {
+  static getPoints() {
     return api
-      .get('/platoons')
+      .get('/points')
       .then(response => response)
       .catch(error => error);
   }
 
-  static createPlatoon(name) {
+  static createPoint(name) {
     return api
-      .post('/platoons', { name })
+      .post('/points', { name })
       .then(response => response)
       .catch(error => error);
   }
 
-  static deletePlatoon(id) {
+  static deletePoint(id) {
     return api
-      .delete(`/platoons/${id}`)
+      .delete(`/points/${id}`)
       .then(response => response)
       .catch(error => error);
   }
 
-  static updatePlatoon(id, name) {
+  static updatePoint(id, name) {
     return api
-      .put(`/platoons/${id}`, { name })
+      .put(`/points/${id}`, { name })
       .then(response => response)
       .catch(error => error);
   }
 }
 
-export default PlatoonService;
+export default PointsService;

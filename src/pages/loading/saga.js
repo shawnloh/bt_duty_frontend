@@ -6,6 +6,10 @@ import {
   loadPlatoonsSuccess
 } from '../../actions/platoonsActions';
 import {
+  loadPointsFailure,
+  loadPointsSuccess
+} from '../../actions/pointsActions';
+import {
   loadEventsSuccess,
   loadEventsFailure
 } from '../../actions/eventsActions';
@@ -16,8 +20,32 @@ import {
 import { loadAppSuccess, loadAppFailed } from './actions';
 import RanksService from '../../services/ranks';
 import PlatoonsService from '../../services/platoons';
+import PointsService from '../../services/points';
 import EventsService from '../../services/events';
 import PersonnelsService from '../../services/personnels';
+
+function* loadPoints() {
+  try {
+    const response = yield call(PointsService.getPoints);
+    if (response.ok) {
+      const points = {};
+      const ids = [];
+
+      response.data.forEach(point => {
+        const { _id: id } = point;
+        points[id] = point;
+        ids.push(id);
+      });
+      yield put(loadPointsSuccess({ ids, points }));
+    } else {
+      yield put(
+        loadPointsFailure(response.data.message || response.data.errors)
+      );
+    }
+  } catch (error) {
+    yield put(loadPointsFailure([error.message]));
+  }
+}
 
 function* loadRanks() {
   try {
@@ -116,6 +144,7 @@ function* loadEssentials() {
     yield all([
       call(loadRanks),
       call(loadPlatoons),
+      call(loadPoints),
       call(loadEvents),
       call(loadPersonnels)
     ]);

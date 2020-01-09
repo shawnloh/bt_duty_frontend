@@ -35,6 +35,11 @@ const TopNavBar = ({ username, logout }) => {
               Ranks
             </NavLink>
           </NavItem>
+          <NavItem>
+            <NavLink tag={Link} to="/platoons" activeClassName="active" exact>
+              Platoons
+            </NavLink>
+          </NavItem>
           <UncontrolledDropdown nav inNavbar>
             <DropdownToggle nav caret>
               Options

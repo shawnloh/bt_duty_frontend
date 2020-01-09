@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
 
-const RankTable = ({ ranks, toggle, modes }) => {
+const PlatoonTable = ({ platoons, toggle, modes }) => {
   return (
     <div>
       <Table responsive>
@@ -13,19 +13,19 @@ const RankTable = ({ ranks, toggle, modes }) => {
           </tr>
         </thead>
         <tbody>
-          {ranks.map(rank => {
+          {platoons.map(platoon => {
             return (
-              <tr key={rank._id}>
-                <td className="text-right">{rank.name}</td>
+              <tr key={platoon._id}>
+                <td className="text-right">{platoon.name}</td>
                 <td className="text-center">
                   <Button
                     color="primary"
-                    onClick={() => toggle(modes.UPDATE, rank._id)}
+                    onClick={() => toggle(modes.UPDATE, platoon._id)}
                   >
                     Edit
                   </Button>{' '}
                   <Button
-                    onClick={() => toggle(modes.DELETE, rank._id)}
+                    onClick={() => toggle(modes.DELETE, platoon._id)}
                     color="danger"
                   >
                     Delete
@@ -40,8 +40,8 @@ const RankTable = ({ ranks, toggle, modes }) => {
   );
 };
 
-RankTable.propTypes = {
-  ranks: PropTypes.arrayOf(
+PlatoonTable.propTypes = {
+  platoons: PropTypes.arrayOf(
     PropTypes.shape({
       _id: PropTypes.string,
       name: PropTypes.string
@@ -55,4 +55,4 @@ RankTable.propTypes = {
   }).isRequired
 };
 
-export default RankTable;
+export default PlatoonTable;

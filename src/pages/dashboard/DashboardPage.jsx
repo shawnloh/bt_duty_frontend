@@ -9,8 +9,10 @@ import {
   Button
 } from 'reactstrap';
 import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
 import { GiRank3, GiGroupedDrops } from 'react-icons/gi';
 import { TiGroup } from 'react-icons/ti';
+import { MdEvent, MdSettingsSystemDaydream } from 'react-icons/md';
 import AppLayout from '../shared/AppLayout';
 
 export class DashboardPage extends PureComponent {
@@ -20,34 +22,34 @@ export class DashboardPage extends PureComponent {
         <Helmet>
           <title>Dashboard</title>
         </Helmet>
-        <Container fluid>
-          <Row className="mt-2">
-            <Col sm="4">
+        <Container>
+          <Row>
+            <Col sm="4 mt-2">
               <Card body className="text-center">
                 <CardTitle>
-                  <GiRank3 fontSize="3em" />
+                  <MdEvent fontSize="3em" />
                 </CardTitle>
-                <CardTitle>Rank</CardTitle>
+                <CardTitle>Events</CardTitle>
                 <CardText>
-                  Rank System allows you to assign rank to individual person
+                  Allows you to create event, generate names and allocate points
                 </CardText>
                 <Button color="primary">Go</Button>
               </Card>
             </Col>
-            <Col sm="4">
+            <Col sm="4 mt-2">
               <Card body className="text-center">
                 <CardTitle>
-                  <GiGroupedDrops fontSize="3em" />
+                  <MdSettingsSystemDaydream fontSize="3em" />
                 </CardTitle>
-                <CardTitle>Platoon</CardTitle>
+                <CardTitle>Point System</CardTitle>
                 <CardText>
-                  Platoon System allows you to assign platoon to individual
-                  person
+                  Create a point system and allocate points during event
+                  creation to individuals
                 </CardText>
-                <Button color="primary">Go somewhere</Button>
+                <Button color="primary">Go</Button>
               </Card>
             </Col>
-            <Col sm="4">
+            <Col sm="4 mt-2">
               <Card body className="text-center">
                 <CardTitle>
                   <TiGroup fontSize="3em" />
@@ -56,12 +58,12 @@ export class DashboardPage extends PureComponent {
                 <CardText>
                   Add / Remove / Edit Person including status and blockout dates
                 </CardText>
-                <Button color="primary">Go somewhere</Button>
+                <Button color="primary">Go</Button>
               </Card>
             </Col>
           </Row>
-          <Row className="mt-2">
-            <Col sm="4">
+          <Row>
+            <Col sm="4 mt-2">
               <Card body className="text-center">
                 <CardTitle>
                   <GiRank3 fontSize="3em" />
@@ -70,10 +72,12 @@ export class DashboardPage extends PureComponent {
                 <CardText>
                   Rank System allows you to assign rank to individual person
                 </CardText>
-                <Button color="primary">Go</Button>
+                <Button tag={Link} to="/ranks" color="primary">
+                  Go
+                </Button>
               </Card>
             </Col>
-            <Col sm="4">
+            <Col sm="4 mt-2">
               <Card body className="text-center">
                 <CardTitle>
                   <GiGroupedDrops fontSize="3em" />
@@ -83,19 +87,9 @@ export class DashboardPage extends PureComponent {
                   Platoon System allows you to assign platoon to individual
                   person
                 </CardText>
-                <Button color="primary">Go somewhere</Button>
-              </Card>
-            </Col>
-            <Col sm="4">
-              <Card body className="text-center">
-                <CardTitle>
-                  <TiGroup fontSize="3em" />
-                </CardTitle>
-                <CardTitle>Person</CardTitle>
-                <CardText>
-                  Add / Remove / Edit Person including status and blockout dates
-                </CardText>
-                <Button color="primary">Go somewhere</Button>
+                <Button tag={Link} to="/platoons" color="primary">
+                  Go
+                </Button>
               </Card>
             </Col>
           </Row>

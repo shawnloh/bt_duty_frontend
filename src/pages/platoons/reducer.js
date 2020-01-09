@@ -1,38 +1,38 @@
 import { Map } from 'immutable';
 import {
-  LOAD_PLATOONS_FAILURE,
-  LOAD_PLATOONS_SUCCESS
-} from '../actions/constants';
-import {
+  ADD_PLATOON_FAILURE,
+  ADD_PLATOON,
   ADD_PLATOON_SUCCESS,
+  DELETE_PLATOON,
   DELETE_PLATOON_SUCCESS,
+  DELETE_PLATOON_FAILURE,
+  UPDATE_PLATOON,
+  UPDATE_PLATOON_FAILURE,
   UPDATE_PLATOON_SUCCESS
-} from '../pages/platoons/constants';
+} from './constants';
 
 const initialState = Map({
-  ids: [],
-  platoons: {},
   errors: []
 });
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
+    case ADD_PLATOON:
     case ADD_PLATOON_SUCCESS:
+    case DELETE_PLATOON:
     case DELETE_PLATOON_SUCCESS:
-    case LOAD_PLATOONS_SUCCESS:
-      return state.merge({
-        ids: payload.ids,
-        platoons: payload.platoons,
-        errors: []
-      });
+    case UPDATE_PLATOON:
     case UPDATE_PLATOON_SUCCESS:
       return state.merge({
-        platoons: payload
+        errors: []
       });
-    case LOAD_PLATOONS_FAILURE:
+    case ADD_PLATOON_FAILURE:
+    case DELETE_PLATOON_FAILURE:
+    case UPDATE_PLATOON_FAILURE:
       return state.merge({
         errors: payload
       });
+
     default:
       return state;
   }

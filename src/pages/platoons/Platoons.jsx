@@ -5,12 +5,12 @@ import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 
 import AppLayout from '../shared/AppLayout';
-import RankTable from '../../components/ranks/RankTable';
-import RankModalEdit from '../../components/ranks/RankModalEdit';
-import RankModalDelete from '../../components/ranks/RankModalDelete';
-import RankModalAdd from '../../components/ranks/RankModalAdd';
+import PlatoonTable from '../../components/platoons/PlatoonTable';
+import PlatoonModalEdit from '../../components/platoons/PlatoonModalEdit';
+import PlatoonModalDelete from '../../components/platoons/PlatoonModalDelete';
+import PlatoonModalAdd from '../../components/platoons/PlatoonModalAdd';
 
-import { addRank, deleteRank, updateRank } from './actions';
+import { addPlatoon, deletePlatoon, updatePlatoon } from './actions';
 
 const modes = {
   UPDATE: 'UPDATE',
@@ -18,7 +18,7 @@ const modes = {
   ADD: 'ADD'
 };
 
-export class Ranks extends Component {
+export class Platoons extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -30,23 +30,23 @@ export class Ranks extends Component {
   }
 
   handleUpdate = () => {
-    const { updateRank: modifyRank } = this.props;
+    const { updatePlatoon: modifyPlatoon } = this.props;
     const { selectedId, newName } = this.state;
-    modifyRank(selectedId, newName);
+    modifyPlatoon(selectedId, newName);
     this.toggleModal();
   };
 
   handleDelete = () => {
-    const { deleteRank: removeRank } = this.props;
+    const { deletePlatoon: removePlatoon } = this.props;
     const { selectedId } = this.state;
-    removeRank(selectedId);
+    removePlatoon(selectedId);
     this.toggleModal();
   };
 
   handleAdd = () => {
-    const { addRank: createRank } = this.props;
+    const { addPlatoon: createPlatoon } = this.props;
     const { newName } = this.state;
-    createRank(newName);
+    createPlatoon(newName);
     this.toggleModal();
   };
 
@@ -84,12 +84,12 @@ export class Ranks extends Component {
     );
   };
 
-  getModal = (mode, ranks, selectedId, showModal) => {
+  getModal = (mode, platoons, selectedId, showModal) => {
     let modal = null;
     if (mode === modes.UPDATE) {
       modal = (
-        <RankModalEdit
-          rank={ranks[selectedId].name}
+        <PlatoonModalEdit
+          platoon={platoons[selectedId].name}
           onCancel={this.toggleModal}
           onToggle={this.toggleModal}
           onChangeText={this.handleChange}
@@ -99,8 +99,8 @@ export class Ranks extends Component {
       );
     } else if (mode === modes.DELETE) {
       modal = (
-        <RankModalDelete
-          rank={ranks[selectedId]}
+        <PlatoonModalDelete
+          platoon={platoons[selectedId]}
           onCancel={this.toggleModal}
           onToggle={this.toggleModal}
           onDelete={this.handleDelete}
@@ -109,7 +109,7 @@ export class Ranks extends Component {
       );
     } else if (mode === modes.ADD) {
       modal = (
-        <RankModalAdd
+        <PlatoonModalAdd
           onCancel={this.toggleModal}
           onToggle={this.toggleModal}
           onSave={this.handleAdd}
@@ -122,26 +122,26 @@ export class Ranks extends Component {
   };
 
   render() {
-    const { ids, ranks, errors } = this.props;
+    const { ids, platoons, errors } = this.props;
     const { showModal, selectedId, mode } = this.state;
 
-    const modal = this.getModal(mode, ranks, selectedId, showModal);
+    const modal = this.getModal(mode, platoons, selectedId, showModal);
 
-    const shownRanks = ids.map(id => {
-      return ranks[id];
+    const shownPlatoons = ids.map(id => {
+      return platoons[id];
     });
 
     return (
       <AppLayout>
         <Helmet>
-          <title>Ranks</title>
+          <title>Platoons</title>
         </Helmet>
         <Container>
           {modal}
           {errors.length > 0 && this.showErrors()}
           <Row className="my-2 mx-2">
             <Col xs="9">
-              <h1>Ranks</h1>
+              <h1>Platoons</h1>
             </Col>
             <Col xs="3">
               <Button
@@ -155,9 +155,9 @@ export class Ranks extends Component {
           </Row>
           <Row>
             <Col md="12">
-              <RankTable
+              <PlatoonTable
                 modes={modes}
-                ranks={shownRanks}
+                platoons={shownPlatoons}
                 toggle={this.toggleModal}
               />
             </Col>
@@ -168,27 +168,27 @@ export class Ranks extends Component {
   }
 }
 
-Ranks.propTypes = {
+Platoons.propTypes = {
   ids: PropTypes.arrayOf(PropTypes.string).isRequired,
-  ranks: PropTypes.shape({
+  platoons: PropTypes.shape({
     id: PropTypes.string
   }).isRequired,
   errors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  addRank: PropTypes.func.isRequired,
-  deleteRank: PropTypes.func.isRequired,
-  updateRank: PropTypes.func.isRequired
+  addPlatoon: PropTypes.func.isRequired,
+  deletePlatoon: PropTypes.func.isRequired,
+  updatePlatoon: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  ids: state.ranks.get('ids'),
-  ranks: state.ranks.get('ranks'),
-  errors: state.pages.ranks.get('errors')
+  ids: state.platoons.get('ids'),
+  platoons: state.platoons.get('platoons'),
+  errors: state.pages.platoons.get('errors')
 });
 
 const mapDispatchToProps = {
-  addRank,
-  deleteRank,
-  updateRank
+  addPlatoon,
+  deletePlatoon,
+  updatePlatoon
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Ranks);
+export default connect(mapStateToProps, mapDispatchToProps)(Platoons);
