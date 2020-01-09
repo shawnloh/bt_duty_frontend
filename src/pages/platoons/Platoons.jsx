@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Container, Col, Row, Button, Alert } from 'reactstrap';
+import { Container, Col, Row, Button, Alert, Spinner } from 'reactstrap';
 import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 
@@ -84,8 +84,10 @@ export class Platoons extends Component {
     );
   };
 
-  getModal = (mode, platoons, selectedId, showModal) => {
+  getModal = () => {
     let modal = null;
+    const { showModal, selectedId, mode } = this.state;
+    const { platoons } = this.props;
     if (mode === modes.UPDATE) {
       modal = (
         <PlatoonModalEdit
@@ -122,10 +124,8 @@ export class Platoons extends Component {
   };
 
   render() {
-    const { ids, platoons, errors } = this.props;
-    const { showModal, selectedId, mode } = this.state;
-
-    const modal = this.getModal(mode, platoons, selectedId, showModal);
+    const { ids, platoons, errors, actionInProgress } = this.props;
+    const modal = this.getModal();
 
     const shownPlatoons = ids.map(id => {
       return platoons[id];
@@ -139,6 +139,13 @@ export class Platoons extends Component {
         <Container>
           {modal}
           {errors.length > 0 && this.showErrors()}
+          {actionInProgress && (
+            <Row>
+              <Alert color="primary" className="w-100">
+                Action in progress <Spinner color="primary" size="sm" />
+              </Alert>
+            </Row>
+          )}
           <Row className="my-2 mx-2">
             <Col xs="9">
               <h1>Platoons</h1>
@@ -174,6 +181,7 @@ Platoons.propTypes = {
     id: PropTypes.string
   }).isRequired,
   errors: PropTypes.arrayOf(PropTypes.string).isRequired,
+  actionInProgress: PropTypes.bool.isRequired,
   addPlatoon: PropTypes.func.isRequired,
   deletePlatoon: PropTypes.func.isRequired,
   updatePlatoon: PropTypes.func.isRequired
@@ -182,7 +190,8 @@ Platoons.propTypes = {
 const mapStateToProps = state => ({
   ids: state.platoons.get('ids'),
   platoons: state.platoons.get('platoons'),
-  errors: state.pages.platoons.get('errors')
+  errors: state.pages.platoons.get('errors'),
+  actionInProgress: state.pages.platoons.get('actionInProgress')
 });
 
 const mapDispatchToProps = {

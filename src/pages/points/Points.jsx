@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Container, Col, Row, Button, Alert } from 'reactstrap';
+import { Container, Col, Row, Button, Alert, Spinner } from 'reactstrap';
 import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 
@@ -84,7 +84,10 @@ export class Points extends Component {
     );
   };
 
-  getModal = (mode, points, selectedId, showModal) => {
+  getModal = () => {
+    const { points } = this.props;
+    const { showModal, selectedId, mode } = this.state;
+
     let modal = null;
     if (mode === modes.UPDATE) {
       modal = (
@@ -122,10 +125,9 @@ export class Points extends Component {
   };
 
   render() {
-    const { ids, points, errors } = this.props;
-    const { showModal, selectedId, mode } = this.state;
+    const { ids, points, errors, actionInProgress } = this.props;
 
-    const modal = this.getModal(mode, points, selectedId, showModal);
+    const modal = this.getModal();
 
     const shownPoints = ids.map(id => {
       return points[id];
@@ -139,6 +141,13 @@ export class Points extends Component {
         <Container>
           {modal}
           {errors.length > 0 && this.showErrors()}
+          {actionInProgress && (
+            <Row>
+              <Alert color="primary" className="w-100">
+                Action in progress <Spinner color="primary" size="sm" />
+              </Alert>
+            </Row>
+          )}
           <Row className="my-2 mx-2">
             <Col xs="9">
               <h1>Points</h1>
@@ -176,13 +185,15 @@ Points.propTypes = {
   errors: PropTypes.arrayOf(PropTypes.string).isRequired,
   addPoint: PropTypes.func.isRequired,
   deletePoint: PropTypes.func.isRequired,
-  updatePoint: PropTypes.func.isRequired
+  updatePoint: PropTypes.func.isRequired,
+  actionInProgress: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
   ids: state.points.get('ids'),
   points: state.points.get('points'),
-  errors: state.pages.points.get('errors')
+  errors: state.pages.points.get('errors'),
+  actionInProgress: state.pages.points.get('actionInProgress')
 });
 
 const mapDispatchToProps = {

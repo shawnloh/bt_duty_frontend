@@ -12,25 +12,32 @@ import {
 } from './constants';
 
 const initialState = Map({
-  errors: []
+  errors: [],
+  actionInProgress: false
 });
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
     case ADD_RANK:
-    case ADD_RANK_SUCCESS:
     case DELETE_RANK:
-    case DELETE_RANK_SUCCESS:
     case UPDATE_RANK:
+      return state.merge({
+        errors: [],
+        actionInProgress: true
+      });
+    case ADD_RANK_SUCCESS:
+    case DELETE_RANK_SUCCESS:
     case UPDATE_RANK_SUCCESS:
       return state.merge({
-        errors: []
+        errors: [],
+        actionInProgress: false
       });
     case ADD_RANK_FAILURE:
     case DELETE_RANK_FAILURE:
     case UPDATE_RANK_FAILURE:
       return state.merge({
-        errors: payload
+        errors: payload,
+        actionInProgress: false
       });
 
     default:

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Container, Col, Row, Button, Alert } from 'reactstrap';
+import { Container, Col, Row, Button, Alert, Spinner } from 'reactstrap';
 import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 
@@ -84,8 +84,10 @@ export class Ranks extends Component {
     );
   };
 
-  getModal = (mode, ranks, selectedId, showModal) => {
+  getModal = () => {
     let modal = null;
+    const { ranks } = this.props;
+    const { showModal, selectedId, mode } = this.state;
     if (mode === modes.UPDATE) {
       modal = (
         <RankModalEdit
@@ -122,10 +124,9 @@ export class Ranks extends Component {
   };
 
   render() {
-    const { ids, ranks, errors } = this.props;
-    const { showModal, selectedId, mode } = this.state;
+    const { ids, ranks, errors, actionInProgress } = this.props;
 
-    const modal = this.getModal(mode, ranks, selectedId, showModal);
+    const modal = this.getModal();
 
     const shownRanks = ids.map(id => {
       return ranks[id];
@@ -139,6 +140,13 @@ export class Ranks extends Component {
         <Container>
           {modal}
           {errors.length > 0 && this.showErrors()}
+          {actionInProgress && (
+            <Row>
+              <Alert color="primary" className="w-100">
+                Action in progress <Spinner color="primary" size="sm" />
+              </Alert>
+            </Row>
+          )}
           <Row className="my-2 mx-2">
             <Col xs="9">
               <h1>Ranks</h1>
@@ -176,13 +184,15 @@ Ranks.propTypes = {
   errors: PropTypes.arrayOf(PropTypes.string).isRequired,
   addRank: PropTypes.func.isRequired,
   deleteRank: PropTypes.func.isRequired,
-  updateRank: PropTypes.func.isRequired
+  updateRank: PropTypes.func.isRequired,
+  actionInProgress: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
   ids: state.ranks.get('ids'),
   ranks: state.ranks.get('ranks'),
-  errors: state.pages.ranks.get('errors')
+  errors: state.pages.ranks.get('errors'),
+  actionInProgress: state.pages.ranks.get('actionInProgress')
 });
 
 const mapDispatchToProps = {
