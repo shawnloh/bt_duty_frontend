@@ -5,12 +5,12 @@ import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 
 import AppLayout from '../shared/AppLayout';
-import PlatoonsTable from '../../components/platoons/PlatoonsTable';
-import PlatoonModalEdit from '../../components/platoons/PlatoonModalEdit';
-import PlatoonModalDelete from '../../components/platoons/PlatoonModalDelete';
-import PlatoonModalAdd from '../../components/platoons/PlatoonModalAdd';
+import PointsTable from '../../components/points/PointsTable';
+import PointModalEdit from '../../components/points/PointModalEdit';
+import PointModalDelete from '../../components/points/PointModalDelete';
+import PointModalAdd from '../../components/points/PointModalAdd';
 
-import { addPlatoon, deletePlatoon, updatePlatoon } from './actions';
+import { addPoint, deletePoint, updatePoint } from './actions';
 
 const modes = {
   UPDATE: 'UPDATE',
@@ -18,7 +18,7 @@ const modes = {
   ADD: 'ADD'
 };
 
-export class Platoons extends Component {
+export class Points extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -30,23 +30,23 @@ export class Platoons extends Component {
   }
 
   handleUpdate = () => {
-    const { updatePlatoon: modifyPlatoon } = this.props;
+    const { updatePoint: modifyPoint } = this.props;
     const { selectedId, newName } = this.state;
-    modifyPlatoon(selectedId, newName);
+    modifyPoint(selectedId, newName);
     this.toggleModal();
   };
 
   handleDelete = () => {
-    const { deletePlatoon: removePlatoon } = this.props;
+    const { deletePoint: removePoint } = this.props;
     const { selectedId } = this.state;
-    removePlatoon(selectedId);
+    removePoint(selectedId);
     this.toggleModal();
   };
 
   handleAdd = () => {
-    const { addPlatoon: createPlatoon } = this.props;
+    const { addPoint: createPoint } = this.props;
     const { newName } = this.state;
-    createPlatoon(newName);
+    createPoint(newName);
     this.toggleModal();
   };
 
@@ -84,12 +84,12 @@ export class Platoons extends Component {
     );
   };
 
-  getModal = (mode, platoons, selectedId, showModal) => {
+  getModal = (mode, points, selectedId, showModal) => {
     let modal = null;
     if (mode === modes.UPDATE) {
       modal = (
-        <PlatoonModalEdit
-          platoon={platoons[selectedId].name}
+        <PointModalEdit
+          point={points[selectedId].name}
           onCancel={this.toggleModal}
           onToggle={this.toggleModal}
           onChangeText={this.handleChange}
@@ -99,8 +99,8 @@ export class Platoons extends Component {
       );
     } else if (mode === modes.DELETE) {
       modal = (
-        <PlatoonModalDelete
-          platoon={platoons[selectedId]}
+        <PointModalDelete
+          point={points[selectedId]}
           onCancel={this.toggleModal}
           onToggle={this.toggleModal}
           onDelete={this.handleDelete}
@@ -109,7 +109,7 @@ export class Platoons extends Component {
       );
     } else if (mode === modes.ADD) {
       modal = (
-        <PlatoonModalAdd
+        <PointModalAdd
           onCancel={this.toggleModal}
           onToggle={this.toggleModal}
           onSave={this.handleAdd}
@@ -122,26 +122,26 @@ export class Platoons extends Component {
   };
 
   render() {
-    const { ids, platoons, errors } = this.props;
+    const { ids, points, errors } = this.props;
     const { showModal, selectedId, mode } = this.state;
 
-    const modal = this.getModal(mode, platoons, selectedId, showModal);
+    const modal = this.getModal(mode, points, selectedId, showModal);
 
-    const shownPlatoons = ids.map(id => {
-      return platoons[id];
+    const shownPoints = ids.map(id => {
+      return points[id];
     });
 
     return (
       <AppLayout>
         <Helmet>
-          <title>Platoons</title>
+          <title>Points</title>
         </Helmet>
         <Container>
           {modal}
           {errors.length > 0 && this.showErrors()}
           <Row className="my-2 mx-2">
             <Col xs="9">
-              <h1>Platoons</h1>
+              <h1>Points</h1>
             </Col>
             <Col xs="3">
               <Button
@@ -155,9 +155,9 @@ export class Platoons extends Component {
           </Row>
           <Row>
             <Col md="12">
-              <PlatoonsTable
+              <PointsTable
                 modes={modes}
-                platoons={shownPlatoons}
+                points={shownPoints}
                 toggle={this.toggleModal}
               />
             </Col>
@@ -168,27 +168,27 @@ export class Platoons extends Component {
   }
 }
 
-Platoons.propTypes = {
+Points.propTypes = {
   ids: PropTypes.arrayOf(PropTypes.string).isRequired,
-  platoons: PropTypes.shape({
+  points: PropTypes.shape({
     id: PropTypes.string
   }).isRequired,
   errors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  addPlatoon: PropTypes.func.isRequired,
-  deletePlatoon: PropTypes.func.isRequired,
-  updatePlatoon: PropTypes.func.isRequired
+  addPoint: PropTypes.func.isRequired,
+  deletePoint: PropTypes.func.isRequired,
+  updatePoint: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  ids: state.platoons.get('ids'),
-  platoons: state.platoons.get('platoons'),
-  errors: state.pages.platoons.get('errors')
+  ids: state.points.get('ids'),
+  points: state.points.get('points'),
+  errors: state.pages.points.get('errors')
 });
 
 const mapDispatchToProps = {
-  addPlatoon,
-  deletePlatoon,
-  updatePlatoon
+  addPoint,
+  deletePoint,
+  updatePoint
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Platoons);
+export default connect(mapStateToProps, mapDispatchToProps)(Points);

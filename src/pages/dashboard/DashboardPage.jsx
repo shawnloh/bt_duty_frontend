@@ -46,7 +46,9 @@ export class DashboardPage extends PureComponent {
                   Create a point system and allocate points during event
                   creation to individuals
                 </CardText>
-                <Button color="primary">Go</Button>
+                <Button tag={Link} to="/points" color="primary">
+                  Go
+                </Button>
               </Card>
             </Col>
             <Col sm="4 mt-2">

@@ -11,19 +11,7 @@ import platoonsReducer from './platoonsReducer';
 import eventsReducer from './eventsReducer';
 import personnelsReducer from './personnelsReducer';
 import pointsReducer from './pointsReducer';
-
-// PAGE REDUCERS
-import loginPageReducer from '../pages/login/reducer';
-import loadingPageReducer from '../pages/loading/reducer';
-import ranksPageReducer from '../pages/ranks/reducer';
-import platoonsPageReducer from '../pages/platoons/reducer';
-
-const pages = combineReducers({
-  login: loginPageReducer,
-  loading: loadingPageReducer,
-  ranks: ranksPageReducer,
-  platoons: platoonsPageReducer
-});
+import pagesReducer from './pagesReducer';
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -32,7 +20,7 @@ const appReducer = combineReducers({
   events: eventsReducer,
   personnels: personnelsReducer,
   points: pointsReducer,
-  pages
+  pages: pagesReducer
 });
 
 const rootReducer = (state, action) => {

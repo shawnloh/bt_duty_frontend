@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 
 import AppLayout from '../shared/AppLayout';
-import RankTable from '../../components/ranks/RankTable';
+import RanksTable from '../../components/ranks/RanksTable';
 import RankModalEdit from '../../components/ranks/RankModalEdit';
 import RankModalDelete from '../../components/ranks/RankModalDelete';
 import RankModalAdd from '../../components/ranks/RankModalAdd';
@@ -155,7 +155,7 @@ export class Ranks extends Component {
           </Row>
           <Row>
             <Col md="12">
-              <RankTable
+              <RanksTable
                 modes={modes}
                 ranks={shownRanks}
                 toggle={this.toggleModal}

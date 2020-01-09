@@ -1,35 +1,38 @@
 import { Map } from 'immutable';
-import { LOAD_POINTS_FAILURE, LOAD_POINTS_SUCCESS } from '../actions/constants';
 import {
+  ADD_POINT_FAILURE,
+  ADD_POINT,
   ADD_POINT_SUCCESS,
+  DELETE_POINT,
   DELETE_POINT_SUCCESS,
+  DELETE_POINT_FAILURE,
+  UPDATE_POINT,
+  UPDATE_POINT_FAILURE,
   UPDATE_POINT_SUCCESS
-} from '../pages/points/constants';
+} from './constants';
 
 const initialState = Map({
-  ids: [],
-  points: {},
   errors: []
 });
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
+    case ADD_POINT:
     case ADD_POINT_SUCCESS:
+    case DELETE_POINT:
     case DELETE_POINT_SUCCESS:
-    case LOAD_POINTS_SUCCESS:
-      return state.merge({
-        ids: payload.ids,
-        points: payload.points,
-        errors: []
-      });
+    case UPDATE_POINT:
     case UPDATE_POINT_SUCCESS:
       return state.merge({
-        points: payload
+        errors: []
       });
-    case LOAD_POINTS_FAILURE:
+    case ADD_POINT_FAILURE:
+    case DELETE_POINT_FAILURE:
+    case UPDATE_POINT_FAILURE:
       return state.merge({
         errors: payload
       });
+
     default:
       return state;
   }

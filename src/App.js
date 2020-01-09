@@ -12,6 +12,7 @@ import LoadingPage from './pages/loading';
 import DashboardPage from './pages/dashboard';
 import RanksPage from './pages/ranks';
 import PlatoonsPage from './pages/platoons';
+import PointsPage from './pages/points';
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
         <AuthRoute path="/dashboard" exact component={DashboardPage} />
         <AuthRoute path="/ranks" exact component={RanksPage} />
         <AuthRoute path="/platoons" exact component={PlatoonsPage} />
+        <AuthRoute path="/points" exact component={PointsPage} />
       </Switch>
     </Router>
   );
