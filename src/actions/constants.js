@@ -1,6 +1,9 @@
 export const LOG_OUT = 'LOGOUT';
 export const LOG_OUT_SUCCESS = 'LOGOUT_SUCCESS';
 export const LOG_OUT_FAILURE = 'LOGOUT_FAILURE';
+export const CHECK_AUTH = 'CHECK_AUTH';
+export const CHECK_AUTH_FAILURE = 'CHECK_AUTH_FAILURE';
+export const CHECK_AUTH_SUCCESS = 'CHECK_AUTH_SUCCESS';
 
 export const LOAD_RANKS = 'LOAD_RANKS';
 export const LOAD_RANKS_SUCCESS = 'LOAD_RANKS_SUCCESS';

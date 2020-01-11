@@ -1,6 +1,12 @@
-import { put, call, takeLatest } from 'redux-saga/effects';
-import { LOG_OUT } from '../actions/constants';
-import { logoutSuccess, logoutFailure } from '../actions/authActions';
+import { put, call, takeLatest, all } from 'redux-saga/effects';
+import { LOG_OUT, CHECK_AUTH } from '../actions/constants';
+import {
+  logoutSuccess,
+  logoutFailure,
+  checkAuthFailure,
+  checkAuthSuccess,
+  logout as logoutAction
+} from '../actions/authActions';
 import AccountService from '../services/accounts';
 
 function* logout() {
@@ -12,8 +18,25 @@ function* logout() {
   }
 }
 
+function* checkAuth() {
+  try {
+    const response = yield call(AccountService.checkAuthenticated);
+    if (!response.ok) {
+      yield put(checkAuthFailure());
+    } else {
+      const isAuth = response.data.isAuthenticated;
+      yield put(checkAuthSuccess(isAuth));
+      if (!isAuth) {
+        yield put(logoutAction());
+      }
+    }
+  } catch (error) {
+    yield put(checkAuthFailure(error.message || ['Unable to login']));
+  }
+}
+
 function* authSagaWatcher() {
-  yield takeLatest(LOG_OUT, logout);
+  yield all([takeLatest(CHECK_AUTH, checkAuth), takeLatest(LOG_OUT, logout)]);
 }
 
 export default authSagaWatcher;

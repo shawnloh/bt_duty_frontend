@@ -1,5 +1,6 @@
 import { Map } from 'immutable';
-import { LOGIN, LOGIN_FAIL, LOGIN_SUCCESS } from '../pages/login/constants';
+import { LOGIN } from '../pages/login/constants';
+import { CHECK_AUTH_SUCCESS, CHECK_AUTH_FAILURE } from '../actions/constants';
 
 const initialState = Map({
   username: '',
@@ -12,11 +13,11 @@ const authReducer = (state = initialState, { type, payload }) => {
       return state.merge({
         username: payload.username
       });
-    case LOGIN_SUCCESS:
+    case CHECK_AUTH_SUCCESS:
       return state.merge({
         isAuthenticated: payload
       });
-    case LOGIN_FAIL:
+    case CHECK_AUTH_FAILURE:
       return state.merge({
         isAuthenticated: false
       });
