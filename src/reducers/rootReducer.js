@@ -11,6 +11,7 @@ import platoonsReducer from './platoonsReducer';
 import eventsReducer from './eventsReducer';
 import personnelsReducer from './personnelsReducer';
 import pointsReducer from './pointsReducer';
+import statusesReducer from './statusesReducer';
 import pagesReducer from './pagesReducer';
 
 const appReducer = combineReducers({
@@ -20,6 +21,7 @@ const appReducer = combineReducers({
   events: eventsReducer,
   personnels: personnelsReducer,
   points: pointsReducer,
+  statuses: statusesReducer,
   pages: pagesReducer
 });
 

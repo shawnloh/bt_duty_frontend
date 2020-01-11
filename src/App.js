@@ -17,6 +17,7 @@ import DashboardPage from './pages/dashboard';
 import RanksPage from './pages/ranks';
 import PlatoonsPage from './pages/platoons';
 import PointsPage from './pages/points';
+import StatusesPage from './pages/statuses';
 
 class App extends PureComponent {
   componentDidMount() {
@@ -35,6 +36,7 @@ class App extends PureComponent {
           <AuthRoute path="/ranks" exact component={RanksPage} />
           <AuthRoute path="/platoons" exact component={PlatoonsPage} />
           <AuthRoute path="/points" exact component={PointsPage} />
+          <AuthRoute path="/statuses" exact component={StatusesPage} />
         </Switch>
       </Router>
     );

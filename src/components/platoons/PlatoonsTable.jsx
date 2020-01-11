@@ -8,7 +8,9 @@ const PlatoonTable = ({ platoons, toggle, modes }) => {
       <Table responsive>
         <thead>
           <tr>
-            <th className="text-right">Name</th>
+            <th className="text-right" style={{ width: '50%' }}>
+              Name
+            </th>
             <th className="text-center">Actions</th>
           </tr>
         </thead>

@@ -2,32 +2,32 @@ import React from 'react';
 import { Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
 
-const RankTable = ({ ranks, toggle, modes }) => {
+const StatusesTable = ({ statuses, toggle, modes }) => {
   return (
     <div>
-      <Table>
+      <Table responsive>
         <thead>
           <tr>
-            <th className="text-right" style={{ width: '50%' }}>
-              Name
-            </th>
+            <th className="text-right">Name</th>
             <th className="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {ranks.map(rank => {
+          {statuses.map(status => {
             return (
-              <tr key={rank._id}>
-                <td className="text-right">{rank.name}</td>
+              <tr key={status._id}>
+                <td style={{ width: '50%' }} className="text-right">
+                  {status.name}
+                </td>
                 <td className="text-center">
                   <Button
                     color="primary"
-                    onClick={() => toggle(modes.UPDATE, rank._id)}
+                    onClick={() => toggle(modes.UPDATE, status._id)}
                   >
                     Edit
                   </Button>{' '}
                   <Button
-                    onClick={() => toggle(modes.DELETE, rank._id)}
+                    onClick={() => toggle(modes.DELETE, status._id)}
                     color="danger"
                   >
                     Delete
@@ -42,8 +42,8 @@ const RankTable = ({ ranks, toggle, modes }) => {
   );
 };
 
-RankTable.propTypes = {
-  ranks: PropTypes.arrayOf(
+StatusesTable.propTypes = {
+  statuses: PropTypes.arrayOf(
     PropTypes.shape({
       _id: PropTypes.string,
       name: PropTypes.string
@@ -57,4 +57,4 @@ RankTable.propTypes = {
   }).isRequired
 };
 
-export default RankTable;
+export default StatusesTable;

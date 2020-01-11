@@ -17,12 +17,18 @@ import {
   loadPersonnelsFailure,
   loadPersonnelsSuccess
 } from '../../actions/personnelsActions';
+import {
+  loadStatusesFailure,
+  loadStatusesSuccess
+} from '../../actions/statusesActions';
+
 import { loadAppSuccess, loadAppFailed } from './actions';
 import RanksService from '../../services/ranks';
 import PlatoonsService from '../../services/platoons';
 import PointsService from '../../services/points';
 import EventsService from '../../services/events';
 import PersonnelsService from '../../services/personnels';
+import StatusesService from '../../services/statuses';
 
 function* loadPoints() {
   try {
@@ -139,6 +145,29 @@ function* loadPersonnels() {
   }
 }
 
+function* loadStatuses() {
+  try {
+    const response = yield call(StatusesService.getStatuses);
+    if (response.ok) {
+      const statuses = {};
+      const ids = [];
+
+      response.data.forEach(rank => {
+        const { _id: id } = rank;
+        statuses[id] = rank;
+        ids.push(id);
+      });
+      yield put(loadStatusesSuccess({ ids, statuses }));
+    } else {
+      yield put(
+        loadStatusesFailure(response.data.message || response.data.errors)
+      );
+    }
+  } catch (error) {
+    yield put(loadStatusesFailure([error.message]));
+  }
+}
+
 function* loadEssentials() {
   try {
     yield all([
@@ -146,7 +175,8 @@ function* loadEssentials() {
       call(loadPlatoons),
       call(loadPoints),
       call(loadEvents),
-      call(loadPersonnels)
+      call(loadPersonnels),
+      call(loadStatuses)
     ]);
     yield put(loadAppSuccess());
   } catch (error) {

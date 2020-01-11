@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import { GiRank3, GiGroupedDrops } from 'react-icons/gi';
 import { TiGroup } from 'react-icons/ti';
 import { MdEvent, MdSettingsSystemDaydream } from 'react-icons/md';
+import { IoMdPaper } from 'react-icons/io';
 import AppLayout from '../shared/AppLayout';
 
 export class DashboardPage extends PureComponent {
@@ -44,7 +45,7 @@ export class DashboardPage extends PureComponent {
                 <CardTitle>Point System</CardTitle>
                 <CardText>
                   Create a point system and allocate points during event
-                  creation to individuals
+                  creation
                 </CardText>
                 <Button tag={Link} to="/points" color="primary">
                   Go
@@ -56,7 +57,7 @@ export class DashboardPage extends PureComponent {
                 <CardTitle>
                   <TiGroup fontSize="3em" />
                 </CardTitle>
-                <CardTitle>Person</CardTitle>
+                <CardTitle>Personnels</CardTitle>
                 <CardText>
                   Add / Remove / Edit Person including status and blockout dates
                 </CardText>
@@ -90,6 +91,18 @@ export class DashboardPage extends PureComponent {
                   person
                 </CardText>
                 <Button tag={Link} to="/platoons" color="primary">
+                  Go
+                </Button>
+              </Card>
+            </Col>
+            <Col sm="4 mt-2">
+              <Card body className="text-center">
+                <CardTitle>
+                  <IoMdPaper fontSize="3em" />
+                </CardTitle>
+                <CardTitle>Status</CardTitle>
+                <CardText>Add status in order to assign to personnels</CardText>
+                <Button tag={Link} to="/statuses" color="primary">
                   Go
                 </Button>
               </Card>
