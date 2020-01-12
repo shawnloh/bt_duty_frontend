@@ -5,10 +5,10 @@ import PropTypes from 'prop-types';
 const PlatoonTable = ({ platoons, toggle, modes }) => {
   return (
     <div>
-      <Table responsive>
+      <Table striped>
         <thead>
           <tr>
-            <th className="text-right" style={{ width: '50%' }}>
+            <th className="text-center" style={{ width: '50%' }}>
               Name
             </th>
             <th className="text-center">Actions</th>
@@ -18,7 +18,7 @@ const PlatoonTable = ({ platoons, toggle, modes }) => {
           {platoons.map(platoon => {
             return (
               <tr key={platoon._id}>
-                <td className="text-right">{platoon.name}</td>
+                <td className="text-center">{platoon.name}</td>
                 <td className="text-center">
                   <Button
                     color="primary"

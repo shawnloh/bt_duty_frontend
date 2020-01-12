@@ -61,7 +61,9 @@ export class DashboardPage extends PureComponent {
                 <CardText>
                   Add / Remove / Edit Person including status and blockout dates
                 </CardText>
-                <Button color="primary">Go</Button>
+                <Button tag={Link} to="/personnels" color="primary">
+                  Go
+                </Button>
               </Card>
             </Col>
           </Row>

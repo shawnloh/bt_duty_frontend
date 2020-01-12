@@ -31,6 +31,11 @@ const TopNavBar = ({ username, logout }) => {
             </NavLink>
           </NavItem>
           <NavItem>
+            <NavLink tag={Link} to="/personnels" activeClassName="active" exact>
+              Personnels
+            </NavLink>
+          </NavItem>
+          <NavItem>
             <NavLink tag={Link} to="/ranks" activeClassName="active" exact>
               Ranks
             </NavLink>
@@ -50,17 +55,6 @@ const TopNavBar = ({ username, logout }) => {
               Statuses
             </NavLink>
           </NavItem>
-          <UncontrolledDropdown nav inNavbar>
-            <DropdownToggle nav caret>
-              Options
-            </DropdownToggle>
-            <DropdownMenu right>
-              <DropdownItem>Option 1</DropdownItem>
-              <DropdownItem>Option 2</DropdownItem>
-              <DropdownItem divider />
-              <DropdownItem>Reset</DropdownItem>
-            </DropdownMenu>
-          </UncontrolledDropdown>
         </Nav>
         <Nav className="ml-auto" navbar>
           <UncontrolledDropdown nav inNavbar>

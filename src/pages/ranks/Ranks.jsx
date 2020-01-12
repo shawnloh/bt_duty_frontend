@@ -147,11 +147,11 @@ export class Ranks extends Component {
               </Alert>
             </Row>
           )}
-          <Row className="my-2 mx-2">
+          <Row className="my-2 mx-2 d-flex justify-content-center align-items-center">
             <Col xs="9">
               <h1>Ranks</h1>
             </Col>
-            <Col xs="3">
+            <Col xs="3" className="d-flex justify-content-end">
               <Button
                 color="success"
                 size="md"

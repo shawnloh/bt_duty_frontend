@@ -19,10 +19,7 @@ class LoadingPage extends PureComponent {
       return <Redirect to="/dashboard" exact />;
     }
     return (
-      <Container
-        className="d-flex justify-content-center align-items-center flex-column"
-        style={{ height: '100vh' }}
-      >
+      <Container className="d-flex h-100 justify-content-center align-items-center flex-column">
         <Row>
           <Spinner type="grow" color="primary" />
           <Spinner type="grow" color="secondary" />

@@ -3,6 +3,7 @@ import {
   LOAD_PERSONNELS_FAILURE,
   LOAD_PERSONNELS_SUCCESS
 } from '../actions/constants';
+import { DELETE_PERSONNEL_SUCCESS } from '../pages/personnels/constants';
 
 const initialState = Map({
   ids: [],
@@ -13,6 +14,7 @@ const initialState = Map({
 export default (state = initialState, { type, payload }) => {
   switch (type) {
     case LOAD_PERSONNELS_SUCCESS:
+    case DELETE_PERSONNEL_SUCCESS:
       return state.merge({
         ids: payload.ids,
         personnels: payload.personnels

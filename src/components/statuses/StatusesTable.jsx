@@ -5,10 +5,12 @@ import PropTypes from 'prop-types';
 const StatusesTable = ({ statuses, toggle, modes }) => {
   return (
     <div>
-      <Table responsive>
+      <Table striped>
         <thead>
           <tr>
-            <th className="text-right">Name</th>
+            <th style={{ width: '50%' }} className="text-center">
+              Name
+            </th>
             <th className="text-center">Actions</th>
           </tr>
         </thead>
@@ -16,9 +18,7 @@ const StatusesTable = ({ statuses, toggle, modes }) => {
           {statuses.map(status => {
             return (
               <tr key={status._id}>
-                <td style={{ width: '50%' }} className="text-right">
-                  {status.name}
-                </td>
+                <td className="text-center">{status.name}</td>
                 <td className="text-center">
                   <Button
                     color="primary"

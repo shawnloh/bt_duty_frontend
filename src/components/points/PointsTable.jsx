@@ -5,10 +5,10 @@ import PropTypes from 'prop-types';
 const PointTable = ({ points, toggle, modes }) => {
   return (
     <div>
-      <Table responsive>
+      <Table striped>
         <thead>
           <tr>
-            <th className="text-right" style={{ width: '50%' }}>
+            <th className="text-center" style={{ width: '50%' }}>
               Name
             </th>
             <th className="text-center">Actions</th>
@@ -18,7 +18,7 @@ const PointTable = ({ points, toggle, modes }) => {
           {points.map(point => {
             return (
               <tr key={point._id}>
-                <td className="text-right">{point.name}</td>
+                <td className="text-center">{point.name}</td>
                 <td className="text-center">
                   <Button
                     color="primary"

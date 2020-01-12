@@ -5,10 +5,10 @@ import PropTypes from 'prop-types';
 const RankTable = ({ ranks, toggle, modes }) => {
   return (
     <div>
-      <Table>
+      <Table striped>
         <thead>
           <tr>
-            <th className="text-right" style={{ width: '50%' }}>
+            <th className="text-center" style={{ width: '50%' }}>
               Name
             </th>
             <th className="text-center">Actions</th>
@@ -18,7 +18,7 @@ const RankTable = ({ ranks, toggle, modes }) => {
           {ranks.map(rank => {
             return (
               <tr key={rank._id}>
-                <td className="text-right">{rank.name}</td>
+                <td className="text-center">{rank.name}</td>
                 <td className="text-center">
                   <Button
                     color="primary"

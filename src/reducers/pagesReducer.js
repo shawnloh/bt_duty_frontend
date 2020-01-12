@@ -5,6 +5,7 @@ import ranksPageReducer from '../pages/ranks/reducer';
 import platoonsPageReducer from '../pages/platoons/reducer';
 import pointsPageReducer from '../pages/points/reducer';
 import statusesPageReducer from '../pages/statuses/reducer';
+import personnelsPageReducer from '../pages/personnels/reducer';
 
 const pages = combineReducers({
   login: loginPageReducer,
@@ -12,7 +13,8 @@ const pages = combineReducers({
   ranks: ranksPageReducer,
   platoons: platoonsPageReducer,
   points: pointsPageReducer,
-  statuses: statusesPageReducer
+  statuses: statusesPageReducer,
+  personnels: personnelsPageReducer
 });
 
 export default pages;
