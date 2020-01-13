@@ -1,4 +1,4 @@
-import { takeLatest, call, select, put, all } from 'redux-saga/effects';
+import { takeLatest, call, select, put, all, delay } from 'redux-saga/effects';
 import { ADD_RANK, DELETE_RANK, UPDATE_RANK } from './constants';
 import {
   addRankSuccess,
@@ -10,6 +10,15 @@ import {
 } from './actions';
 import { logout } from '../../actions/authActions';
 import RanksService from '../../services/ranks';
+
+function* clearError(funcToClear) {
+  try {
+    yield delay(4000);
+    yield put(funcToClear([]));
+  } catch (error) {
+    yield put(funcToClear([]));
+  }
+}
 
 function* addRank(action) {
   try {
@@ -38,9 +47,11 @@ function* addRank(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(addRankFailure(errors));
+      yield call(clearError, addRankFailure);
     }
   } catch (error) {
     yield put(addRankFailure([error.message]));
+    yield call(clearError, addRankFailure);
   }
 }
 
@@ -66,9 +77,11 @@ function* deleteRank(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(deleteRankFailure(errors));
+      yield call(clearError, deleteRankFailure);
     }
   } catch (error) {
     yield put(deleteRankFailure([error.message]));
+    yield call(clearError, deleteRankFailure);
   }
 }
 
@@ -88,8 +101,9 @@ function* updateRank(action) {
       yield put(logout());
     } else if (response.status === 304) {
       yield put(
-        updateRankFailure(['Updating rank must not be the same as before'])
+        updateRankFailure(['Updating rank must not be the same name as before'])
       );
+      yield call(clearError, updateRankFailure);
     } else {
       let errors = [];
       if (response.data.message) {
@@ -100,9 +114,11 @@ function* updateRank(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(updateRankFailure(errors));
+      yield call(clearError, updateRankFailure);
     }
   } catch (error) {
     yield put(updateRankFailure([error.message]));
+    yield call(clearError, updateRankFailure);
   }
 }
 

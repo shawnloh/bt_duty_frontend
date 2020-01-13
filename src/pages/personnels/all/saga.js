@@ -1,8 +1,17 @@
-import { call, takeLatest, select, put } from 'redux-saga/effects';
+import { call, takeLatest, select, put, delay } from 'redux-saga/effects';
 import { DELETE_PERSONNEL } from './constants';
 import { deletePersonnelFailure, deletePersonnelSuccess } from './actions';
 import { logout } from '../../../actions/authActions';
 import PersonnelsService from '../../../services/personnels';
+
+function* clearError() {
+  try {
+    yield delay(4000);
+    yield put(deletePersonnelFailure([]));
+  } catch (error) {
+    yield put(deletePersonnelFailure([]));
+  }
+}
 
 function* deletePersonnel(action) {
   try {
@@ -29,14 +38,16 @@ function* deletePersonnel(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(deletePersonnelFailure(errors));
+      yield call(clearError);
     }
   } catch (error) {
     yield put(deletePersonnelFailure([error.message]));
+    yield call(clearError);
   }
 }
 
-function* viewAllWatcher() {
+function* allWatcher() {
   yield takeLatest(DELETE_PERSONNEL, deletePersonnel);
 }
 
-export default viewAllWatcher;
+export default allWatcher;

@@ -8,6 +8,7 @@ import {
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { checkAuth } from './actions/authActions';
+import { loadApp } from './pages/loading/actions';
 
 import AuthRoute from './AuthRoute';
 
@@ -23,9 +24,22 @@ const StatusesPage = lazy(() => import('./pages/statuses'));
 const PersonnelsPage = lazy(() => import('./pages/personnels'));
 
 class App extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   componentDidMount() {
-    const { isAuthenticated } = this.props;
-    isAuthenticated();
+    const { checkAuthenticated } = this.props;
+    checkAuthenticated();
+  }
+
+  static getDerivedStateFromProps(props) {
+    if (props.isAuthenticated && !props.appLoaded) {
+      props.reloadApp();
+    }
+
+    return {};
   }
 
   render() {
@@ -50,11 +64,20 @@ class App extends PureComponent {
 }
 
 App.propTypes = {
-  isAuthenticated: PropTypes.func.isRequired
+  checkAuthenticated: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool.isRequired,
+  appLoaded: PropTypes.bool.isRequired
 };
 
+const mapStateToProps = state => {
+  return {
+    isAuthenticated: state.auth.get('isAuthenticated'),
+    appLoaded: state.pages.loading.get('appLoaded')
+  };
+};
 const mapDispatchToProps = {
-  isAuthenticated: checkAuth
+  checkAuthenticated: checkAuth,
+  reloadApp: loadApp
 };
 
-export default connect(null, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);

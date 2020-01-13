@@ -1,4 +1,4 @@
-import { takeLatest, call, select, put, all } from 'redux-saga/effects';
+import { takeLatest, call, select, put, all, delay } from 'redux-saga/effects';
 import { ADD_PLATOON, DELETE_PLATOON, UPDATE_PLATOON } from './constants';
 import {
   addPlatoonSuccess,
@@ -10,6 +10,15 @@ import {
 } from './actions';
 import { logout } from '../../actions/authActions';
 import PlatoonsService from '../../services/platoons';
+
+function* clearError(funcToClear) {
+  try {
+    yield delay(4000);
+    yield put(funcToClear([]));
+  } catch (error) {
+    yield put(funcToClear([]));
+  }
+}
 
 function* addPlatoon(action) {
   try {
@@ -38,9 +47,11 @@ function* addPlatoon(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(addPlatoonFailure(errors));
+      yield call(clearError, addPlatoonFailure);
     }
   } catch (error) {
     yield put(addPlatoonFailure([error.message]));
+    yield call(clearError, addPlatoonFailure);
   }
 }
 
@@ -68,9 +79,11 @@ function* deletePlatoon(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(deletePlatoonFailure(errors));
+      yield call(clearError, deletePlatoonFailure);
     }
   } catch (error) {
     yield put(deletePlatoonFailure([error.message]));
+    yield call(clearError, deletePlatoonFailure);
   }
 }
 
@@ -93,9 +106,10 @@ function* updatePlatoon(action) {
     } else if (response.status === 304) {
       yield put(
         updatePlatoonFailure([
-          'Updating platoon must not be the same as before'
+          'Updating platoon must not be the same name as before'
         ])
       );
+      yield call(clearError, updatePlatoonFailure);
     } else {
       let errors = [];
       if (response.data.message) {
@@ -106,9 +120,11 @@ function* updatePlatoon(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(updatePlatoonFailure(errors));
+      yield call(clearError, updatePlatoonFailure);
     }
   } catch (error) {
     yield put(updatePlatoonFailure([error.message]));
+    yield call(clearError, updatePlatoonFailure);
   }
 }
 

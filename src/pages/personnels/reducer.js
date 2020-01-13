@@ -1,8 +1,10 @@
 import { combineReducers } from 'redux';
-import viewAllReducer from './ViewAll/reducer';
+import allReducer from './all/reducer';
+import addReducer from './add/reducer';
 
 const personnelsPageReducers = combineReducers({
-  viewAll: viewAllReducer
+  all: allReducer,
+  add: addReducer
 });
 
 export default personnelsPageReducers;

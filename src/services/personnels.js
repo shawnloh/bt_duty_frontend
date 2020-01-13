@@ -10,7 +10,7 @@ class PersonnelsService {
 
   static createPersonnel(name, rank, platoon) {
     return api
-      .post('/person', { name, rank, platoon })
+      .post('/person/new', { name, rank, platoon })
       .then(response => response)
       .catch(error => error);
   }

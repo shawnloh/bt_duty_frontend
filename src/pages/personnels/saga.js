@@ -1,8 +1,9 @@
 import { all } from 'redux-saga/effects';
-import viewAllSaga from './ViewAll/saga';
+import allSaga from './all/saga';
+import addSaga from './add/saga';
 
 function* personnelsSaga() {
-  yield all([viewAllSaga()]);
+  yield all([allSaga(), addSaga()]);
 }
 
 export default personnelsSaga;

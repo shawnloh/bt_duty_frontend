@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import AppLayout from '../shared/AppLayout';
 // SUB-PAGES
-import ViewAll from './ViewAll';
+import All from './all';
 import Add from './add';
 
 export class Personnels extends PureComponent {
@@ -15,7 +15,7 @@ export class Personnels extends PureComponent {
     return (
       <AppLayout>
         <Switch>
-          <Route exact path={path} component={ViewAll} />
+          <Route exact path={path} component={All} />
           <Route path={`${path}/add`} component={Add} />
         </Switch>
       </AppLayout>

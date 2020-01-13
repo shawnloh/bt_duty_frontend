@@ -1,4 +1,4 @@
-import { takeLatest, call, select, put, all } from 'redux-saga/effects';
+import { takeLatest, call, select, put, all, delay } from 'redux-saga/effects';
 import { ADD_POINT, DELETE_POINT, UPDATE_POINT } from './constants';
 import {
   addPointSuccess,
@@ -10,6 +10,15 @@ import {
 } from './actions';
 import { logout } from '../../actions/authActions';
 import PointsService from '../../services/points';
+
+function* clearError(funcToClear) {
+  try {
+    yield delay(4000);
+    yield put(funcToClear([]));
+  } catch (error) {
+    yield put(funcToClear([]));
+  }
+}
 
 function* addPoint(action) {
   try {
@@ -38,9 +47,11 @@ function* addPoint(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(addPointFailure(errors));
+      yield call(clearError, addPointFailure);
     }
   } catch (error) {
     yield put(addPointFailure([error.message]));
+    yield call(clearError, addPointFailure);
   }
 }
 
@@ -66,9 +77,11 @@ function* deletePoint(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(deletePointFailure(errors));
+      yield call(clearError, deletePointFailure);
     }
   } catch (error) {
     yield put(deletePointFailure([error.message]));
+    yield call(clearError, deletePointFailure);
   }
 }
 
@@ -90,6 +103,7 @@ function* updatePoint(action) {
       yield put(
         updatePointFailure(['Updating point must not be the same as before'])
       );
+      yield call(clearError, updatePointFailure);
     } else {
       let errors = [];
       if (response.data.message) {
@@ -100,9 +114,11 @@ function* updatePoint(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(updatePointFailure(errors));
+      yield call(clearError, updatePointFailure);
     }
   } catch (error) {
     yield put(updatePointFailure([error.message]));
+    yield call(clearError, updatePointFailure);
   }
 }
 

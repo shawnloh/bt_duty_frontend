@@ -1,5 +1,2 @@
-export {
-  DELETE_PERSONNEL,
-  DELETE_PERSONNEL_FAILURE,
-  DELETE_PERSONNEL_SUCCESS
-} from './ViewAll/constants';
+export * from './all/constants';
+export * from './add/constants';

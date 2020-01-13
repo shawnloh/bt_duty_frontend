@@ -5,14 +5,14 @@ import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import PersonnelsTable from '../../../components/personnels/PersonnelsTable';
-import Pagination from '../../../components/personnels/Pagination';
-import Search from '../../../components/personnels/Search';
-import PersonnelModalDelete from '../../../components/personnels/PersonnelModalDelete';
+import PersonnelsTable from '../../../components/personnels/all/PersonnelsTable';
+import Pagination from '../../../components/personnels/all/Pagination';
+import Search from '../../../components/personnels/all/Search';
+import PersonnelModalDelete from '../../../components/personnels/all/PersonnelModalDelete';
 
 import { deletePersonnel } from './actions';
 
-class ViewAll extends PureComponent {
+class All extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -184,7 +184,7 @@ class ViewAll extends PureComponent {
   }
 }
 
-ViewAll.propTypes = {
+All.propTypes = {
   ids: PropTypes.arrayOf(PropTypes.string).isRequired,
   personnels: PropTypes.shape({
     id: PropTypes.string
@@ -201,12 +201,12 @@ ViewAll.propTypes = {
 const mapStateToProps = state => ({
   ids: state.personnels.get('ids'),
   personnels: state.personnels.get('personnels'),
-  errors: state.pages.personnels.viewAll.get('errors'),
-  actionInProgress: state.pages.personnels.viewAll.get('actionInProgress')
+  errors: state.pages.personnels.all.get('errors'),
+  actionInProgress: state.pages.personnels.all.get('actionInProgress')
 });
 
 const mapDispatchToProps = {
   removePersonnel: deletePersonnel
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ViewAll);
+export default connect(mapStateToProps, mapDispatchToProps)(All);
