@@ -1,10 +1,11 @@
 import React from 'react';
 import { Table, Button } from 'reactstrap';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 const PersonnelsTable = ({ personnels, onDelete }) => {
   return (
-    <Table>
+    <Table striped>
       <thead>
         <tr>
           <th className="text-center" style={{ width: '50%' }}>
@@ -22,7 +23,9 @@ const PersonnelsTable = ({ personnels, onDelete }) => {
             <tr key={person._id}>
               <td className="text-center">{`${platoon} ${rank} ${name}`}</td>
               <td className="text-center">
-                <Button color="primary">Edit</Button>{' '}
+                <Button color="primary" tag={Link} to={`/personnels/${_id}`}>
+                  Edit
+                </Button>{' '}
                 <Button color="danger" onClick={() => onDelete(_id)}>
                   Delete
                 </Button>

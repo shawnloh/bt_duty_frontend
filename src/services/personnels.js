@@ -28,6 +28,17 @@ class PersonnelsService {
       .then(response => response)
       .catch(error => error);
   }
+
+  static addPersonnelStatus(personnelId, statusId, startDate, endDate) {
+    return api
+      .post(`/person/status/${personnelId}/add`, {
+        statusId,
+        startDate,
+        endDate
+      })
+      .then(response => response)
+      .catch(error => error);
+  }
 }
 
 export default PersonnelsService;

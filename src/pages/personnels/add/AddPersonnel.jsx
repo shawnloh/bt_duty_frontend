@@ -3,30 +3,26 @@ import PropTypes from 'prop-types';
 import {
   Container,
   Row,
-  FormGroup,
-  Label,
-  Input,
   Col,
-  Button,
-  Form,
   Breadcrumb,
   BreadcrumbItem,
-  Alert,
-  Spinner
+  Alert
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
 
 import { addPersonnel } from './actions';
+import AddForm from '../../../components/personnels/add/AddForm';
+import ActionAlert from '../../../components/commons/ActionAlert';
 
 export class AddPersonnel extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       name: '',
-      rank: undefined,
-      platoon: undefined
+      rank: '',
+      platoon: ''
     };
   }
 
@@ -137,9 +133,7 @@ export class AddPersonnel extends PureComponent {
           {actionInProgress && (
             <Row className="my-2">
               <Col>
-                <Alert color="primary" className="w-100">
-                  Adding in progress <Spinner color="primary" size="sm" />
-                </Alert>
+                <ActionAlert name="Adding" />
               </Col>
             </Row>
           )}
@@ -154,62 +148,18 @@ export class AddPersonnel extends PureComponent {
           )}
           <Row>
             <Col>
-              <Form onSubmit={this.handleSubmit}>
-                <FormGroup>
-                  <Label for="nameInput">Name</Label>
-                  <Input
-                    type="text"
-                    name="name"
-                    id="nameInput"
-                    placeholder="John"
-                    value={name}
-                    onChange={this.handleChange}
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label for="rankSelect">Rank</Label>
-                  <Input
-                    type="select"
-                    name="rank"
-                    id="rankSelect"
-                    onChange={this.handleChange}
-                    value={rank}
-                  >
-                    {rankIds.map(id => {
-                      return (
-                        <option value={id} key={id}>
-                          {ranks[id].name}
-                        </option>
-                      );
-                    })}
-                  </Input>
-                </FormGroup>
-                <FormGroup>
-                  <Label for="platoonSelect">Platoon</Label>
-                  <Input
-                    type="select"
-                    name="platoon"
-                    id="platoonSelect"
-                    onChange={this.handleChange}
-                    value={platoon}
-                  >
-                    {platoonIds.map(id => {
-                      return (
-                        <option value={id} key={id}>
-                          {platoons[id].name}
-                        </option>
-                      );
-                    })}
-                  </Input>
-                </FormGroup>
-                <Button
-                  color="success"
-                  className="w-100"
-                  disabled={this.checkDisabledSubmit()}
-                >
-                  Submit
-                </Button>
-              </Form>
+              <AddForm
+                handleChange={this.handleChange}
+                handleSubmit={this.handleSubmit}
+                name={name}
+                platoon={platoon}
+                platoonIds={platoonIds}
+                platoons={platoons}
+                rank={rank}
+                rankIds={rankIds}
+                ranks={ranks}
+                disabled={this.checkDisabledSubmit()}
+              />
             </Col>
           </Row>
         </Container>

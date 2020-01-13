@@ -5,7 +5,8 @@ import {
 } from '../actions/constants';
 import {
   DELETE_PERSONNEL_SUCCESS,
-  ADD_PERSONNEL_SUCCESS
+  ADD_PERSONNEL_SUCCESS,
+  ADD_STATUS_SUCCESS
 } from '../pages/personnels/constants';
 
 const initialState = Map({
@@ -22,6 +23,10 @@ export default (state = initialState, { type, payload }) => {
       return state.merge({
         ids: payload.ids,
         personnels: payload.personnels
+      });
+    case ADD_STATUS_SUCCESS:
+      return state.merge({
+        personnels: payload
       });
     case LOAD_PERSONNELS_FAILURE:
       return state.merge({
