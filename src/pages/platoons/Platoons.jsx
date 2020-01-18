@@ -146,7 +146,7 @@ export class Platoons extends PureComponent {
               </Alert>
             </Row>
           )}
-          <Row className="my-2 mx-2 d-flex justify-content-center align-items-center">
+          <Row className="my-2 d-flex justify-content-center align-items-center">
             <Col xs="9">
               <h1>Platoons</h1>
             </Col>

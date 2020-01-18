@@ -147,7 +147,7 @@ class All extends PureComponent {
               </Alert>
             </Row>
           )}
-          <Row className="my-2 mx-2 justify-content-center align-items-center">
+          <Row className="my-2 justify-content-center align-items-center">
             <Col xs="9">
               <h1>Personnels</h1>
             </Col>
@@ -157,7 +157,7 @@ class All extends PureComponent {
               </Button>
             </Col>
           </Row>
-          <Row className="my-2 mx-2">
+          <Row className="my-2 mx-1">
             <Search
               onChange={this.onChangeSearch}
               onClear={this.clearSearch}

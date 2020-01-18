@@ -148,7 +148,7 @@ export class Points extends PureComponent {
               </Alert>
             </Row>
           )}
-          <Row className="my-2 mx-2 d-flex justify-content-center align-items-center">
+          <Row className="my-2 d-flex justify-content-center align-items-center">
             <Col xs="9">
               <h1>Points</h1>
             </Col>

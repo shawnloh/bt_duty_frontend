@@ -64,7 +64,7 @@ export class All extends PureComponent {
           <title>Events</title>
         </Helmet>
         <Container>
-          <Row className="my-2 mx-2 d-flex justify-content-center align-items-center">
+          <Row className="my-2 d-flex justify-content-center align-items-center">
             <Col xs="9">
               <h1>Events</h1>
             </Col>

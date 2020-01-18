@@ -122,14 +122,24 @@ export class Single extends PureComponent {
                 <BreadcrumbItem active tag="span">
                   Details
                 </BreadcrumbItem>
+                <BreadcrumbItem active tag="span">
+                  {person.name}
+                </BreadcrumbItem>
               </Breadcrumb>
             </Col>
           </Row>
           {errors.length > 0 && this.showErrors()}
           {actionInProgress && <ActionAlert name="Action" />}
-          <Row className="my-2 mx-2 align-items-center">
+          <Row className="my-2 align-items-center">
             <Col>
               <h1>Details</h1>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <p className="text-danger">
+                Note: Status that expired will be automatically removed
+              </p>
             </Col>
           </Row>
 
