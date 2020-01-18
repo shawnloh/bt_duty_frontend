@@ -62,7 +62,7 @@ const DeletePersonnelStatus = ({ statuses, onDelete }) => {
 
       <Row>
         <Col>
-          <Table striped>
+          <Table striped responsive>
             <thead>
               <tr>
                 <th>Status</th>

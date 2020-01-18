@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 const PersonnelsTable = ({ personnels, onDelete }) => {
   return (
-    <Table striped>
+    <Table striped responsive>
       <thead>
         <tr>
           <th className="text-center" style={{ width: '50%' }}>

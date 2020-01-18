@@ -20,7 +20,7 @@ const PersonnelsPagination = ({
     return null;
   }
   return (
-    <Pagination aria-label="Personnel navigation">
+    <Pagination aria-label="Events Pagination">
       <PaginationItem disabled={currentPage === 1}>
         <PaginationLink first onClick={() => setPage(1)} />
       </PaginationItem>

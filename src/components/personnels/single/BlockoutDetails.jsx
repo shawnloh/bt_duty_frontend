@@ -8,7 +8,7 @@ function BlockoutDetails({ blockoutDates, handleDelete }) {
   }
 
   return (
-    <Table striped>
+    <Table striped responsive>
       <thead>
         <tr>
           <th className="text-center">Blockout Dates:</th>

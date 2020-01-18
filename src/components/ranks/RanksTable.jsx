@@ -4,41 +4,39 @@ import PropTypes from 'prop-types';
 
 const RankTable = ({ ranks, toggle, modes }) => {
   return (
-    <div>
-      <Table striped>
-        <thead>
-          <tr>
-            <th className="text-center" style={{ width: '50%' }}>
-              Name
-            </th>
-            <th className="text-center">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ranks.map(rank => {
-            return (
-              <tr key={rank._id}>
-                <td className="text-center">{rank.name}</td>
-                <td className="text-center">
-                  <Button
-                    color="primary"
-                    onClick={() => toggle(modes.UPDATE, rank._id)}
-                  >
-                    Edit
-                  </Button>{' '}
-                  <Button
-                    onClick={() => toggle(modes.DELETE, rank._id)}
-                    color="danger"
-                  >
-                    Delete
-                  </Button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </Table>
-    </div>
+    <Table striped responsive>
+      <thead>
+        <tr>
+          <th className="text-center" style={{ width: '50%' }}>
+            Name
+          </th>
+          <th className="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {ranks.map(rank => {
+          return (
+            <tr key={rank._id}>
+              <td className="text-center">{rank.name}</td>
+              <td className="text-center">
+                <Button
+                  color="primary"
+                  onClick={() => toggle(modes.UPDATE, rank._id)}
+                >
+                  Edit
+                </Button>{' '}
+                <Button
+                  onClick={() => toggle(modes.DELETE, rank._id)}
+                  color="danger"
+                >
+                  Delete
+                </Button>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </Table>
   );
 };
 

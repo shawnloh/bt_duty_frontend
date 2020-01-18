@@ -5,7 +5,7 @@ import { Table } from 'reactstrap';
 const Details = ({ name, rank, platoon, eventsDate }) => {
   return (
     <>
-      <Table striped>
+      <Table striped responsive>
         <tbody>
           <tr>
             <th className="text-center">Name:</th>
@@ -21,7 +21,7 @@ const Details = ({ name, rank, platoon, eventsDate }) => {
           </tr>
         </tbody>
       </Table>
-      <Table striped>
+      <Table striped responsive>
         <thead>
           <tr>
             <th>Event Dates:</th>
