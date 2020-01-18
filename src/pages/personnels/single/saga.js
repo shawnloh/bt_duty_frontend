@@ -1,15 +1,32 @@
-import { takeLatest, call, put, select, all } from 'redux-saga/effects';
+import { takeLatest, call, put, select, all, delay } from 'redux-saga/effects';
 import moment from 'moment-timezone';
-import { ADD_STATUS, DELETE_STATUS } from './constants';
+import {
+  ADD_STATUS,
+  DELETE_STATUS,
+  ADD_BLOCKOUT,
+  DELETE_BLOCKOUT
+} from './constants';
 import {
   addStatusSuccess,
   addStatusFailure,
   deleteStatusFailure,
-  deleteStatusSuccess
+  deleteStatusSuccess,
+  addBlockoutSuccess,
+  addBlockoutFailure,
+  deleteBlockoutFailure,
+  deleteBlockoutSuccess
 } from './actions';
 import { logout } from '../../../actions/authActions';
 import PersonnelsService from '../../../services/personnels';
 
+function* clearError(action) {
+  try {
+    yield delay(4000);
+    yield put(action([]));
+  } catch (error) {
+    yield put(action([]));
+  }
+}
 function* addStatus(action) {
   try {
     const { personnelId, statusId } = action.payload;
@@ -49,9 +66,11 @@ function* addStatus(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(addStatusFailure(errors));
+      yield call(clearError, addStatusFailure);
     }
   } catch (error) {
     yield put(addStatusFailure([error.message]));
+    yield call(clearError, addStatusFailure);
   }
 }
 
@@ -84,16 +103,95 @@ function* deleteStatus(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(deleteStatusFailure(errors));
+      yield call(clearError, deleteStatusFailure);
     }
   } catch (error) {
     yield put(deleteStatusFailure([error.message]));
+    yield call(clearError, deleteStatusFailure);
+  }
+}
+
+function* addBlockout(action) {
+  try {
+    const { personnelId, date } = action.payload;
+    const startDate = moment(date, 'DDMMYY', true).format('DD-MM-YYYY');
+    const response = yield call(
+      PersonnelsService.addPersonnelBlockout,
+      personnelId,
+      startDate
+    );
+
+    if (response.ok) {
+      const { ...personnels } = yield select(state =>
+        state.personnels.get('personnels')
+      );
+      const { blockOutDates, _id: id } = response.data;
+      personnels[id].blockOutDates = blockOutDates;
+      yield put(addBlockoutSuccess(personnels));
+    } else if (response.status === 304) {
+      yield put(addBlockoutFailure(['Blockout date already exist']));
+      yield call(clearError, addBlockoutFailure);
+    } else if (response.status === 401) {
+      yield put(logout());
+    } else {
+      let errors = [];
+      if (response.data.message) {
+        errors.push(response.data.message);
+      }
+
+      if (response.data.errors) {
+        errors = errors.concat(response.data.errors);
+      }
+      yield put(addBlockoutFailure(errors));
+      yield call(clearError, addBlockoutFailure);
+    }
+  } catch (error) {
+    yield put(addBlockoutFailure([error.message]));
+    yield call(clearError, addBlockoutFailure);
+  }
+}
+
+function* deleteBlockout(action) {
+  try {
+    const { personnelId, date } = action.payload;
+    const response = yield call(
+      PersonnelsService.deletePersonnelBlockout,
+      personnelId,
+      date
+    );
+    if (response.ok) {
+      const { ...personnels } = yield select(state =>
+        state.personnels.get('personnels')
+      );
+      const { blockOutDates, _id: id } = response.data;
+      personnels[id].blockOutDates = blockOutDates;
+      yield put(deleteBlockoutSuccess(personnels));
+    } else if (response.status === 401) {
+      yield put(logout());
+    } else {
+      let errors = [];
+      if (response.data.message) {
+        errors.push(response.data.message);
+      }
+
+      if (response.data.errors) {
+        errors = errors.concat(response.data.errors);
+      }
+      yield put(deleteBlockoutFailure(errors));
+      yield call(clearError, deleteBlockoutFailure);
+    }
+  } catch (error) {
+    yield put(deleteBlockoutFailure([error.message]));
+    yield call(clearError, deleteBlockoutFailure);
   }
 }
 
 function* singleWatcher() {
   yield all([
     takeLatest(ADD_STATUS, addStatus),
-    takeLatest(DELETE_STATUS, deleteStatus)
+    takeLatest(DELETE_STATUS, deleteStatus),
+    takeLatest(ADD_BLOCKOUT, addBlockout),
+    takeLatest(DELETE_BLOCKOUT, deleteBlockout)
   ]);
 }
 

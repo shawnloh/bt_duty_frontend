@@ -46,6 +46,20 @@ class PersonnelsService {
       .then(response => response)
       .catch(error => error);
   }
+
+  static addPersonnelBlockout(personnelId, date) {
+    return api
+      .post(`/person/${personnelId}/blockout`, { startDate: date })
+      .then(response => response)
+      .catch(error => error);
+  }
+
+  static deletePersonnelBlockout(personnelId, date) {
+    return api
+      .post(`/person/${personnelId}/blockout/delete`, { date })
+      .then(response => response)
+      .catch(error => error);
+  }
 }
 
 export default PersonnelsService;

@@ -13,12 +13,19 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { addStatus, deleteStatus } from './actions';
+import {
+  addStatus,
+  deleteStatus,
+  addBlockout,
+  deleteBlockout
+} from './actions';
 import Details from '../../../components/personnels/single/Details';
 import Tabs from '../../../components/personnels/single/Tabs';
 import DeletePersonnelStatus from '../../../components/personnels/single/DeletePersonnelStatus';
 import AddStatus from '../../../components/personnels/single/AddStatus';
 import ActionAlert from '../../../components/commons/ActionAlert';
+import AddBlockout from '../../../components/personnels/single/AddBlockout';
+import BlockoutDetails from '../../../components/personnels/single/BlockoutDetails';
 
 export class Single extends PureComponent {
   constructor(props) {
@@ -51,6 +58,26 @@ export class Single extends PureComponent {
       addPersonnelStatus
     } = this.props;
     addPersonnelStatus(personnelId, statusId, startDate, endDate);
+  };
+
+  handleAddBlockoutDate = date => {
+    const {
+      match: {
+        params: { personnelId }
+      },
+      addBlockoutDate
+    } = this.props;
+    addBlockoutDate(personnelId, date);
+  };
+
+  handleDeleteBlockoutDate = date => {
+    const {
+      match: {
+        params: { personnelId }
+      },
+      deleteBlockoutDate
+    } = this.props;
+    deleteBlockoutDate(personnelId, date);
   };
 
   showErrors = () => {
@@ -127,7 +154,13 @@ export class Single extends PureComponent {
                 statuses={person.statuses}
               />
             </TabPane>
-            <TabPane tabId="3">Bye</TabPane>
+            <TabPane tabId="3">
+              <AddBlockout handleAdd={this.handleAddBlockoutDate} />
+              <BlockoutDetails
+                blockoutDates={person.blockOutDates}
+                handleDelete={this.handleDeleteBlockoutDate}
+              />
+            </TabPane>
           </TabContent>
         </Container>
       </>
@@ -153,6 +186,8 @@ Single.propTypes = {
   statusIds: PropTypes.arrayOf(PropTypes.string).isRequired,
   addPersonnelStatus: PropTypes.func.isRequired,
   deletePersonnelStatus: PropTypes.func.isRequired,
+  addBlockoutDate: PropTypes.func.isRequired,
+  deleteBlockoutDate: PropTypes.func.isRequired,
   actionInProgress: PropTypes.bool.isRequired,
   errors: PropTypes.arrayOf(PropTypes.string).isRequired
 };
@@ -167,7 +202,9 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   addPersonnelStatus: addStatus,
-  deletePersonnelStatus: deleteStatus
+  deletePersonnelStatus: deleteStatus,
+  addBlockoutDate: addBlockout,
+  deleteBlockoutDate: deleteBlockout
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Single);

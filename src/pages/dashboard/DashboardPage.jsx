@@ -42,7 +42,7 @@ export class DashboardPage extends PureComponent {
                 <CardTitle>
                   <MdSettingsSystemDaydream fontSize="3em" />
                 </CardTitle>
-                <CardTitle>Point System</CardTitle>
+                <CardTitle>Points System</CardTitle>
                 <CardText>
                   Create a point system and allocate points during event
                   creation
@@ -73,7 +73,7 @@ export class DashboardPage extends PureComponent {
                 <CardTitle>
                   <GiRank3 fontSize="3em" />
                 </CardTitle>
-                <CardTitle>Rank</CardTitle>
+                <CardTitle>Ranks</CardTitle>
                 <CardText>
                   Rank System allows you to assign rank to individual person
                 </CardText>
@@ -87,7 +87,7 @@ export class DashboardPage extends PureComponent {
                 <CardTitle>
                   <GiGroupedDrops fontSize="3em" />
                 </CardTitle>
-                <CardTitle>Platoon</CardTitle>
+                <CardTitle>Platoons</CardTitle>
                 <CardText>
                   Platoon System allows you to assign platoon to individual
                   person
@@ -102,8 +102,10 @@ export class DashboardPage extends PureComponent {
                 <CardTitle>
                   <IoMdPaper fontSize="3em" />
                 </CardTitle>
-                <CardTitle>Status</CardTitle>
-                <CardText>Add status in order to assign to personnels</CardText>
+                <CardTitle>Statuses</CardTitle>
+                <CardText>
+                  Add status in order to assign to individual person
+                </CardText>
                 <Button tag={Link} to="/statuses" color="primary">
                   Go
                 </Button>

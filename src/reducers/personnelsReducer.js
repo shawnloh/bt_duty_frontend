@@ -6,7 +6,10 @@ import {
 import {
   DELETE_PERSONNEL_SUCCESS,
   ADD_PERSONNEL_SUCCESS,
-  ADD_STATUS_SUCCESS
+  ADD_STATUS_SUCCESS,
+  DELETE_STATUS_SUCCESS,
+  ADD_BLOCKOUT_SUCCESS,
+  DELETE_BLOCKOUT_SUCCESS
 } from '../pages/personnels/constants';
 
 const initialState = Map({
@@ -24,7 +27,10 @@ export default (state = initialState, { type, payload }) => {
         ids: payload.ids,
         personnels: payload.personnels
       });
+    case DELETE_STATUS_SUCCESS:
     case ADD_STATUS_SUCCESS:
+    case ADD_BLOCKOUT_SUCCESS:
+    case DELETE_BLOCKOUT_SUCCESS:
       return state.merge({
         personnels: payload
       });

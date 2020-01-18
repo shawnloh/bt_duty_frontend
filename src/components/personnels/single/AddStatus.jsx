@@ -15,7 +15,11 @@ import {
 import moment from 'moment-timezone';
 
 const checkDateValid = date => {
-  return moment(date, 'DDMMYY', true).isValid() || date === 'PERMANENT';
+  return (
+    moment(date, 'DDMMYY', true).isValid() ||
+    date === 'PERMANENT' ||
+    date === 'permanent'
+  );
 };
 
 const AddStatus = ({ handleAdd, statuses, statusIds }) => {
@@ -39,7 +43,8 @@ const AddStatus = ({ handleAdd, statuses, statusIds }) => {
   const changeStartDate = e => setStartDate(e.target.value);
   const changeEndDate = e => setEndDate(e.target.value);
 
-  const submit = () => {
+  const submit = e => {
+    if (e) e.preventDefault();
     handleAdd({
       statusId: status,
       startDate,
@@ -108,7 +113,7 @@ const AddStatus = ({ handleAdd, statuses, statusIds }) => {
                     converted to DD-MM-YYYY
                   </FormText>
                   <FormText color="muted">
-                    If permanent, please indicate PERMANENT in CAPS
+                    If permanent, please indicate permanent in end date
                   </FormText>
                 </FormGroup>
                 <Button
