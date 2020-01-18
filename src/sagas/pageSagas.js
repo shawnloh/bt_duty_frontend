@@ -6,6 +6,7 @@ import platoonsPageSaga from '../pages/platoons/saga';
 import pointsPageSaga from '../pages/points/saga';
 import statusesPageSaga from '../pages/statuses/saga';
 import personnelsPageSaga from '../pages/personnels/saga';
+import eventsPageSaga from '../pages/events/saga';
 
 const pageSagas = [
   loginPageSaga(),
@@ -14,7 +15,8 @@ const pageSagas = [
   platoonsPageSaga(),
   pointsPageSaga(),
   statusesPageSaga(),
-  personnelsPageSaga()
+  personnelsPageSaga(),
+  eventsPageSaga()
 ];
 
 export default pageSagas;

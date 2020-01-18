@@ -16,9 +16,7 @@ import moment from 'moment-timezone';
 
 const checkDateValid = date => {
   return (
-    moment(date, 'DDMMYY', true).isValid() ||
-    date === 'PERMANENT' ||
-    date === 'permanent'
+    moment(date, 'DDMMYY', true).isValid() || date.toLowerCase() === 'permanent'
   );
 };
 

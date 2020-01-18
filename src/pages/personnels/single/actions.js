@@ -10,7 +10,8 @@ import {
   ADD_BLOCKOUT_SUCCESS,
   DELETE_BLOCKOUT,
   DELETE_BLOCKOUT_FAILURE,
-  DELETE_BLOCKOUT_SUCCESS
+  DELETE_BLOCKOUT_SUCCESS,
+  CLEAR_ERRORS
 } from './constants';
 
 export const addStatus = (personnelId, statusId, startDate, endDate) => ({
@@ -85,4 +86,8 @@ export const deleteBlockoutSuccess = payload => ({
 export const deleteBlockoutFailure = errors => ({
   type: DELETE_BLOCKOUT_FAILURE,
   payload: errors
+});
+
+export const clearErrors = () => ({
+  type: CLEAR_ERRORS
 });

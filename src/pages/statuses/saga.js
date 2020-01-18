@@ -1,4 +1,4 @@
-import { takeLatest, call, select, put, all } from 'redux-saga/effects';
+import { takeLatest, call, select, put, all, delay } from 'redux-saga/effects';
 import { ADD_STATUS, DELETE_STATUS, UPDATE_STATUS } from './constants';
 import {
   addStatusSuccess,
@@ -11,6 +11,14 @@ import {
 import { logout } from '../../actions/authActions';
 import StatusesService from '../../services/statuses';
 
+function* clearError(funcToClear) {
+  try {
+    yield delay(4000);
+    yield put(funcToClear([]));
+  } catch (error) {
+    yield put(funcToClear([]));
+  }
+}
 function* addStatus(action) {
   try {
     const name = action.payload;
@@ -38,9 +46,11 @@ function* addStatus(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(addStatusFailure(errors));
+      yield call(clearError, addStatusFailure);
     }
   } catch (error) {
     yield put(addStatusFailure([error.message]));
+    yield call(clearError, addStatusFailure);
   }
 }
 
@@ -68,9 +78,11 @@ function* deleteStatus(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(deleteStatusFailure(errors));
+      yield call(clearError, deleteStatusFailure);
     }
   } catch (error) {
     yield put(deleteStatusFailure([error.message]));
+    yield call(clearError, deleteStatusFailure);
   }
 }
 
@@ -94,6 +106,7 @@ function* updateStatus(action) {
       yield put(
         updateStatusFailure(['Updating status must not be the same as before'])
       );
+      yield call(clearError, updateStatusFailure);
     } else {
       let errors = [];
       if (response.data.message) {
@@ -104,9 +117,11 @@ function* updateStatus(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(updateStatusFailure(errors));
+      yield call(clearError, updateStatusFailure);
     }
   } catch (error) {
     yield put(updateStatusFailure([error.message]));
+    yield call(clearError, updateStatusFailure);
   }
 }
 

@@ -14,17 +14,18 @@ import {
   addBlockoutSuccess,
   addBlockoutFailure,
   deleteBlockoutFailure,
-  deleteBlockoutSuccess
+  deleteBlockoutSuccess,
+  clearErrors
 } from './actions';
 import { logout } from '../../../actions/authActions';
 import PersonnelsService from '../../../services/personnels';
 
-function* clearError(action) {
+function* clearError() {
   try {
     yield delay(4000);
-    yield put(action([]));
+    yield put(clearErrors());
   } catch (error) {
-    yield put(action([]));
+    yield put(clearErrors());
   }
 }
 function* addStatus(action) {
@@ -32,7 +33,11 @@ function* addStatus(action) {
     const { personnelId, statusId } = action.payload;
     let { startDate, endDate } = action.payload;
     startDate = moment(startDate, 'DDMMYY', true).format('DD-MM-YYYY');
-    endDate = moment(endDate, 'DDMMYY', true).format('DD-MM-YYYY');
+    endDate =
+      endDate.toLowerCase() === 'permanent'
+        ? endDate
+        : moment(endDate, 'DDMMYY', true).format('DD-MM-YYYY');
+
     const response = yield call(
       PersonnelsService.addPersonnelStatus,
       personnelId,
@@ -66,11 +71,11 @@ function* addStatus(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(addStatusFailure(errors));
-      yield call(clearError, addStatusFailure);
+      yield call(clearError);
     }
   } catch (error) {
     yield put(addStatusFailure([error.message]));
-    yield call(clearError, addStatusFailure);
+    yield call(clearError);
   }
 }
 
@@ -103,11 +108,11 @@ function* deleteStatus(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(deleteStatusFailure(errors));
-      yield call(clearError, deleteStatusFailure);
+      yield call(clearError);
     }
   } catch (error) {
     yield put(deleteStatusFailure([error.message]));
-    yield call(clearError, deleteStatusFailure);
+    yield call(clearError);
   }
 }
 
@@ -143,11 +148,11 @@ function* addBlockout(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(addBlockoutFailure(errors));
-      yield call(clearError, addBlockoutFailure);
+      yield call(clearError);
     }
   } catch (error) {
     yield put(addBlockoutFailure([error.message]));
-    yield call(clearError, addBlockoutFailure);
+    yield call(clearError);
   }
 }
 
@@ -178,11 +183,11 @@ function* deleteBlockout(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(deleteBlockoutFailure(errors));
-      yield call(clearError, deleteBlockoutFailure);
+      yield call(clearError);
     }
   } catch (error) {
     yield put(deleteBlockoutFailure([error.message]));
-    yield call(clearError, deleteBlockoutFailure);
+    yield call(clearError);
   }
 }
 

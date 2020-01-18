@@ -11,7 +11,8 @@ import {
   ADD_BLOCKOUT_SUCCESS,
   DELETE_BLOCKOUT,
   DELETE_BLOCKOUT_FAILURE,
-  DELETE_BLOCKOUT_SUCCESS
+  DELETE_BLOCKOUT_SUCCESS,
+  CLEAR_ERRORS
 } from './constants';
 
 const initialState = Map({
@@ -33,6 +34,7 @@ export default (state = initialState, { type, payload }) => {
     case DELETE_STATUS_SUCCESS:
     case ADD_BLOCKOUT_SUCCESS:
     case DELETE_BLOCKOUT_SUCCESS:
+    case CLEAR_ERRORS:
       return state.merge({
         actionInProgress: false,
         errors: []
