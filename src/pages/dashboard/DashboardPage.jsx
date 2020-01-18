@@ -34,7 +34,9 @@ export class DashboardPage extends PureComponent {
                 <CardText>
                   Allows you to create event, generate names and allocate points
                 </CardText>
-                <Button color="primary">Go</Button>
+                <Button tag={Link} to="/events" color="primary">
+                  Go
+                </Button>
               </Card>
             </Col>
             <Col sm="4 mt-2">

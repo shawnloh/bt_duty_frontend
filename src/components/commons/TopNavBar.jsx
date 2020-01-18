@@ -31,6 +31,11 @@ const TopNavBar = ({ username, logout }) => {
             </NavLink>
           </NavItem>
           <NavItem>
+            <NavLink tag={Link} to="/events" activeClassName="active" exact>
+              Events
+            </NavLink>
+          </NavItem>
+          <NavItem>
             <NavLink tag={Link} to="/personnels" activeClassName="active" exact>
               Personnels
             </NavLink>

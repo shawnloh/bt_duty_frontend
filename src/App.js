@@ -22,6 +22,7 @@ const PlatoonsPage = lazy(() => import('./pages/platoons'));
 const PointsPage = lazy(() => import('./pages/points'));
 const StatusesPage = lazy(() => import('./pages/statuses'));
 const PersonnelsPage = lazy(() => import('./pages/personnels'));
+const EventsPage = lazy(() => import('./pages/events'));
 
 class App extends PureComponent {
   constructor(props) {
@@ -51,6 +52,7 @@ class App extends PureComponent {
             <Route path="/login" component={LoginPage} />
             <AuthRoute path="/app" component={LoadingPage} />
             <AuthRoute path="/dashboard" component={DashboardPage} />
+            <AuthRoute path="/events" component={EventsPage} />
             <AuthRoute path="/ranks" component={RanksPage} />
             <AuthRoute path="/platoons" component={PlatoonsPage} />
             <AuthRoute path="/points" component={PointsPage} />
