@@ -11,6 +11,7 @@ import {
   Table,
   Button
 } from 'reactstrap';
+import { Helmet } from 'react-helmet';
 
 import AppLayout from '../../shared/AppLayout';
 
@@ -27,6 +28,9 @@ export class Single extends PureComponent {
     return (
       <AppLayout>
         <Container>
+          <Helmet>
+            <title>Event - Details</title>
+          </Helmet>
           <Row className="my-2">
             <Col>
               <Breadcrumb tag="nav">
