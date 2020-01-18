@@ -13,10 +13,10 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { addStatus } from './actions';
+import { addStatus, deleteStatus } from './actions';
 import Details from '../../../components/personnels/single/Details';
 import Tabs from '../../../components/personnels/single/Tabs';
-import PersonnelStatus from '../../../components/personnels/single/PersonnelStatus';
+import DeletePersonnelStatus from '../../../components/personnels/single/DeletePersonnelStatus';
 import AddStatus from '../../../components/personnels/single/AddStatus';
 import ActionAlert from '../../../components/commons/ActionAlert';
 
@@ -34,7 +34,13 @@ export class Single extends PureComponent {
   };
 
   handleDeleteStatus = id => {
-    console.log('deleting', id);
+    const {
+      deletePersonnelStatus,
+      match: {
+        params: { personnelId }
+      }
+    } = this.props;
+    deletePersonnelStatus(personnelId, id);
   };
 
   handleAddStatus = ({ statusId, startDate, endDate }) => {
@@ -107,7 +113,7 @@ export class Single extends PureComponent {
                 name={person.name}
                 rank={person.rank}
                 platoon={person.platoon}
-                lastEventDate={person.lastEventDate || 'None'}
+                eventsDate={person.eventsDate || ['None']}
               />
             </TabPane>
             <TabPane tabId="2">
@@ -116,14 +122,13 @@ export class Single extends PureComponent {
                 statuses={statuses}
                 handleAdd={this.handleAddStatus}
               />
-              <PersonnelStatus
+              <DeletePersonnelStatus
                 onDelete={this.handleDeleteStatus}
                 statuses={person.statuses}
               />
             </TabPane>
             <TabPane tabId="3">Bye</TabPane>
           </TabContent>
-          {/* </Row> */}
         </Container>
       </>
     );
@@ -147,6 +152,7 @@ Single.propTypes = {
   }).isRequired,
   statusIds: PropTypes.arrayOf(PropTypes.string).isRequired,
   addPersonnelStatus: PropTypes.func.isRequired,
+  deletePersonnelStatus: PropTypes.func.isRequired,
   actionInProgress: PropTypes.bool.isRequired,
   errors: PropTypes.arrayOf(PropTypes.string).isRequired
 };
@@ -160,7 +166,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  addPersonnelStatus: addStatus
+  addPersonnelStatus: addStatus,
+  deletePersonnelStatus: deleteStatus
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Single);

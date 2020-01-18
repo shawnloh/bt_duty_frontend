@@ -2,38 +2,52 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'reactstrap';
 
-const Details = ({ name, rank, platoon, lastEventDate }) => {
+const Details = ({ name, rank, platoon, eventsDate }) => {
   return (
-    <Table striped>
-      <tbody>
-        <tr>
-          <th className="text-center">Name:</th>
-          <td className="text-center">{name}</td>
-        </tr>
-        <tr>
-          <th className="text-center">Rank:</th>
-          <td className="text-center">{rank.name}</td>
-        </tr>
-        <tr>
-          <th className="text-center">Platoon:</th>
-          <td className="text-center">{platoon.name}</td>
-        </tr>
-        <tr>
-          <th className="text-center">Last Event Date:</th>
-          <td className="text-center">{lastEventDate}</td>
-        </tr>
-      </tbody>
-    </Table>
+    <>
+      <Table striped>
+        <tbody>
+          <tr>
+            <th className="text-center">Name:</th>
+            <td className="text-center">{name}</td>
+          </tr>
+          <tr>
+            <th className="text-center">Rank:</th>
+            <td className="text-center">{rank.name}</td>
+          </tr>
+          <tr>
+            <th className="text-center">Platoon:</th>
+            <td className="text-center">{platoon.name}</td>
+          </tr>
+        </tbody>
+      </Table>
+      <Table striped>
+        <thead>
+          <tr>
+            <th>Event Dates:</th>
+          </tr>
+        </thead>
+        <tbody>
+          {eventsDate.map(date => {
+            return (
+              <tr key={date}>
+                <td className="text-center">{date}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </Table>
+    </>
   );
 };
 
 Details.defaultProps = {
-  lastEventDate: 'None'
+  eventsDate: []
 };
 
 Details.propTypes = {
   name: PropTypes.string.isRequired,
-  lastEventDate: PropTypes.string,
+  eventsDate: PropTypes.arrayOf(PropTypes.string),
   rank: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired

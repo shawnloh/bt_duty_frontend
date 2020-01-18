@@ -1,7 +1,12 @@
-import { takeLatest, call, put, select } from 'redux-saga/effects';
+import { takeLatest, call, put, select, all } from 'redux-saga/effects';
 import moment from 'moment-timezone';
 import { ADD_STATUS, DELETE_STATUS } from './constants';
-import { addStatusSuccess, addStatusFailure } from './actions';
+import {
+  addStatusSuccess,
+  addStatusFailure,
+  deleteStatusFailure,
+  deleteStatusSuccess
+} from './actions';
 import { logout } from '../../../actions/authActions';
 import PersonnelsService from '../../../services/personnels';
 
@@ -50,8 +55,46 @@ function* addStatus(action) {
   }
 }
 
+function* deleteStatus(action) {
+  try {
+    const { personnelId, pStatusId } = action.payload;
+    const response = yield call(
+      PersonnelsService.deletePersonnelStatus,
+      personnelId,
+      pStatusId
+    );
+    if (response.ok) {
+      const status = response.data.personnelStatus;
+      const { ...personnels } = yield select(state =>
+        state.personnels.get('personnels')
+      );
+      personnels[personnelId].statuses = personnels[
+        personnelId
+      ].statuses.filter(pStatus => pStatus._id !== status._id);
+      yield put(deleteStatusSuccess(personnels));
+    } else if (response.status === 401) {
+      yield put(logout());
+    } else {
+      let errors = [];
+      if (response.data.message) {
+        errors.push(response.data.message);
+      }
+
+      if (response.data.errors) {
+        errors = errors.concat(response.data.errors);
+      }
+      yield put(deleteStatusFailure(errors));
+    }
+  } catch (error) {
+    yield put(deleteStatusFailure([error.message]));
+  }
+}
+
 function* singleWatcher() {
-  yield takeLatest(ADD_STATUS, addStatus);
+  yield all([
+    takeLatest(ADD_STATUS, addStatus),
+    takeLatest(DELETE_STATUS, deleteStatus)
+  ]);
 }
 
 export default singleWatcher;

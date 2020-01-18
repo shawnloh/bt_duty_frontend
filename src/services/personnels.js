@@ -39,6 +39,13 @@ class PersonnelsService {
       .then(response => response)
       .catch(error => error);
   }
+
+  static deletePersonnelStatus(personnelId, pStatusId) {
+    return api
+      .delete(`/person/status/${personnelId}/${pStatusId}`)
+      .then(response => response)
+      .catch(error => error);
+  }
 }
 
 export default PersonnelsService;

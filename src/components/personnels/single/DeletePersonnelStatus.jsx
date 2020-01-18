@@ -18,7 +18,7 @@ const statusInitial = {
   endDate: null
 };
 
-const PersonnelStatus = ({ statuses, onDelete }) => {
+const DeletePersonnelStatus = ({ statuses, onDelete }) => {
   const [showModal, setShowModal] = useState(false);
   const [status, setStatus] = useState(statusInitial);
   // const [name, setName] = useState(null);
@@ -105,9 +105,9 @@ const PersonnelStatus = ({ statuses, onDelete }) => {
   );
 };
 
-PersonnelStatus.propTypes = {
+DeletePersonnelStatus.propTypes = {
   statuses: PropTypes.arrayOf(PropTypes.object).isRequired,
   onDelete: PropTypes.func.isRequired
 };
 
-export default PersonnelStatus;
+export default DeletePersonnelStatus;

@@ -26,3 +26,21 @@ export const addStatusFailure = errors => ({
   type: ADD_STATUS_FAILURE,
   payload: errors
 });
+
+export const deleteStatus = (personnelId, pStatusId) => ({
+  type: DELETE_STATUS,
+  payload: {
+    personnelId,
+    pStatusId
+  }
+});
+
+export const deleteStatusSuccess = payload => ({
+  type: DELETE_STATUS_SUCCESS,
+  payload
+});
+
+export const deleteStatusFailure = errors => ({
+  type: DELETE_STATUS_FAILURE,
+  payload: errors
+});

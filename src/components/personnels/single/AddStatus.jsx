@@ -104,7 +104,11 @@ const AddStatus = ({ handleAdd, statuses, statusIds }) => {
                     onChange={changeEndDate}
                   />
                   <FormText color="muted">
-                    Dates must be in DDMMYY format
+                    Dates must be in DDMMYY format, it will be automatically be
+                    converted to DD-MM-YYYY
+                  </FormText>
+                  <FormText color="muted">
+                    If permanent, please indicate PERMANENT in CAPS
                   </FormText>
                 </FormGroup>
                 <Button

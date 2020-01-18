@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Container, Col, Row, Button, Alert, Spinner } from 'reactstrap';
 import { connect } from 'react-redux';
@@ -18,7 +18,7 @@ const modes = {
   ADD: 'ADD'
 };
 
-export class Statuses extends Component {
+export class Statuses extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
