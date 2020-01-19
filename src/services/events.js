@@ -14,6 +14,20 @@ class EventsService {
       .then(response => response)
       .catch(error => error);
   }
+
+  static createEvent(data) {
+    return api
+      .post('/events/create', data)
+      .then(response => response)
+      .catch(error => error);
+  }
+
+  static generateName(data) {
+    return api
+      .post('/events/generate', data)
+      .then(response => response)
+      .catch(error => error);
+  }
 }
 
 export default EventsService;

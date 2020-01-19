@@ -68,7 +68,8 @@ class App extends PureComponent {
 App.propTypes = {
   checkAuthenticated: PropTypes.func.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
-  appLoaded: PropTypes.bool.isRequired
+  appLoaded: PropTypes.bool.isRequired,
+  reloadApp: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {
