@@ -13,6 +13,7 @@ import { loadApp } from './pages/loading/actions';
 import AuthRoute from './AuthRoute';
 
 import Loading from './components/commons/Loading';
+import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 
 const LoginPage = lazy(() => import('./pages/login'));
 const LoadingPage = lazy(() => import('./pages/loading'));
@@ -58,6 +59,7 @@ class App extends PureComponent {
             <AuthRoute path="/points" component={PointsPage} />
             <AuthRoute path="/statuses" component={StatusesPage} />
             <AuthRoute path="/personnels" component={PersonnelsPage} />
+            <Route path="*" component={NotFoundPage} />
           </Switch>
         </Suspense>
       </Router>

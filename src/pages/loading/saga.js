@@ -1,4 +1,4 @@
-import { takeLatest, call, all, put } from 'redux-saga/effects';
+import { takeLatest, call, all, put, delay } from 'redux-saga/effects';
 import { LOAD_APP } from './constants';
 import { loadRanksSuccess, loadRanksFailure } from '../../actions/ranksActions';
 import {
@@ -184,8 +184,16 @@ function* loadEssentials() {
   }
 }
 
+function* refresh() {
+  while (true) {
+    const fiveMinute = 1000 * 60 * 5;
+    yield delay(fiveMinute);
+    yield call(loadPersonnels);
+  }
+}
+
 function* loadingWatcher() {
-  yield takeLatest(LOAD_APP, loadEssentials);
+  yield all([takeLatest(LOAD_APP, loadEssentials), refresh()]);
 }
 
 export default loadingWatcher;
