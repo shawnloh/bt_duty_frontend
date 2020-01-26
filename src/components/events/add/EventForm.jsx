@@ -15,7 +15,7 @@ const EventForm = ({
   name = '',
   pointAllocation = 1,
   handleChange,
-  isAdding
+  isAdding = false
 }) => {
   return (
     <Form>
@@ -58,7 +58,9 @@ const EventForm = ({
               type="text"
               name="date"
               id="Date"
-              placeholder="e.g. 291219"
+              placeholder={`e.g. ${moment()
+                .tz('Asia/Singapore')
+                .format('DDMMYY')}`}
               invalid={!checkDateValid(date)}
               onChange={handleChange}
               value={date}
@@ -103,7 +105,8 @@ EventForm.propTypes = {
   name: PropTypes.string.isRequired,
   pointAllocation: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
     .isRequired,
-  handleChange: PropTypes.func.isRequired
+  handleChange: PropTypes.func.isRequired,
+  isAdding: PropTypes.bool.isRequired
 };
 
 export default EventForm;

@@ -33,18 +33,12 @@ const GenerateForm = ({
   const [WSQty, setWSQty] = useState(0);
   const [selectedRanks, setSelectedRanks] = useState([]);
   const [selectedPlatoons, setSelectedPlatoons] = useState([]);
-  const [selectedStatuses, setSelectedStatuses] = useState([]);
-  const [prevStatuses, setPrevStatuses] = useState([]);
+
+  const [statusesOnly, setStatusesOnly] = useState(false);
+  const [excludeStatus, setExcludeStatus] = useState([]);
+  const [prevExcludeStatuses, setPrevExcludeStatuses] = useState([]);
 
   const toggle = () => {
-    // if (!modal) {
-    //   setPioneersQty(1);
-    //   setWSQty(1);
-    //   setSelectedRanks([]);
-    //   setSelectedPlatoons([]);
-    //   setSelectedStatuses([]);
-    //   setPrevStatuses([]);
-    // }
     setModal(!modal);
   };
 
@@ -83,7 +77,8 @@ const GenerateForm = ({
     }
     setSelectedRanks(value);
   };
-  const handleStatusesChange = e => {
+
+  const handleStatusesNotAllowedChange = e => {
     const { options } = e.target;
     const value = [];
     for (let i = 0, l = options.length; i < l; i += 1) {
@@ -91,16 +86,48 @@ const GenerateForm = ({
         value.push(options[i].value);
       }
     }
-    setSelectedStatuses(value);
+    setExcludeStatus(value);
+    if (value.length > 0 && statusesOnly) {
+      setStatusesOnly(false);
+    }
   };
 
-  const handleStatusOnly = e => {
+  const handleExcludeStatus = e => {
     if (e.target.checked) {
-      setPrevStatuses(selectedStatuses);
-      setSelectedStatuses(statusIds);
+      setPrevExcludeStatuses(excludeStatus);
+      setExcludeStatus(statusIds);
+      setStatusesOnly(false);
     } else {
-      setSelectedStatuses(prevStatuses);
-      setPrevStatuses([]);
+      setExcludeStatus(prevExcludeStatuses);
+      setPrevExcludeStatuses([]);
+    }
+  };
+
+  const handleStatusesOnly = e => {
+    if (e.target.checked) {
+      setPrevExcludeStatuses(excludeStatus);
+      setExcludeStatus([]);
+      setStatusesOnly(true);
+    } else {
+      setExcludeStatus(prevExcludeStatuses);
+      setPrevExcludeStatuses([]);
+      setStatusesOnly(false);
+    }
+  };
+
+  const handleSelectAllRanks = e => {
+    if (e.target.checked) {
+      setSelectedRanks(rankIds);
+    } else {
+      setSelectedRanks([]);
+    }
+  };
+
+  const handleSelectAllPlatoons = e => {
+    if (e.target.checked) {
+      setSelectedPlatoons(platoonIds);
+    } else {
+      setSelectedPlatoons([]);
     }
   };
 
@@ -108,10 +135,17 @@ const GenerateForm = ({
     const data = {
       pQty: pioneersQty,
       wsQty: WSQty,
-      statuses: selectedStatuses,
+
       ranks: selectedRanks,
       platoons: selectedPlatoons
     };
+
+    if (statusesOnly) {
+      data.onlyStatus = true;
+    } else {
+      data.statuses = excludeStatus;
+    }
+
     handleSubmit(data);
     toggle();
   };
@@ -172,7 +206,18 @@ const GenerateForm = ({
                       );
                     })}
                   </Input>
+                  <FormGroup check>
+                    <Label check>
+                      <Input
+                        type="checkbox"
+                        onChange={handleSelectAllPlatoons}
+                        checked={selectedPlatoons.length === platoonIds.length}
+                      />{' '}
+                      All Platoons
+                    </Label>
+                  </FormGroup>
                 </FormGroup>
+
                 <FormGroup>
                   <Label for="selectRanks">Ranks</Label>
                   <Input
@@ -192,7 +237,18 @@ const GenerateForm = ({
                       );
                     })}
                   </Input>
+                  <FormGroup check>
+                    <Label check>
+                      <Input
+                        type="checkbox"
+                        onChange={handleSelectAllRanks}
+                        checked={selectedRanks.length === rankIds.length}
+                      />{' '}
+                      All Ranks
+                    </Label>
+                  </FormGroup>
                 </FormGroup>
+
                 <FormGroup>
                   <Label for="selectStatuses">Statuses not allowed</Label>
                   <Input
@@ -200,8 +256,8 @@ const GenerateForm = ({
                     name="selectStatuses"
                     id="selectStatuses"
                     multiple
-                    value={selectedStatuses}
-                    onChange={handleStatusesChange}
+                    value={excludeStatus}
+                    onChange={handleStatusesNotAllowedChange}
                   >
                     {statusIds.map(id => {
                       const status = statuses[id];
@@ -215,8 +271,22 @@ const GenerateForm = ({
                 </FormGroup>
                 <FormGroup check>
                   <Label check>
-                    <Input type="checkbox" onChange={handleStatusOnly} />{' '}
-                    Statuses only
+                    <Input
+                      type="checkbox"
+                      onChange={handleExcludeStatus}
+                      checked={excludeStatus.length === statusIds.length}
+                    />{' '}
+                    Exclude All Status
+                  </Label>
+                </FormGroup>
+                <FormGroup check>
+                  <Label check>
+                    <Input
+                      type="checkbox"
+                      onChange={handleStatusesOnly}
+                      checked={statusesOnly}
+                    />{' '}
+                    Statuses Only
                   </Label>
                 </FormGroup>
               </Col>

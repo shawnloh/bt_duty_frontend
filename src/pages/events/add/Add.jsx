@@ -55,7 +55,14 @@ export class Add extends PureComponent {
     }
   }
 
-  handleGenerateForm = async ({ pQty, wsQty, statuses, ranks, platoons }) => {
+  handleGenerateForm = async ({
+    pQty,
+    wsQty,
+    statuses = [],
+    onlyStatus = false,
+    ranks,
+    platoons
+  }) => {
     this.setState({
       generatingNames: true,
       selectedPersonnels: [],
@@ -75,9 +82,13 @@ export class Add extends PureComponent {
     if (wsQty > 0) {
       data.wspecs = wsQty;
     }
-    if (statuses.length > 0) {
-      data.statusesNotAllowed = statuses;
+    if (statuses.length > 0 && !onlyStatus) {
+      data.statusNotAllowed = statuses;
     }
+    if (onlyStatus && statuses.length === 0) {
+      data.onlyStatus = true;
+    }
+
     try {
       const response = await EventsService.generateName(data);
       if (response.ok) {
