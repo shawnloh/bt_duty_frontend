@@ -138,7 +138,8 @@ export class Single extends PureComponent {
           <Row>
             <Col>
               <p className="text-danger">
-                Note: Status that expired will be automatically removed
+                Note: Status and blockout dates that expired will be
+                automatically removed
               </p>
             </Col>
           </Row>

@@ -1,5 +1,9 @@
 import { Map } from 'immutable';
-import { LOGIN, LOGIN_SUCCESS, LOGIN_FAIL } from './constants';
+import { LOGIN, LOGIN_FAIL } from './constants';
+import {
+  CHECK_AUTH_SUCCESS,
+  CHECK_AUTH_FAILURE
+} from '../../actions/constants';
 
 const initialState = Map({
   isLoading: false,
@@ -13,7 +17,8 @@ export default (state = initialState, { type, payload }) => {
         isLoading: true,
         errors: []
       });
-    case LOGIN_SUCCESS:
+    case CHECK_AUTH_SUCCESS:
+    case CHECK_AUTH_FAILURE:
       return state.merge({
         isLoading: false
       });

@@ -9,23 +9,20 @@ import rootReducer from '../reducers/rootReducer';
 import rootSagas from '../sagas/rootSaga';
 
 const configureStore = (state = {}) => {
-  let sagaMiddleware = createSagaMiddleware();
-  let store = createStore(rootReducer, state, applyMiddleware(sagaMiddleware));
-  let persistor = persistStore(store);
+  // let sagaMiddleware = createSagaMiddleware();
+  // let store = createStore(rootReducer, state, applyMiddleware(sagaMiddleware));
+  // let persistor = persistStore(store);
 
-  if (process.env.NODE_ENV === 'development') {
-    const sagaMonitor = Reactotron.createSagaMonitor();
-    sagaMiddleware = createSagaMiddleware({ sagaMonitor });
-    store = createStore(
-      rootReducer,
-      state,
-      compose(
-        applyMiddleware(sagaMiddleware),
-        ReactotronConfig.createEnhancer()
-      )
-    );
-    persistor = persistStore(store);
-  }
+  // if (process.env.NODE_ENV === 'development') {
+  const sagaMonitor = Reactotron.createSagaMonitor();
+  const sagaMiddleware = createSagaMiddleware({ sagaMonitor });
+  const store = createStore(
+    rootReducer,
+    state,
+    compose(applyMiddleware(sagaMiddleware), ReactotronConfig.createEnhancer())
+  );
+  const persistor = persistStore(store);
+  // }
 
   sagaMiddleware.run(rootSagas);
   return { store, persistor };

@@ -10,7 +10,7 @@ function* login(action) {
     const response = yield call(AccountService.login, username, password);
     yield delay(500);
     if (!response.ok) {
-      yield put(loginFailure(response.data.errors));
+      yield put(loginFailure([response.data]));
     } else {
       yield put(loginSuccess());
       yield put(checkAuth());
