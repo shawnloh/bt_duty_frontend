@@ -1,7 +1,7 @@
 import { create } from 'apisauce';
 
 const api = create({
-  baseURL: '/api',
+  baseURL: 'https://btdutyapp.herokuapp.com/api',
   withCredentials: true
 });
 
