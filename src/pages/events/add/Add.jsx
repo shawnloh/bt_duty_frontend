@@ -15,7 +15,6 @@ import PropTypes from 'prop-types';
 import AppLayout from '../../shared/AppLayout';
 import EventForm from '../../../components/events/add/EventForm';
 import { createEvent } from './actions';
-// import EventsService from '../../../services/events';
 
 export class Add extends PureComponent {
   componentDidUpdate(prevProps) {
@@ -109,6 +108,7 @@ export class Add extends PureComponent {
             personnels={personnels}
             isAdding={isAdding}
             handleSubmit={this.handleSubmit}
+            logout={this.logout}
           />
         </Container>
       </AppLayout>

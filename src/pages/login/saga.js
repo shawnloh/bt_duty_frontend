@@ -10,13 +10,18 @@ function* login(action) {
     const response = yield call(AccountService.login, username, password);
     yield delay(500);
     if (!response.ok) {
+      if (response.status === 420) {
+        yield put(
+          loginFailure(['Too many login request, please login in 30mins time'])
+        );
+      }
       yield put(loginFailure([response.data]));
     } else {
       yield put(loginSuccess());
       yield put(checkAuth());
     }
   } catch (error) {
-    yield put(loginFailure([error.message]));
+    yield put(loginFailure([error.message || 'Unable to login']));
   }
 }
 

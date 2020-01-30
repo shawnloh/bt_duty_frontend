@@ -18,7 +18,6 @@ import moment from 'moment-timezone';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Swal from 'sweetalert2';
-import { useHistory } from 'react-router-dom';
 
 import EventsService from '../../../services/events';
 
@@ -58,7 +57,6 @@ const GenerateForm = ({
   date,
   setSelectedPersonnels
 }) => {
-  const history = useHistory();
   const [modal, setModal] = useState(false);
   const toggle = () => {
     if (date === '') {
@@ -123,8 +121,7 @@ const GenerateForm = ({
         setSelectedPersonnels(personnels);
         toggle();
       } else if (response.status === 401) {
-        // setErrors(['Unauthenticated, please refresh the page or logout']);
-        history.replace('/login');
+        setErrors(['Unauthenticated, please refresh the page or logout']);
       } else {
         let responseErrors = [];
         if (response.data.message) {
@@ -220,19 +217,6 @@ const GenerateForm = ({
         <Modal isOpen={modal} toggle={toggle}>
           <ModalHeader toggle={toggle}>Generate</ModalHeader>
           <ModalBody>
-            {errors.length > 0 && (
-              <Row>
-                <Col>
-                  {errors.map(error => {
-                    return (
-                      <p className="text-danger" key={error}>
-                        {error}
-                      </p>
-                    );
-                  })}
-                </Col>
-              </Row>
-            )}
             <Row>
               <Col>
                 <FormGroup>
@@ -405,6 +389,19 @@ const GenerateForm = ({
                 </FormGroup>
               </Col>
             </Row>
+            {errors.length > 0 && (
+              <Row>
+                <Col>
+                  {errors.map(error => {
+                    return (
+                      <p className="text-danger" key={error}>
+                        {error}
+                      </p>
+                    );
+                  })}
+                </Col>
+              </Row>
+            )}
           </ModalBody>
           <ModalFooter>{footer}</ModalFooter>
         </Modal>
