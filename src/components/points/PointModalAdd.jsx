@@ -20,10 +20,12 @@ const PointModalAdd = ({
 }) => {
   return (
     <Modal isOpen={showModal} toggle={() => onToggle()}>
-      <ModalHeader toggle={() => onToggle()}>Adding New Point!</ModalHeader>
+      <ModalHeader toggle={() => onToggle()}>
+        Adding New Point System!
+      </ModalHeader>
       <ModalBody>
         <FormGroup>
-          <Label for="pointName">New point</Label>
+          <Label for="pointName">New point system</Label>
           <Input
             type="text"
             name="pointName"

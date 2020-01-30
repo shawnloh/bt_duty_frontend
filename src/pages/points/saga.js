@@ -23,31 +23,38 @@ function* clearError(funcToClear) {
 function* addPoint(action) {
   try {
     const name = action.payload;
-    const ids = yield select(state => state.points.get('ids'));
-    const points = yield select(state => state.points.get('points'));
-    const response = yield call(PointsService.createPoint, name);
-
-    if (response.ok) {
-      const newPoint = response.data;
-      ids.push(newPoint._id);
-      points[newPoint._id] = {
-        _id: newPoint._id,
-        name: newPoint.name
-      };
-      yield put(addPointSuccess({ ids, points }));
-    } else if (response.status === 401) {
-      yield put(logout());
-    } else {
-      let errors = [];
-      if (response.data.message) {
-        errors.push(response.data.message);
-      }
-
-      if (response.data.errors) {
-        errors = errors.concat(response.data.errors);
-      }
-      yield put(addPointFailure(errors));
+    if (!name) {
+      yield put(
+        addPointFailure(['Cannot give an empty name for new point system'])
+      );
       yield call(clearError, addPointFailure);
+    } else {
+      const ids = yield select(state => state.points.get('ids'));
+      const points = yield select(state => state.points.get('points'));
+      const response = yield call(PointsService.createPoint, name);
+
+      if (response.ok) {
+        const newPoint = response.data;
+        ids.push(newPoint._id);
+        points[newPoint._id] = {
+          _id: newPoint._id,
+          name: newPoint.name
+        };
+        yield put(addPointSuccess({ ids, points }));
+      } else if (response.status === 401) {
+        yield put(logout());
+      } else {
+        let errors = [];
+        if (response.data.message) {
+          errors.push(response.data.message);
+        }
+
+        if (response.data.errors) {
+          errors = errors.concat(response.data.errors);
+        }
+        yield put(addPointFailure(errors));
+        yield call(clearError, addPointFailure);
+      }
     }
   } catch (error) {
     yield put(addPointFailure([error.message]));
@@ -88,33 +95,40 @@ function* deletePoint(action) {
 function* updatePoint(action) {
   try {
     const { id, name } = action.payload;
-    const response = yield call(PointsService.updatePoint, id, name);
-    if (response.ok) {
-      const { ...points } = yield select(state => state.points.get('points'));
-      points[id] = {
-        _id: response.data._id,
-        name: response.data.name
-      };
-
-      yield put(updatePointSuccess(points));
-    } else if (response.status === 401) {
-      yield put(logout());
-    } else if (response.status === 304) {
+    if (!name) {
       yield put(
-        updatePointFailure(['Updating point must not be the same as before'])
+        updatePointFailure(['Cannot update a point system with empty name'])
       );
       yield call(clearError, updatePointFailure);
     } else {
-      let errors = [];
-      if (response.data.message) {
-        errors.push(response.data.message);
-      }
+      const response = yield call(PointsService.updatePoint, id, name);
+      if (response.ok) {
+        const { ...points } = yield select(state => state.points.get('points'));
+        points[id] = {
+          _id: response.data._id,
+          name: response.data.name
+        };
 
-      if (response.data.errors) {
-        errors = errors.concat(response.data.errors);
+        yield put(updatePointSuccess(points));
+      } else if (response.status === 401) {
+        yield put(logout());
+      } else if (response.status === 304) {
+        yield put(
+          updatePointFailure(['Updating point must not be the same as before'])
+        );
+        yield call(clearError, updatePointFailure);
+      } else {
+        let errors = [];
+        if (response.data.message) {
+          errors.push(response.data.message);
+        }
+
+        if (response.data.errors) {
+          errors = errors.concat(response.data.errors);
+        }
+        yield put(updatePointFailure(errors));
+        yield call(clearError, updatePointFailure);
       }
-      yield put(updatePointFailure(errors));
-      yield call(clearError, updatePointFailure);
     }
   } catch (error) {
     yield put(updatePointFailure([error.message]));

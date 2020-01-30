@@ -23,31 +23,36 @@ function* clearError(funcToClear) {
 function* addRank(action) {
   try {
     const name = action.payload;
-    const ids = yield select(state => state.ranks.get('ids'));
-    const ranks = yield select(state => state.ranks.get('ranks'));
-    const response = yield call(RanksService.createRank, name);
-
-    if (response.ok) {
-      const newRank = response.data;
-      ids.push(newRank._id);
-      ranks[newRank._id] = {
-        _id: newRank._id,
-        name: newRank.name
-      };
-      yield put(addRankSuccess({ ids, ranks }));
-    } else if (response.status === 401) {
-      yield put(logout());
-    } else {
-      let errors = [];
-      if (response.data.message) {
-        errors.push(response.data.message);
-      }
-
-      if (response.data.errors) {
-        errors = errors.concat(response.data.errors);
-      }
-      yield put(addRankFailure(errors));
+    if (!name) {
+      yield put(addRankFailure(['Cannot give an empty name for new rank']));
       yield call(clearError, addRankFailure);
+    } else {
+      const ids = yield select(state => state.ranks.get('ids'));
+      const ranks = yield select(state => state.ranks.get('ranks'));
+      const response = yield call(RanksService.createRank, name);
+
+      if (response.ok) {
+        const newRank = response.data;
+        ids.push(newRank._id);
+        ranks[newRank._id] = {
+          _id: newRank._id,
+          name: newRank.name
+        };
+        yield put(addRankSuccess({ ids, ranks }));
+      } else if (response.status === 401) {
+        yield put(logout());
+      } else {
+        let errors = [];
+        if (response.data.message) {
+          errors.push(response.data.message);
+        }
+
+        if (response.data.errors) {
+          errors = errors.concat(response.data.errors);
+        }
+        yield put(addRankFailure(errors));
+        yield call(clearError, addRankFailure);
+      }
     }
   } catch (error) {
     yield put(addRankFailure([error.message]));
@@ -88,33 +93,42 @@ function* deleteRank(action) {
 function* updateRank(action) {
   try {
     const { id, name } = action.payload;
-    const response = yield call(RanksService.updateRank, id, name);
-    if (response.ok) {
-      const { ...ranks } = yield select(state => state.ranks.get('ranks'));
-      ranks[id] = {
-        _id: response.data._id,
-        name: response.data.name
-      };
-
-      yield put(updateRankSuccess(ranks));
-    } else if (response.status === 401) {
-      yield put(logout());
-    } else if (response.status === 304) {
+    if (!name) {
       yield put(
-        updateRankFailure(['Updating rank must not be the same name as before'])
+        updateRankFailure(['Cannot update the rank with an empty name'])
       );
       yield call(clearError, updateRankFailure);
     } else {
-      let errors = [];
-      if (response.data.message) {
-        errors.push(response.data.message);
-      }
+      const response = yield call(RanksService.updateRank, id, name);
+      if (response.ok) {
+        const { ...ranks } = yield select(state => state.ranks.get('ranks'));
+        ranks[id] = {
+          _id: response.data._id,
+          name: response.data.name
+        };
 
-      if (response.data.errors) {
-        errors = errors.concat(response.data.errors);
+        yield put(updateRankSuccess(ranks));
+      } else if (response.status === 401) {
+        yield put(logout());
+      } else if (response.status === 304) {
+        yield put(
+          updateRankFailure([
+            'Updating rank must not be the same name as before'
+          ])
+        );
+        yield call(clearError, updateRankFailure);
+      } else {
+        let errors = [];
+        if (response.data.message) {
+          errors.push(response.data.message);
+        }
+
+        if (response.data.errors) {
+          errors = errors.concat(response.data.errors);
+        }
+        yield put(updateRankFailure(errors));
+        yield call(clearError, updateRankFailure);
       }
-      yield put(updateRankFailure(errors));
-      yield call(clearError, updateRankFailure);
     }
   } catch (error) {
     yield put(updateRankFailure([error.message]));

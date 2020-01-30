@@ -150,7 +150,7 @@ export class Points extends PureComponent {
           )}
           <Row className="my-2 d-flex justify-content-center align-items-center">
             <Col xs="9">
-              <h1>Points</h1>
+              <h1>Points System</h1>
             </Col>
             <Col xs="3" className="d-flex justify-content-end">
               <Button

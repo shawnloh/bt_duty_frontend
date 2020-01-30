@@ -21,7 +21,9 @@ const PointModalEdit = ({
 }) => {
   return (
     <Modal isOpen={showModal} toggle={() => onToggle()}>
-      <ModalHeader toggle={() => onToggle()}>Updating for {point}</ModalHeader>
+      <ModalHeader toggle={() => onToggle()}>
+        Updating for {point} point system
+      </ModalHeader>
       <ModalBody>
         <FormGroup>
           <Label for="pointName">New name for {point}</Label>

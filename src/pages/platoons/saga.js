@@ -23,31 +23,38 @@ function* clearError(funcToClear) {
 function* addPlatoon(action) {
   try {
     const name = action.payload;
-    const ids = yield select(state => state.platoons.get('ids'));
-    const platoons = yield select(state => state.platoons.get('platoons'));
-    const response = yield call(PlatoonsService.createPlatoon, name);
-
-    if (response.ok) {
-      const newPlatoon = response.data;
-      ids.push(newPlatoon._id);
-      platoons[newPlatoon._id] = {
-        _id: newPlatoon._id,
-        name: newPlatoon.name
-      };
-      yield put(addPlatoonSuccess({ ids, platoons }));
-    } else if (response.status === 401) {
-      yield put(logout());
-    } else {
-      let errors = [];
-      if (response.data.message) {
-        errors.push(response.data.message);
-      }
-
-      if (response.data.errors) {
-        errors = errors.concat(response.data.errors);
-      }
-      yield put(addPlatoonFailure(errors));
+    if (!name) {
+      yield put(
+        addPlatoonFailure(['Cannot give an empty name for new platoon'])
+      );
       yield call(clearError, addPlatoonFailure);
+    } else {
+      const ids = yield select(state => state.platoons.get('ids'));
+      const platoons = yield select(state => state.platoons.get('platoons'));
+      const response = yield call(PlatoonsService.createPlatoon, name);
+
+      if (response.ok) {
+        const newPlatoon = response.data;
+        ids.push(newPlatoon._id);
+        platoons[newPlatoon._id] = {
+          _id: newPlatoon._id,
+          name: newPlatoon.name
+        };
+        yield put(addPlatoonSuccess({ ids, platoons }));
+      } else if (response.status === 401) {
+        yield put(logout());
+      } else {
+        let errors = [];
+        if (response.data.message) {
+          errors.push(response.data.message);
+        }
+
+        if (response.data.errors) {
+          errors = errors.concat(response.data.errors);
+        }
+        yield put(addPlatoonFailure(errors));
+        yield call(clearError, addPlatoonFailure);
+      }
     }
   } catch (error) {
     yield put(addPlatoonFailure([error.message]));
@@ -90,37 +97,42 @@ function* deletePlatoon(action) {
 function* updatePlatoon(action) {
   try {
     const { id, name } = action.payload;
-    const response = yield call(PlatoonsService.updatePlatoon, id, name);
-    if (response.ok) {
-      const { ...platoons } = yield select(state =>
-        state.platoons.get('platoons')
-      );
-      platoons[id] = {
-        _id: response.data._id,
-        name: response.data.name
-      };
-
-      yield put(updatePlatoonSuccess(platoons));
-    } else if (response.status === 401) {
-      yield put(logout());
-    } else if (response.status === 304) {
-      yield put(
-        updatePlatoonFailure([
-          'Updating platoon must not be the same name as before'
-        ])
-      );
+    if (!name) {
+      yield put(updatePlatoonFailure([`Cannot give an empty name`]));
       yield call(clearError, updatePlatoonFailure);
     } else {
-      let errors = [];
-      if (response.data.message) {
-        errors.push(response.data.message);
-      }
+      const response = yield call(PlatoonsService.updatePlatoon, id, name);
+      if (response.ok) {
+        const { ...platoons } = yield select(state =>
+          state.platoons.get('platoons')
+        );
+        platoons[id] = {
+          _id: response.data._id,
+          name: response.data.name
+        };
 
-      if (response.data.errors) {
-        errors = errors.concat(response.data.errors);
+        yield put(updatePlatoonSuccess(platoons));
+      } else if (response.status === 401) {
+        yield put(logout());
+      } else if (response.status === 304) {
+        yield put(
+          updatePlatoonFailure([
+            'Updating platoon must not be the same name as before'
+          ])
+        );
+        yield call(clearError, updatePlatoonFailure);
+      } else {
+        let errors = [];
+        if (response.data.message) {
+          errors.push(response.data.message);
+        }
+
+        if (response.data.errors) {
+          errors = errors.concat(response.data.errors);
+        }
+        yield put(updatePlatoonFailure(errors));
+        yield call(clearError, updatePlatoonFailure);
       }
-      yield put(updatePlatoonFailure(errors));
-      yield call(clearError, updatePlatoonFailure);
     }
   } catch (error) {
     yield put(updatePlatoonFailure([error.message]));
