@@ -15,6 +15,11 @@ const initialState = Map({
 export default (state = initialState, { type, payload }) => {
   switch (type) {
     case ADD_PERSONNEL:
+      return state.merge({
+        errors: [],
+        actionInProgress: true,
+        success: false
+      });
     case ADD_PERSONNEL_SUCCESS:
       return state.merge({
         actionInProgress: false,

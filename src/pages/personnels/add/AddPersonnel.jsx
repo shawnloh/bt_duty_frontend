@@ -17,33 +17,15 @@ import AddForm from '../../../components/personnels/add/AddForm';
 import ActionAlert from '../../../components/commons/ActionAlert';
 
 export class AddPersonnel extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      name: '',
-      rank: '',
-      platoon: ''
-    };
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    const { rankIds, platoonIds, success } = props;
-    if (success) {
-      return {
-        name: '',
-        rank: rankIds[0],
-        platoon: platoonIds[0]
-      };
+  componentDidUpdate(prevProps) {
+    const { actionInProgress, errors, history } = this.props;
+    if (
+      prevProps.actionInProgress &&
+      !actionInProgress &&
+      errors.length === 0
+    ) {
+      history.replace('/personnels');
     }
-    return state;
-  }
-
-  componentDidMount() {
-    const { rankIds, platoonIds } = this.props;
-    this.setState({
-      rank: rankIds[0],
-      platoon: platoonIds[0]
-    });
   }
 
   showErrors = () => {
@@ -62,26 +44,7 @@ export class AddPersonnel extends PureComponent {
     );
   };
 
-  handleChange = e => {
-    const { name, value } = e.target;
-    this.setState({
-      [name]: value
-    });
-  };
-
-  checkDisabledSubmit = () => {
-    const { rank, platoon, name } = this.state;
-    const { actionInProgress } = this.props;
-    if (name === '') return true;
-    if (!rank || !platoon) return true;
-    if (actionInProgress) return true;
-
-    return false;
-  };
-
-  handleSubmit = e => {
-    e.preventDefault();
-    const { name, platoon, rank } = this.state;
+  handleSubmit = ({ name, platoon, rank }) => {
     const { createPersonnel } = this.props;
     createPersonnel(name, platoon, rank);
   };
@@ -96,7 +59,6 @@ export class AddPersonnel extends PureComponent {
       errors,
       success
     } = this.props;
-    const { name, rank, platoon } = this.state;
     let emptyRankAndPlatoonError = null;
     if (rankIds.length === 0 || platoonIds.length === 0) {
       emptyRankAndPlatoonError = (
@@ -141,7 +103,7 @@ export class AddPersonnel extends PureComponent {
             <Row className="my-2">
               <Col>
                 <Alert color="success" className="w-100">
-                  Successfully added personnel {name}
+                  Successfully added personnel
                 </Alert>
               </Col>
             </Row>
@@ -149,16 +111,11 @@ export class AddPersonnel extends PureComponent {
           <Row>
             <Col>
               <AddForm
-                handleChange={this.handleChange}
                 handleSubmit={this.handleSubmit}
-                name={name}
-                platoon={platoon}
                 platoonIds={platoonIds}
                 platoons={platoons}
-                rank={rank}
                 rankIds={rankIds}
                 ranks={ranks}
-                disabled={this.checkDisabledSubmit()}
               />
             </Col>
           </Row>
@@ -186,7 +143,10 @@ AddPersonnel.propTypes = {
   errors: PropTypes.arrayOf(PropTypes.string).isRequired,
   actionInProgress: PropTypes.bool.isRequired,
   success: PropTypes.bool.isRequired,
-  createPersonnel: PropTypes.func.isRequired
+  createPersonnel: PropTypes.func.isRequired,
+  history: PropTypes.shape({
+    replace: PropTypes.func.isRequired
+  }).isRequired
 };
 
 const mapStateToProps = state => ({
