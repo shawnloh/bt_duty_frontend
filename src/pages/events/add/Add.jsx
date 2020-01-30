@@ -5,133 +5,33 @@ import {
   Col,
   Breadcrumb,
   BreadcrumbItem,
-  Spinner,
-  Button,
   Alert
 } from 'reactstrap';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment-timezone';
 import PropTypes from 'prop-types';
 
 import AppLayout from '../../shared/AppLayout';
 import EventForm from '../../../components/events/add/EventForm';
-import GenerateForm from '../../../components/events/add/GenerateForm';
 import { createEvent } from './actions';
-import EventsService from '../../../services/events';
+// import EventsService from '../../../services/events';
 
 export class Add extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      pointSystem: '',
-      date: '',
-      name: '',
-      selectedPersonnels: [],
-      pointAllocation: 1,
-      authenticated: true,
-      generationErrors: [],
-      generatingNames: false,
-      redirectToEvents: false
-    };
-  }
-
-  componentDidMount() {
-    const { pointIds, points } = this.props;
-    if (pointIds.length > 0) {
-      this.setState({
-        pointSystem: points[pointIds[0]]._id
-      });
-    }
-  }
-
   componentDidUpdate(prevProps) {
-    const { isAdding, errors } = this.props;
-    if (prevProps.isAdding && !isAdding && errors.length <= 0) {
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({
-        redirectToEvents: true
-      });
+    const { isAdding, errors, history } = this.props;
+    if (prevProps.isAdding && !isAdding && errors.length === 0) {
+      history.replace('/events');
     }
   }
 
-  handleGenerateForm = async ({
-    pQty,
-    wsQty,
-    statuses = [],
-    onlyStatus = false,
-    ranks,
-    platoons
+  handleSubmit = ({
+    name,
+    date,
+    pointSystem,
+    pointAllocation,
+    selectedPersonnels
   }) => {
-    this.setState({
-      generatingNames: true,
-      selectedPersonnels: [],
-      generationErrors: []
-    });
-
-    const { date, pointSystem } = this.state;
-    const data = {
-      date: moment(date, 'DDMMYY', true).format('DD-MM-YYYY'),
-      pointSystemId: pointSystem,
-      ranks,
-      platoons
-    };
-    if (pQty > 0) {
-      data.pioneers = pQty;
-    }
-    if (wsQty > 0) {
-      data.wspecs = wsQty;
-    }
-    if (statuses.length > 0 && !onlyStatus) {
-      data.statusNotAllowed = statuses;
-    }
-    if (onlyStatus && statuses.length === 0) {
-      data.onlyStatus = true;
-    }
-
-    try {
-      const response = await EventsService.generateName(data);
-      if (response.ok) {
-        const personnels = response.data.map(person => person._id);
-        this.setState({
-          selectedPersonnels: personnels,
-          generatingNames: false
-        });
-      } else if (response.status === 401) {
-        this.setState({
-          authenticated: false,
-          generatingNames: false
-        });
-      } else {
-        let errors = [];
-        if (response.data.message) {
-          errors.push(response.data.message);
-        }
-
-        if (response.data.errors) {
-          errors = errors.concat(response.data.errors);
-        }
-        this.setState({
-          generationErrors: errors,
-          generatingNames: false
-        });
-      }
-    } catch (error) {
-      this.setState({
-        generationErrors: [error.message],
-        generatingNames: false
-      });
-    }
-  };
-
-  handleSubmit = () => {
-    const {
-      name,
-      date,
-      pointSystem,
-      pointAllocation,
-      selectedPersonnels
-    } = this.state;
     const { addEvent } = this.props;
     const data = {
       name,
@@ -141,30 +41,6 @@ export class Add extends PureComponent {
       personnels: selectedPersonnels
     };
     addEvent(data);
-  };
-
-  handleChange = e => {
-    const { name, value } = e.target;
-    this.setState({
-      [name]: value
-    });
-  };
-
-  renderGenerationErrors = () => {
-    const { generationErrors } = this.state;
-    if (generationErrors.length <= 0) return null;
-
-    return (
-      <Row className="my-2">
-        <Col>
-          <Alert color="danger">
-            {generationErrors.map(error => {
-              return <p key={error}>{error}</p>;
-            })}
-          </Alert>
-        </Col>
-      </Row>
-    );
   };
 
   renderErrors = () => {
@@ -184,32 +60,6 @@ export class Add extends PureComponent {
     );
   };
 
-  checkValidForm = () => {
-    const {
-      name,
-      pointSystem,
-      date,
-      selectedPersonnels,
-      pointAllocation
-    } = this.state;
-    if (name === '' || pointSystem === '' || date === '') {
-      return false;
-    }
-
-    if (selectedPersonnels.length <= 0) {
-      return false;
-    }
-    if (pointAllocation <= 0) {
-      return false;
-    }
-
-    if (!moment(date, 'DDMMYY', true).isValid()) {
-      return false;
-    }
-
-    return true;
-  };
-
   render() {
     const {
       pointIds,
@@ -224,26 +74,6 @@ export class Add extends PureComponent {
       isAdding
     } = this.props;
 
-    const {
-      pointSystem,
-      date,
-      name,
-      selectedPersonnels,
-      pointAllocation,
-      authenticated,
-      generatingNames,
-      redirectToEvents
-    } = this.state;
-
-    if (!authenticated) {
-      return <Redirect to="/login" />;
-    }
-
-    if (redirectToEvents) {
-      return <Redirect to="/events" />;
-    }
-
-    const generationErrors = this.renderGenerationErrors();
     const Errors = this.renderErrors();
     return (
       <AppLayout>
@@ -260,7 +90,7 @@ export class Add extends PureComponent {
               </Breadcrumb>
             </Col>
           </Row>
-          {generationErrors}
+
           {Errors}
           <Row className="my-2">
             <Col>
@@ -270,76 +100,16 @@ export class Add extends PureComponent {
           <EventForm
             pointIds={pointIds}
             points={points}
-            pointSystem={pointSystem}
-            date={date}
-            handleChange={this.handleChange}
-            name={name}
-            pointAllocation={pointAllocation}
+            platoonIds={platoonIds}
+            platoons={platoons}
+            rankIds={rankIds}
+            ranks={ranks}
+            statusIds={statusIds}
+            statuses={statuses}
+            personnels={personnels}
             isAdding={isAdding}
+            handleSubmit={this.handleSubmit}
           />
-          <Row>
-            <Col className="d-flex justify-content-start align-items-center">
-              <p className="font-weight-bold">
-                Total Selected: {selectedPersonnels.length}
-              </p>
-            </Col>
-            <Col className="d-flex justify-content-end align-items-center">
-              <GenerateForm
-                platoonIds={platoonIds}
-                platoons={platoons}
-                rankIds={rankIds}
-                ranks={ranks}
-                statusIds={statusIds}
-                statuses={statuses}
-                handleSubmit={this.handleGenerateForm}
-                date={date}
-              />
-            </Col>
-          </Row>
-          {generatingNames && (
-            <Row>
-              <Col className="d-flex justify-content-center align-items-center flex-column">
-                <Spinner color="primary" />
-                <p>Generating names...</p>
-              </Col>
-            </Row>
-          )}
-          <Row className="my-2">
-            <Col className="overflow-auto" style={{ maxHeight: '150px' }}>
-              {selectedPersonnels.map(id => {
-                const person = personnels[id];
-                return (
-                  <Row key={id}>
-                    <Col>
-                      <p>
-                        {person.platoon.name} {person.rank.name} {person.name}
-                      </p>
-                    </Col>
-                  </Row>
-                );
-              })}
-            </Col>
-          </Row>
-          <Row>
-            <Col className="text-center">
-              {isAdding ? (
-                <>
-                  <Spinner color="primary" />
-                  <p>Adding...</p>
-                </>
-              ) : (
-                <Button
-                  size="lg"
-                  className="w-100"
-                  color="success"
-                  disabled={!this.checkValidForm()}
-                  onClick={this.handleSubmit}
-                >
-                  Create
-                </Button>
-              )}
-            </Col>
-          </Row>
         </Container>
       </AppLayout>
     );
@@ -390,13 +160,16 @@ Add.propTypes = {
   }).isRequired,
   isAdding: PropTypes.bool.isRequired,
   errors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  addEvent: PropTypes.func.isRequired
+  addEvent: PropTypes.func.isRequired,
+  history: PropTypes.shape({
+    replace: PropTypes.func.isRequired
+  }).isRequired
 };
 
 const mapStateToProps = state => ({
   points: state.points.get('points'),
   pointIds: state.points.get('ids'),
-  personnelIds: state.personnels.get('ids'),
+  // personnelIds: state.personnels.get('ids'),
   personnels: state.personnels.get('personnels'),
   rankIds: state.ranks.get('ids'),
   ranks: state.ranks.get('ranks'),
