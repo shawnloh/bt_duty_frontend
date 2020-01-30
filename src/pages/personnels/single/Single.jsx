@@ -60,13 +60,22 @@ export class Single extends PureComponent {
     addPersonnelStatus(personnelId, statusId, startDate, endDate);
   };
 
-  handleAddBlockoutDate = date => {
+  handleAddBlockoutDate = ({ startDate, endDate }) => {
     const {
       match: {
         params: { personnelId }
       },
       addBlockoutDate
     } = this.props;
+
+    const date = {
+      startDate
+    };
+
+    if (endDate) {
+      date.endDate = endDate;
+    }
+
     addBlockoutDate(personnelId, date);
   };
 

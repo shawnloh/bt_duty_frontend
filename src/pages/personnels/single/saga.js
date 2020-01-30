@@ -119,11 +119,25 @@ function* deleteStatus(action) {
 function* addBlockout(action) {
   try {
     const { personnelId, date } = action.payload;
-    const startDate = moment(date, 'DDMMYY', true).format('DD-MM-YYYY');
+
+    const startDate = moment(date.startDate, 'DDMMYY', true).format(
+      'DD-MM-YYYY'
+    );
+
+    const dateToSubmit = {
+      startDate
+    };
+
+    if (date.endDate) {
+      dateToSubmit.endDate = moment(date.endDate, 'DDMMYY', true).format(
+        'DD-MM-YYYY'
+      );
+    }
+
     const response = yield call(
       PersonnelsService.addPersonnelBlockout,
       personnelId,
-      startDate
+      dateToSubmit
     );
 
     if (response.ok) {

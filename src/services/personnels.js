@@ -49,7 +49,7 @@ class PersonnelsService {
 
   static addPersonnelBlockout(personnelId, date) {
     return api
-      .post(`/person/${personnelId}/blockout`, { startDate: date })
+      .post(`/person/${personnelId}/blockout`, date)
       .then(response => response)
       .catch(error => error);
   }
