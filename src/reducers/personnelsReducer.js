@@ -5,7 +5,8 @@ import {
   PERSONNELS_UPDATE_EVENT_POINTS,
   PERSONNELS_UPDATE_PLATOON_NAME,
   PERSONNELS_UPDATE_POINTS_SYSTEM,
-  PERSONNELS_UPDATE_RANK_NAME
+  PERSONNELS_UPDATE_RANK_NAME,
+  PERSONNELS_UPDATE_STATUS_NAME
 } from '../actions/constants';
 import {
   DELETE_PERSONNEL_SUCCESS,
@@ -41,6 +42,7 @@ export default (state = initialState, { type, payload }) => {
     case PERSONNELS_UPDATE_PLATOON_NAME:
     case PERSONNELS_UPDATE_RANK_NAME:
     case PERSONNELS_UPDATE_POINTS_SYSTEM:
+    case PERSONNELS_UPDATE_STATUS_NAME:
       return state.merge({
         personnels: payload
       });

@@ -15,7 +15,8 @@ import {
   personnelsUpdateEventPoints,
   personnelsUpdatePlatoon,
   personnelsUpdatePointsSystem,
-  personnelsUpdateRank
+  personnelsUpdateRank,
+  personnelsUpdateStatus
 } from '../actions/personnelsActions';
 
 import {
@@ -43,6 +44,13 @@ import {
   DELETE_POINT_FAILURE,
   UPDATE_POINT_SUCCESS
 } from '../pages/points/constants';
+
+import {
+  UPDATE_STATUS,
+  UPDATE_STATUS_FAILURE,
+  UPDATE_STATUS_SUCCESS
+} from '../pages/statuses/constants';
+
 import PersonnelsService from '../services/personnels';
 
 function* refreshPersonnelsFromServer() {
@@ -177,11 +185,38 @@ function* updatePersonnelsRankName(action) {
     yield put(personnelsUpdateRank(personnels));
   }
 }
+
+function* updateStatusesName(action) {
+  const { id, name } = action.payload;
+  const { success } = yield race({
+    success: take(UPDATE_STATUS_SUCCESS),
+    failure: take(UPDATE_STATUS_FAILURE)
+  });
+
+  if (success) {
+    const personnelsState = yield select(state => state.personnels);
+    const ids = personnelsState.get('ids');
+    const { ...personnels } = personnelsState.get('personnels');
+    ids.forEach(personId => {
+      const person = personnels[personId];
+      person.statuses = person.statuses.map(status => {
+        const currStatus = status;
+        if (currStatus.statusId._id === id) {
+          currStatus.statusId.name = String(name).toUpperCase();
+        }
+        return currStatus;
+      });
+    });
+    yield put(personnelsUpdateStatus(personnels));
+  }
+}
+
 function* personnelsSagaWatcher() {
   yield all([
     takeLatest(UPDATE_POINT_SUCCESS, updatePersonnelsPointSystemName),
     takeEvery(UPDATE_PLATOON, updatePersonnelsPlatoonName),
     takeEvery(UPDATE_RANK, updatePersonnelsRankName),
+    takeEvery(UPDATE_STATUS, updateStatusesName),
     takeEvery(DELETE_POINT, deletePersonnelsPointsSystem),
     takeEvery(DELETE_EVENT, deleteEventUpdatePoints),
     takeLatest(ADD_POINT_SUCCESS, refreshPersonnelsFromServer),

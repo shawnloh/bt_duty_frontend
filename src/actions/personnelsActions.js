@@ -5,7 +5,8 @@ import {
   PERSONNELS_UPDATE_EVENT_POINTS,
   PERSONNELS_UPDATE_PLATOON_NAME,
   PERSONNELS_UPDATE_POINTS_SYSTEM,
-  PERSONNELS_UPDATE_RANK_NAME
+  PERSONNELS_UPDATE_RANK_NAME,
+  PERSONNELS_UPDATE_STATUS_NAME
 } from './constants';
 
 export const loadPersonnels = () => ({
@@ -38,5 +39,9 @@ export const personnelsUpdatePlatoon = payload => ({
 
 export const personnelsUpdateRank = payload => ({
   type: PERSONNELS_UPDATE_RANK_NAME,
+  payload
+});
+export const personnelsUpdateStatus = payload => ({
+  type: PERSONNELS_UPDATE_STATUS_NAME,
   payload
 });
