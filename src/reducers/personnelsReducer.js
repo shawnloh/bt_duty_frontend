@@ -15,7 +15,8 @@ import {
   DELETE_STATUS_SUCCESS,
   ADD_BLOCKOUT_SUCCESS,
   DELETE_BLOCKOUT_SUCCESS,
-  EDIT_PERSONNEL_POINT_SUCCESS
+  EDIT_PERSONNEL_POINT_SUCCESS,
+  UPDATE_PERSON_SUCCESS
 } from '../pages/personnels/constants';
 
 const initialState = Map({
@@ -38,6 +39,7 @@ export default (state = initialState, { type, payload }) => {
     case ADD_BLOCKOUT_SUCCESS:
     case DELETE_BLOCKOUT_SUCCESS:
     case EDIT_PERSONNEL_POINT_SUCCESS:
+    case UPDATE_PERSON_SUCCESS:
     case PERSONNELS_UPDATE_EVENT_POINTS:
     case PERSONNELS_UPDATE_PLATOON_NAME:
     case PERSONNELS_UPDATE_RANK_NAME:

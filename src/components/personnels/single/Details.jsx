@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Table } from 'reactstrap';
+import { Table, Button } from 'reactstrap';
+import { Link, useRouteMatch } from 'react-router-dom';
 
 const Details = ({ name, rank, platoon, eventsDate }) => {
+  const { url } = useRouteMatch();
   return (
     <>
       <Table striped responsive>
@@ -21,6 +23,14 @@ const Details = ({ name, rank, platoon, eventsDate }) => {
           </tr>
         </tbody>
       </Table>
+      <Button
+        tag={Link}
+        to={`${url}/edit`}
+        color="primary"
+        className="w-100 my-2"
+      >
+        Edit Details
+      </Button>
       <Table striped responsive>
         <thead>
           <tr>

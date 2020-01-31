@@ -9,7 +9,7 @@ import {
   BreadcrumbItem,
   Alert
 } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -130,75 +130,74 @@ export class Single extends PureComponent {
     const { activeTab } = this.state;
 
     const person = personnels[personnelId];
+    if (!person) {
+      return <Redirect to="/personnels" />;
+    }
     return (
-      <>
-        <Container>
-          <Row className="my-2 justify-content-center align-items-center">
-            <Col>
-              <Breadcrumb tag="nav" listTag="div">
-                <BreadcrumbItem tag={Link} to="/personnels">
-                  Personnels
-                </BreadcrumbItem>
-                <BreadcrumbItem active tag="span">
-                  Details
-                </BreadcrumbItem>
-                <BreadcrumbItem active tag="span">
-                  {person.name}
-                </BreadcrumbItem>
-              </Breadcrumb>
-            </Col>
-          </Row>
-          {errors.length > 0 && this.showErrors()}
-          {actionInProgress && <ActionAlert name="Action" />}
-          <Row className="my-2 align-items-center">
-            <Col>
-              <h1>Details</h1>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <p className="text-danger">
-                Note: Event dates, status and blockout dates that expired will
-                be automatically removed
-              </p>
-            </Col>
-          </Row>
+      <Container>
+        <Row className="my-2 justify-content-center align-items-center">
+          <Col>
+            <Breadcrumb tag="nav" listTag="div">
+              <BreadcrumbItem tag={Link} to="/personnels">
+                Personnels
+              </BreadcrumbItem>
+              <BreadcrumbItem tag="span">Details</BreadcrumbItem>
+              <BreadcrumbItem active tag="span">
+                {person.name}
+              </BreadcrumbItem>
+            </Breadcrumb>
+          </Col>
+        </Row>
+        {errors.length > 0 && this.showErrors()}
+        {actionInProgress && <ActionAlert name="Action" />}
+        <Row className="my-2 align-items-center">
+          <Col>
+            <h1>Details</h1>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <p className="text-danger">
+              Note: Event dates, status and blockout dates that expired will be
+              automatically removed
+            </p>
+          </Col>
+        </Row>
 
-          <Tabs activeTab={activeTab} setTab={this.setTab} />
-          <TabContent activeTab={activeTab}>
-            <TabPane tabId="1">
-              <Details
-                name={person.name}
-                rank={person.rank}
-                platoon={person.platoon}
-                eventsDate={person.eventsDate || ['None']}
-              />
-            </TabPane>
-            <TabPane tabId="2">
-              <Status
-                handleDelete={this.handleDeleteStatus}
-                personStatuses={person.statuses}
-                statusIds={statusIds}
-                statuses={statuses}
-                handleAdd={this.handleAddStatus}
-              />
-            </TabPane>
-            <TabPane tabId="3">
-              <BlockoutDetails
-                handleAdd={this.handleAddBlockoutDate}
-                blockoutDates={person.blockOutDates}
-                handleDelete={this.handleDeleteBlockoutDate}
-              />
-            </TabPane>
-            <TabPane tabId="4">
-              <PointsDetails
-                points={person.points}
-                handleEdit={this.handleEditPoint}
-              />
-            </TabPane>
-          </TabContent>
-        </Container>
-      </>
+        <Tabs activeTab={activeTab} setTab={this.setTab} />
+        <TabContent activeTab={activeTab}>
+          <TabPane tabId="1">
+            <Details
+              name={person.name}
+              rank={person.rank}
+              platoon={person.platoon}
+              eventsDate={person.eventsDate || ['None']}
+            />
+          </TabPane>
+          <TabPane tabId="2">
+            <Status
+              handleDelete={this.handleDeleteStatus}
+              personStatuses={person.statuses}
+              statusIds={statusIds}
+              statuses={statuses}
+              handleAdd={this.handleAddStatus}
+            />
+          </TabPane>
+          <TabPane tabId="3">
+            <BlockoutDetails
+              handleAdd={this.handleAddBlockoutDate}
+              blockoutDates={person.blockOutDates}
+              handleDelete={this.handleDeleteBlockoutDate}
+            />
+          </TabPane>
+          <TabPane tabId="4">
+            <PointsDetails
+              points={person.points}
+              handleEdit={this.handleEditPoint}
+            />
+          </TabPane>
+        </TabContent>
+      </Container>
     );
   }
 }

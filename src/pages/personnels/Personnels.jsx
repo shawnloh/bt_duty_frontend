@@ -7,6 +7,7 @@ import AppLayout from '../shared/AppLayout';
 import All from './all';
 import Add from './add';
 import Single from './single';
+import Edit from './edit';
 
 export class Personnels extends PureComponent {
   render() {
@@ -18,7 +19,8 @@ export class Personnels extends PureComponent {
         <Switch>
           <Route exact path={path} component={All} />
           <Route path={`${path}/add`} component={Add} />
-          <Route path={`${path}/:personnelId`} component={Single} />
+          <Route path={`${path}/:personnelId`} exact component={Single} />
+          <Route path={`${path}/:personnelId/edit`} component={Edit} />
         </Switch>
       </AppLayout>
     );
