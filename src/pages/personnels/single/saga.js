@@ -234,6 +234,13 @@ function* editPersonnelPoint(action) {
       });
 
       yield put(editPersonnelPointSuccess(personnels));
+    } else if (response.status === 304) {
+      yield put(
+        editPersonnelPointFailure([
+          'Please provide a different point number, must not be the same'
+        ])
+      );
+      yield call(clearError);
     } else if (response.status === 401) {
       yield put(logout());
     } else {
