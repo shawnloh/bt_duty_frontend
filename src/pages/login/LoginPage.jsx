@@ -11,54 +11,31 @@ import {
   Row,
   Spinner,
   ListGroup,
-  ListGroupItem
+  ListGroupItem,
+  FormFeedback
 } from 'reactstrap';
+import { Formik } from 'formik';
 import { Redirect } from 'react-router-dom';
+import * as Yup from 'yup';
 import { login } from './actions';
 
+const LoginFormSchema = Yup.object({
+  username: Yup.string().required('Username is required'),
+  password: Yup.string().required('Password is required')
+});
+
 class LoginPage extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: '',
-      password: '',
-      validateError: null
-    };
-  }
-
-  handleChange = event => {
-    const { target } = event;
-    const { value, name } = target;
-    this.setState({
-      [name]: value
-    });
-  };
-
-  checkValidation = () => {
-    const { username, password } = this.state;
-    if (!username || !password) {
-      this.setState({
-        validateError: 'Please provide valid username / password'
-      });
+  handleLogin = ({ username, password }, actions) => {
+    const { authenticate } = this.props;
+    if (username !== '' && password !== '') {
+      authenticate(username, password);
+      actions.setSubmitting(false);
     }
   };
 
-  handleSubmit = e => {
-    e.preventDefault();
-    this.setState({
-      validateError: null
-    });
-
-    this.checkValidation();
-    const { authenticate } = this.props;
-    const { username, password } = this.state;
-    if (username !== '' && password !== '') authenticate(username, password);
-  };
-
-  checkError = () => {
+  renderErrors = () => {
     const { errors } = this.props;
-    const { validateError } = this.state;
-    if (errors.length > 0 || validateError) {
+    if (errors.length > 0) {
       return (
         <Row className="mx-auto mb-2">
           <ListGroup className="mx-auto">
@@ -69,9 +46,6 @@ class LoginPage extends PureComponent {
                 </ListGroupItem>
               );
             })}
-            {validateError && (
-              <ListGroupItem color="danger"> {validateError}</ListGroupItem>
-            )}
           </ListGroup>
         </Row>
       );
@@ -80,52 +54,83 @@ class LoginPage extends PureComponent {
   };
 
   render() {
-    const { username, password } = this.state;
     const { isLoading, isAuthenticated } = this.props;
+    if (isAuthenticated) {
+      return <Redirect to="/app" exact />;
+    }
+    return (
+      <Container className="d-flex justify-content-center align-items-center flex-column h-100">
+        {this.renderErrors()}
+        <Formik
+          initialValues={{
+            username: '',
+            password: ''
+          }}
+          validationSchema={LoginFormSchema}
+          onSubmit={this.handleLogin}
+        >
+          {props => {
+            return (
+              <Form onSubmit={props.handleSubmit} className="w-50">
+                <FormGroup row className="mx-auto">
+                  <Label for="usernameInput">Username:</Label>
+                  <Input
+                    type="text"
+                    name="username"
+                    id="usernameInput"
+                    placeholder="johndoe"
+                    onChange={props.handleChange}
+                    value={props.values.username}
+                    disabled={props.isSubmitting}
+                    invalid={
+                      props.touched.username &&
+                      props.errors.username &&
+                      props.errors.username !== ''
+                    }
+                  />
+                  {props.touched.username && props.errors.username ? (
+                    <FormFeedback>{props.errors.username}</FormFeedback>
+                  ) : null}
+                </FormGroup>
 
-    return isAuthenticated ? (
-      <Redirect to="/app" exact />
-    ) : (
-      <Container
-        className="d-flex justify-content-center align-items-center flex-column"
-        style={{ height: '100vh' }}
-      >
-        {this.checkError()}
-
-        <Form onSubmit={this.handleSubmit}>
-          <FormGroup row className="mx-auto">
-            <Label for="usernameInput">Username:</Label>
-            <Input
-              type="text"
-              name="username"
-              id="usernameInput"
-              placeholder="johndoe"
-              onChange={this.handleChange}
-              value={username}
-              required
-            />
-          </FormGroup>
-          <FormGroup row className="mx-auto">
-            <Label for="passwordInput">Password:</Label>
-            <Input
-              type="password"
-              name="password"
-              id="passwordInput"
-              onChange={this.handleChange}
-              value={password}
-              required
-            />
-          </FormGroup>
-          <Row className="align-items-center justify-content-center mx-auto">
-            {isLoading ? (
-              <Spinner size="md" color="primary" />
-            ) : (
-              <Button color="success" type="submit" size="lg" className="w-100">
-                Login
-              </Button>
-            )}
-          </Row>
-        </Form>
+                <FormGroup row className="mx-auto">
+                  <Label for="passwordInput">Password:</Label>
+                  <Input
+                    type="password"
+                    name="password"
+                    id="passwordInput"
+                    disabled={props.isSubmitting}
+                    onChange={props.handleChange}
+                    value={props.values.password}
+                    invalid={
+                      props.touched.password &&
+                      props.errors.password &&
+                      props.errors.password !== ''
+                    }
+                  />
+                  {props.touched.password && props.errors.password ? (
+                    <FormFeedback>{props.errors.password}</FormFeedback>
+                  ) : null}
+                </FormGroup>
+                <Row className="align-items-center justify-content-center mx-auto">
+                  {isLoading ? (
+                    <Spinner size="md" color="primary" />
+                  ) : (
+                    <Button
+                      color="success"
+                      type="submit"
+                      size="lg"
+                      className="w-100"
+                      disabled={props.isSubmitting}
+                    >
+                      Login
+                    </Button>
+                  )}
+                </Row>
+              </Form>
+            );
+          }}
+        </Formik>
       </Container>
     );
   }
