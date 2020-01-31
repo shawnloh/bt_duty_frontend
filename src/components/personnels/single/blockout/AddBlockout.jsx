@@ -101,7 +101,7 @@ const AddBlockout = ({ handleAdd }) => {
                     value={formik.values.endDate}
                     name="endDate"
                     id="untilDateInput"
-                    placeholder={`e.g. ${today} *OPTIONAL*`}
+                    placeholder={`*OPTIONAL* e.g. ${today}`}
                     invalid={
                       formik.touched.endDate &&
                       formik.errors.endDate &&

@@ -1,39 +1,58 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Table, Button } from 'reactstrap';
 import Swal from 'sweetalert2';
 
-const PointsDetails = ({ handleEdit, points }) => {
-  const handleEditButtonClick = async (
-    personnelPointId,
-    pointSystemName,
-    point
-  ) => {
-    const { value: pointToEdit } = await Swal.fire({
-      title: `Enter new number for ${pointSystemName}`,
-      input: 'number',
-      inputPlaceholder: point,
-      showCancelButton: true,
-      confirmButtonText: 'Change',
-      inputValidator: value => {
-        if (!value) {
-          return `Please enter a new number for ${pointSystemName}`;
-        }
-        const newPoint = parseInt(value, 10);
-        if (typeof newPoint !== 'number') {
-          return `Only numbers are accepted`;
-        }
-
-        if (newPoint < 0) {
-          return 'Only positive number is allowed inclusive of 0';
-        }
-        return null;
+const handleEditButtonClick = async (
+  personnelPointId,
+  pointSystemName,
+  point,
+  handleEdit
+) => {
+  const { value: pointToEdit } = await Swal.fire({
+    title: `Enter new point for ${pointSystemName}`,
+    input: 'number',
+    inputPlaceholder: point,
+    showCancelButton: true,
+    confirmButtonText: 'Change',
+    inputValidator: value => {
+      if (!value) {
+        return `Please enter a new number for ${pointSystemName}`;
       }
-    });
-    if (pointToEdit) {
-      handleEdit(personnelPointId, pointToEdit);
+      const newPoint = parseInt(value, 10);
+      if (typeof newPoint !== 'number') {
+        return `Only numbers are accepted`;
+      }
+
+      if (newPoint < 0) {
+        return 'Only positive number is allowed inclusive of 0';
+      }
+      return null;
     }
-  };
+  });
+  if (pointToEdit) {
+    handleEdit(personnelPointId, pointToEdit);
+  }
+};
+
+const PointsDetails = ({ handleEdit, points }) => {
+  const sortedPoints = useMemo(() => {
+    const sortingPoints = points;
+    sortingPoints.sort((a, b) => {
+      const textA = String(a.pointSystem.name).toUpperCase();
+      const textB = String(b.pointSystem.name).toUpperCase();
+      if (textA < textB) {
+        return -1;
+      }
+      if (textA > textB) {
+        return 1;
+      }
+
+      return 0;
+    });
+    return sortingPoints;
+  }, [points]);
+
   return (
     <Table striped responsive>
       <thead>
@@ -44,7 +63,7 @@ const PointsDetails = ({ handleEdit, points }) => {
         </tr>
       </thead>
       <tbody>
-        {points.map(point => {
+        {sortedPoints.map(point => {
           return (
             <tr key={point._id}>
               <td className="text-center">{point.pointSystem.name}</td>
@@ -56,7 +75,8 @@ const PointsDetails = ({ handleEdit, points }) => {
                     handleEditButtonClick(
                       point._id,
                       point.pointSystem.name,
-                      point.points
+                      point.points,
+                      handleEdit
                     )
                   }
                 >

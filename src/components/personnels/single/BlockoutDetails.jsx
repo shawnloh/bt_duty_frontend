@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import { Row, Col } from 'reactstrap';
 import moment from 'moment-timezone';
 import BlockoutTable from './blockout/BlockoutTable';
+import AddBlockout from './blockout/AddBlockout';
 import Pagination from '../../commons/Pagination';
 
-function BlockoutDetails({ blockoutDates, handleDelete }) {
+function BlockoutDetails({ blockoutDates, handleDelete, handleAdd }) {
   const [rowsPerPage] = useState(5);
   const [page, setPage] = useState(1);
   const sortedBlockoutDate = useMemo(() => {
@@ -26,16 +27,17 @@ function BlockoutDetails({ blockoutDates, handleDelete }) {
     return dates;
   }, [blockoutDates]);
 
-  if (sortedBlockoutDate.length === 0) {
-    return <h3 className="my-2">No blockout date for this personnel</h3>;
-  }
-
   const lastIndex = page * rowsPerPage;
   const firstIndex = lastIndex - rowsPerPage;
   const shownDates = sortedBlockoutDate.slice(firstIndex, lastIndex);
   return (
     <>
-      <BlockoutTable handleDelete={handleDelete} blockoutDates={shownDates} />
+      <AddBlockout handleAdd={handleAdd} />
+      {sortedBlockoutDate.length === 0 ? (
+        <h3 className="my-2">No blockout date for this personnel</h3>
+      ) : (
+        <BlockoutTable handleDelete={handleDelete} blockoutDates={shownDates} />
+      )}
       <Row>
         <Col className="d-flex justify-content-center align-items-center">
           <Pagination
@@ -56,7 +58,8 @@ BlockoutDetails.defaultProps = {
 
 BlockoutDetails.propTypes = {
   blockoutDates: PropTypes.arrayOf(PropTypes.string),
-  handleDelete: PropTypes.func.isRequired
+  handleDelete: PropTypes.func.isRequired,
+  handleAdd: PropTypes.func.isRequired
 };
 
 export default BlockoutDetails;

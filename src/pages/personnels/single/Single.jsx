@@ -22,10 +22,8 @@ import {
 } from './actions';
 import Details from '../../../components/personnels/single/Details';
 import Tabs from '../../../components/personnels/single/Tabs';
-import DeletePersonnelStatus from '../../../components/personnels/single/DeletePersonnelStatus';
-import AddStatus from '../../../components/personnels/single/AddStatus';
+import Status from '../../../components/personnels/single/Status';
 import ActionAlert from '../../../components/commons/ActionAlert';
-import AddBlockout from '../../../components/personnels/single/AddBlockout';
 import BlockoutDetails from '../../../components/personnels/single/BlockoutDetails';
 import PointsDetails from '../../../components/personnels/single/PointsDetails';
 
@@ -160,8 +158,8 @@ export class Single extends PureComponent {
           <Row>
             <Col>
               <p className="text-danger">
-                Note: Status and blockout dates that expired will be
-                automatically removed
+                Note: Event dates, status and blockout dates that expired will
+                be automatically removed
               </p>
             </Col>
           </Row>
@@ -177,19 +175,17 @@ export class Single extends PureComponent {
               />
             </TabPane>
             <TabPane tabId="2">
-              <AddStatus
+              <Status
+                handleDelete={this.handleDeleteStatus}
+                personStatuses={person.statuses}
                 statusIds={statusIds}
                 statuses={statuses}
                 handleAdd={this.handleAddStatus}
               />
-              <DeletePersonnelStatus
-                onDelete={this.handleDeleteStatus}
-                statuses={person.statuses}
-              />
             </TabPane>
             <TabPane tabId="3">
-              <AddBlockout handleAdd={this.handleAddBlockoutDate} />
               <BlockoutDetails
+                handleAdd={this.handleAddBlockoutDate}
                 blockoutDates={person.blockOutDates}
                 handleDelete={this.handleDeleteBlockoutDate}
               />
