@@ -12,7 +12,10 @@ import {
   DELETE_BLOCKOUT,
   DELETE_BLOCKOUT_FAILURE,
   DELETE_BLOCKOUT_SUCCESS,
-  CLEAR_ERRORS
+  CLEAR_ERRORS,
+  EDIT_PERSONNEL_POINT,
+  EDIT_PERSONNEL_POINT_FAILURE,
+  EDIT_PERSONNEL_POINT_SUCCESS
 } from './constants';
 
 const initialState = Map({
@@ -26,6 +29,7 @@ export default (state = initialState, { type, payload }) => {
     case DELETE_STATUS:
     case ADD_BLOCKOUT:
     case DELETE_BLOCKOUT:
+    case EDIT_PERSONNEL_POINT:
       return state.merge({
         actionInProgress: true,
         errors: []
@@ -34,6 +38,7 @@ export default (state = initialState, { type, payload }) => {
     case DELETE_STATUS_SUCCESS:
     case ADD_BLOCKOUT_SUCCESS:
     case DELETE_BLOCKOUT_SUCCESS:
+    case EDIT_PERSONNEL_POINT_SUCCESS:
     case CLEAR_ERRORS:
       return state.merge({
         actionInProgress: false,
@@ -44,6 +49,7 @@ export default (state = initialState, { type, payload }) => {
     case DELETE_STATUS_FAILURE:
     case ADD_BLOCKOUT_FAILURE:
     case DELETE_BLOCKOUT_FAILURE:
+    case EDIT_PERSONNEL_POINT_FAILURE:
       return state.merge({
         actionInProgress: false,
         errors: payload

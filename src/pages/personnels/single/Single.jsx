@@ -17,7 +17,8 @@ import {
   addStatus,
   deleteStatus,
   addBlockout,
-  deleteBlockout
+  deleteBlockout,
+  editPersonnelPoint
 } from './actions';
 import Details from '../../../components/personnels/single/Details';
 import Tabs from '../../../components/personnels/single/Tabs';
@@ -26,6 +27,7 @@ import AddStatus from '../../../components/personnels/single/AddStatus';
 import ActionAlert from '../../../components/commons/ActionAlert';
 import AddBlockout from '../../../components/personnels/single/AddBlockout';
 import BlockoutDetails from '../../../components/personnels/single/BlockoutDetails';
+import PointsDetails from '../../../components/personnels/single/PointsDetails';
 
 export class Single extends PureComponent {
   constructor(props) {
@@ -87,6 +89,17 @@ export class Single extends PureComponent {
       deleteBlockoutDate
     } = this.props;
     deleteBlockoutDate(personnelId, date);
+  };
+
+  handleEditPoint = (personnelPointId, newPoint) => {
+    const {
+      match: {
+        params: { personnelId }
+      },
+      editPoint
+    } = this.props;
+
+    editPoint(personnelId, personnelPointId, newPoint);
   };
 
   showErrors = () => {
@@ -181,6 +194,12 @@ export class Single extends PureComponent {
                 handleDelete={this.handleDeleteBlockoutDate}
               />
             </TabPane>
+            <TabPane tabId="4">
+              <PointsDetails
+                points={person.points}
+                handleEdit={this.handleEditPoint}
+              />
+            </TabPane>
           </TabContent>
         </Container>
       </>
@@ -208,6 +227,7 @@ Single.propTypes = {
   deletePersonnelStatus: PropTypes.func.isRequired,
   addBlockoutDate: PropTypes.func.isRequired,
   deleteBlockoutDate: PropTypes.func.isRequired,
+  editPoint: PropTypes.func.isRequired,
   actionInProgress: PropTypes.bool.isRequired,
   errors: PropTypes.arrayOf(PropTypes.string).isRequired
 };
@@ -224,7 +244,8 @@ const mapDispatchToProps = {
   addPersonnelStatus: addStatus,
   deletePersonnelStatus: deleteStatus,
   addBlockoutDate: addBlockout,
-  deleteBlockoutDate: deleteBlockout
+  deleteBlockoutDate: deleteBlockout,
+  editPoint: editPersonnelPoint
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Single);

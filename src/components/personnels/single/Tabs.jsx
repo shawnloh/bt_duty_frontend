@@ -35,6 +35,16 @@ const Tabs = ({ setTab, activeTab }) => {
           Blockout dates
         </NavLink>
       </NavItem>
+      <NavItem>
+        <NavLink
+          className={activeTab === '4' ? 'active' : ''}
+          onClick={() => {
+            setTab('4');
+          }}
+        >
+          Points
+        </NavLink>
+      </NavItem>
     </Nav>
   );
 };

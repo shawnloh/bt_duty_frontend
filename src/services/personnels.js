@@ -60,6 +60,13 @@ class PersonnelsService {
       .then(response => response)
       .catch(error => error);
   }
+
+  static editPersonnelPoint(personnelId, personnelPointId, points) {
+    return api
+      .put(`person/point/${personnelId}/${personnelPointId}`, { points })
+      .then(response => response)
+      .catch(error => error);
+  }
 }
 
 export default PersonnelsService;

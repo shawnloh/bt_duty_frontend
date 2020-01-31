@@ -4,7 +4,8 @@ import {
   ADD_STATUS,
   DELETE_STATUS,
   ADD_BLOCKOUT,
-  DELETE_BLOCKOUT
+  DELETE_BLOCKOUT,
+  EDIT_PERSONNEL_POINT
 } from './constants';
 import {
   addStatusSuccess,
@@ -15,6 +16,8 @@ import {
   addBlockoutFailure,
   deleteBlockoutFailure,
   deleteBlockoutSuccess,
+  editPersonnelPointFailure,
+  editPersonnelPointSuccess,
   clearErrors
 } from './actions';
 import { logout } from '../../../actions/authActions';
@@ -205,12 +208,59 @@ function* deleteBlockout(action) {
   }
 }
 
+function* editPersonnelPoint(action) {
+  try {
+    const { personnelId, personnelPointId, point } = action.payload;
+
+    const response = yield call(
+      PersonnelsService.editPersonnelPoint,
+      personnelId,
+      personnelPointId,
+      point
+    );
+    if (response.ok) {
+      const { ...personnels } = yield select(state =>
+        state.personnels.get('personnels')
+      );
+      const { points, personId, _id } = response.data.personnelPoint;
+      const person = personnels[personId];
+      person.points = person.points.map(pPoint => {
+        if (_id === pPoint._id) {
+          const personPoint = pPoint;
+          personPoint.points = points;
+          return personPoint;
+        }
+        return pPoint;
+      });
+
+      yield put(editPersonnelPointSuccess(personnels));
+    } else if (response.status === 401) {
+      yield put(logout());
+    } else {
+      let errors = [];
+      if (response.data.message) {
+        errors.push(response.data.message);
+      }
+
+      if (response.data.errors) {
+        errors = errors.concat(response.data.errors);
+      }
+      yield put(editPersonnelPointFailure(errors));
+      yield call(clearError);
+    }
+  } catch (error) {
+    yield put(editPersonnelPointFailure([error.message]));
+    yield call(clearError);
+  }
+}
+
 function* singleWatcher() {
   yield all([
     takeLatest(ADD_STATUS, addStatus),
     takeLatest(DELETE_STATUS, deleteStatus),
     takeLatest(ADD_BLOCKOUT, addBlockout),
-    takeLatest(DELETE_BLOCKOUT, deleteBlockout)
+    takeLatest(DELETE_BLOCKOUT, deleteBlockout),
+    takeLatest(EDIT_PERSONNEL_POINT, editPersonnelPoint)
   ]);
 }
 

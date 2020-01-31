@@ -11,7 +11,10 @@ import {
   DELETE_BLOCKOUT,
   DELETE_BLOCKOUT_FAILURE,
   DELETE_BLOCKOUT_SUCCESS,
-  CLEAR_ERRORS
+  CLEAR_ERRORS,
+  EDIT_PERSONNEL_POINT,
+  EDIT_PERSONNEL_POINT_FAILURE,
+  EDIT_PERSONNEL_POINT_SUCCESS
 } from './constants';
 
 export const addStatus = (personnelId, statusId, startDate, endDate) => ({
@@ -90,4 +93,23 @@ export const deleteBlockoutFailure = errors => ({
 
 export const clearErrors = () => ({
   type: CLEAR_ERRORS
+});
+
+export const editPersonnelPoint = (personnelId, personnelPointId, point) => ({
+  type: EDIT_PERSONNEL_POINT,
+  payload: {
+    personnelId,
+    personnelPointId,
+    point
+  }
+});
+
+export const editPersonnelPointSuccess = payload => ({
+  type: EDIT_PERSONNEL_POINT_SUCCESS,
+  payload
+});
+
+export const editPersonnelPointFailure = errors => ({
+  type: EDIT_PERSONNEL_POINT_FAILURE,
+  payload: errors
 });
