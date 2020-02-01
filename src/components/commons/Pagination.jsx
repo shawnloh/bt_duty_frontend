@@ -1,13 +1,8 @@
 import React, { useMemo } from 'react';
-import { Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 import PropTypes from 'prop-types';
+import ReactPaginate from 'react-paginate';
 
-const PaginationComponent = ({
-  rowsPerPage,
-  totalPosts,
-  currentPage,
-  setPage
-}) => {
+const PaginationComponent = ({ rowsPerPage, totalPosts, setPage }) => {
   const pageNumbers = useMemo(() => {
     const page = [];
     for (let i = 1; i <= Math.ceil(totalPosts / rowsPerPage); i += 1) {
@@ -19,44 +14,42 @@ const PaginationComponent = ({
   if (pageNumbers.length === 0) {
     return null;
   }
+
+  const handlePageClick = ({ selected }) => {
+    const pageNumber = selected + 1;
+    setPage(pageNumber);
+  };
+
   return (
-    <Pagination aria-label="Personnel navigation">
-      <PaginationItem disabled={currentPage === 1}>
-        <PaginationLink first onClick={() => setPage(1)} />
-      </PaginationItem>
-      <PaginationItem disabled={currentPage === 1}>
-        <PaginationLink previous onClick={() => setPage(currentPage - 1)} />
-      </PaginationItem>
-      {pageNumbers.map(number => {
-        return (
-          <PaginationItem active={currentPage === number} key={number}>
-            <PaginationLink onClick={() => setPage(number)}>
-              {number}
-            </PaginationLink>
-          </PaginationItem>
-        );
-      })}
-      <PaginationItem
-        disabled={currentPage === pageNumbers[pageNumbers.length - 1]}
-      >
-        <PaginationLink next onClick={() => setPage(currentPage + 1)} />
-      </PaginationItem>
-      <PaginationItem
-        disabled={currentPage === pageNumbers[pageNumbers.length - 1]}
-      >
-        <PaginationLink
-          last
-          onClick={() => setPage(pageNumbers[pageNumbers.length - 1])}
-        />
-      </PaginationItem>
-    </Pagination>
+    <nav aria-label="Page pagination">
+      <ReactPaginate
+        previousLabel="&laquo;"
+        previousClassName="page-item"
+        previousLinkClassName="page-link"
+        nextLabel="&raquo;"
+        nextClassName="page-item"
+        nextLinkClassName="page-link"
+        breakLabel="..."
+        breakClassName="page-item"
+        breakLinkClassName="page-link"
+        pageCount={pageNumbers.length}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={handlePageClick}
+        containerClassName="pagination justify-content-center"
+        pageClassName="page-item"
+        pageLinkClassName="page-link"
+        activeClassName="page-item active"
+        activeLinkClassName="page-item active"
+        disabledClassName="page-item disabled"
+      />
+    </nav>
   );
 };
 
 PaginationComponent.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
   totalPosts: PropTypes.number.isRequired,
-  currentPage: PropTypes.number.isRequired,
   setPage: PropTypes.func.isRequired
 };
 

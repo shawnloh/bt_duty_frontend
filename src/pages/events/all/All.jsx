@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import EventsTable from '../../../components/events/all/EventsTable';
-import Pagination from '../../../components/events/all/Pagination';
+import Pagination from '../../../components/commons/Pagination';
 import AppLayout from '../../shared/AppLayout';
 
 export class All extends PureComponent {
@@ -55,7 +55,7 @@ export class All extends PureComponent {
       points,
       match: { path }
     } = this.props;
-    const { rowsPerPage, page } = this.state;
+    const { rowsPerPage } = this.state;
     const { shownEvents, ids } = this.getEvents();
 
     return (
@@ -107,7 +107,6 @@ export class All extends PureComponent {
           <Row className="justify-content-center align-items-center">
             <Pagination
               rowsPerPage={rowsPerPage}
-              currentPage={page}
               setPage={this.setPage}
               totalPosts={ids.length}
             />

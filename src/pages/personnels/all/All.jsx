@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import PersonnelsTable from '../../../components/personnels/all/PersonnelsTable';
-import Pagination from '../../../components/personnels/all/Pagination';
+import Pagination from '../../../components/commons/Pagination';
 import Search from '../../../components/personnels/all/Search';
 import PersonnelModalDelete from '../../../components/personnels/all/PersonnelModalDelete';
 
@@ -127,7 +127,7 @@ class All extends PureComponent {
       actionInProgress,
       match: { path }
     } = this.props;
-    const { rowsPerPage, page, search } = this.state;
+    const { rowsPerPage, search } = this.state;
 
     const { shownPersonnels, ids } = this.getPersonnels();
     const modal = this.getDeleteModal();
@@ -173,7 +173,6 @@ class All extends PureComponent {
           <Row className="justify-content-center align-items-center">
             <Pagination
               rowsPerPage={rowsPerPage}
-              currentPage={page}
               setPage={this.setPage}
               totalPosts={ids.length}
             />
