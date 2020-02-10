@@ -1,37 +1,30 @@
-import React, { PureComponent } from 'react';
+import React, { memo, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import TopNavBar from '../../components/commons/TopNavBar';
 import { logout } from '../../actions/authActions';
 
-class AppLayout extends PureComponent {
-  render() {
-    const { children, username, userLogout } = this.props;
-    return (
-      <>
-        <TopNavBar username={username} logout={userLogout} />
-        {children}
-      </>
-    );
-  }
+export function AppLayout({ children }) {
+  const dispatch = useDispatch();
+  const username = useSelector(state => state.auth.get('username'));
+  const handleLogout = useCallback(() => {
+    dispatch(logout());
+  }, [dispatch]);
+
+  return (
+    <>
+      <TopNavBar username={username} logout={handleLogout} />
+      {children}
+    </>
+  );
 }
 
 AppLayout.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node
-  ]).isRequired,
-  username: PropTypes.string.isRequired,
-  userLogout: PropTypes.func.isRequired
+  ]).isRequired
 };
 
-const mapStateToProps = state => ({
-  username: state.auth.get('username')
-});
-
-const mapDispatchToProps = {
-  userLogout: logout
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(AppLayout);
+export default memo(AppLayout);

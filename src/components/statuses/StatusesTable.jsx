@@ -1,8 +1,9 @@
 import React from 'react';
 import { Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
+import { List } from 'immutable';
 
-const StatusesTable = ({ statuses, toggle, modes }) => {
+const StatusesTable = ({ statuses, handleUpdate, handleDelete }) => {
   return (
     <Table striped responsive>
       <thead>
@@ -16,17 +17,17 @@ const StatusesTable = ({ statuses, toggle, modes }) => {
       <tbody>
         {statuses.map(status => {
           return (
-            <tr key={status._id}>
-              <td className="text-center">{status.name}</td>
+            <tr key={status.get('_id')}>
+              <td className="text-center">{status.get('name')}</td>
               <td className="text-center">
                 <Button
                   color="primary"
-                  onClick={() => toggle(modes.UPDATE, status._id)}
+                  onClick={() => handleUpdate(status.get('_id'))}
                 >
                   Edit
                 </Button>{' '}
                 <Button
-                  onClick={() => toggle(modes.DELETE, status._id)}
+                  onClick={() => handleDelete(status.get('_id'))}
                   color="danger"
                 >
                   Delete
@@ -41,18 +42,9 @@ const StatusesTable = ({ statuses, toggle, modes }) => {
 };
 
 StatusesTable.propTypes = {
-  statuses: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string,
-      name: PropTypes.string
-    })
-  ).isRequired,
-  toggle: PropTypes.func.isRequired,
-  modes: PropTypes.shape({
-    UPDATE: PropTypes.string.isRequired,
-    DELETE: PropTypes.string.isRequired,
-    ADD: PropTypes.string.isRequired
-  }).isRequired
+  statuses: PropTypes.instanceOf(List).isRequired,
+  handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired
 };
 
 export default StatusesTable;

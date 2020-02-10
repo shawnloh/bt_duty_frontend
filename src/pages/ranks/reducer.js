@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { fromJS, List } from 'immutable';
 import {
   ADD_RANK_FAILURE,
   ADD_RANK,
@@ -8,12 +8,13 @@ import {
   DELETE_RANK_FAILURE,
   UPDATE_RANK,
   UPDATE_RANK_FAILURE,
-  UPDATE_RANK_SUCCESS
+  UPDATE_RANK_SUCCESS,
+  CLEAR_ERROR
 } from './constants';
 
-const initialState = Map({
+const initialState = fromJS({
   errors: [],
-  actionInProgress: false
+  actionInProgress: 0
 });
 
 export default (state = initialState, { type, payload }) => {
@@ -22,24 +23,27 @@ export default (state = initialState, { type, payload }) => {
     case DELETE_RANK:
     case UPDATE_RANK:
       return state.merge({
-        errors: [],
-        actionInProgress: true
+        errors: List(),
+        actionInProgress: state.get('actionInProgress') + 1
       });
     case ADD_RANK_SUCCESS:
     case DELETE_RANK_SUCCESS:
     case UPDATE_RANK_SUCCESS:
       return state.merge({
         errors: [],
-        actionInProgress: false
+        actionInProgress: state.get('actionInProgress') - 1
       });
     case ADD_RANK_FAILURE:
     case DELETE_RANK_FAILURE:
     case UPDATE_RANK_FAILURE:
       return state.merge({
-        errors: payload,
-        actionInProgress: false
+        errors: List(payload),
+        actionInProgress: state.get('actionInProgress') - 1
       });
-
+    case CLEAR_ERROR:
+      return state.merge({
+        errors: List()
+      });
     default:
       return state;
   }

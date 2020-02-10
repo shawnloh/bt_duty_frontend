@@ -1,205 +1,153 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React, { memo, useCallback } from 'react';
 import { Container, Col, Row, Button, Alert, Spinner } from 'reactstrap';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Helmet } from 'react-helmet';
-
-import AppLayout from '../shared/AppLayout';
-import PointsTable from '../../components/points/PointsTable';
-import PointModalEdit from '../../components/points/PointModalEdit';
-import PointModalDelete from '../../components/points/PointModalDelete';
-import PointModalAdd from '../../components/points/PointModalAdd';
+import Swal from 'sweetalert2';
 
 import { addPoint, deletePoint, updatePoint } from './actions';
+import { getPoints } from './selectors';
 
-const modes = {
-  UPDATE: 'UPDATE',
-  DELETE: 'DELETE',
-  ADD: 'ADD'
-};
+import Layout from '../shared/AppLayout';
+import PointsTable from '../../components/points/PointsTable';
 
-export class Points extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedId: null,
-      showModal: false,
-      mode: null,
-      newName: ''
-    };
-  }
+export function Points() {
+  const dispatch = useDispatch();
+  const pointsById = useSelector(state => state.points.get('points'));
+  const points = useSelector(getPoints);
+  const errors = useSelector(state => state.pages.points.get('errors'));
+  const actionInProgress = useSelector(state =>
+    state.pages.points.get('actionInProgress')
+  );
 
-  handleUpdate = () => {
-    const { updatePoint: modifyPoint } = this.props;
-    const { selectedId, newName } = this.state;
-    modifyPoint(selectedId, newName);
-    this.toggleModal();
-  };
+  const handleUpdate = useCallback(
+    id => {
+      async function showModal() {
+        const selectedPoint = pointsById.get(id);
+        const result = await Swal.fire({
+          title: `Enter a new point name for ${selectedPoint.get('name')}`,
+          input: 'text',
+          inputValue: '',
+          inputPlaceholder: selectedPoint.get('name'),
+          showCancelButton: true,
+          confirmButtonText: 'Update',
+          confirmButtonColor: '#28a745',
+          cancelButtonText: 'Cancel',
+          cancelButtonColor: '#007bff',
+          reverseButtons: true,
+          inputValidator: value => {
+            if (!value) {
+              return 'Updating a point name cannot be empty';
+            }
+            return null;
+          }
+        });
+        if (result.value) {
+          dispatch(updatePoint(id, result.value));
+        }
+      }
+      showModal();
+    },
+    [dispatch, pointsById]
+  );
 
-  handleDelete = () => {
-    const { deletePoint: removePoint } = this.props;
-    const { selectedId } = this.state;
-    removePoint(selectedId);
-    this.toggleModal();
-  };
+  const handleDelete = useCallback(
+    id => {
+      async function showModal() {
+        const selectedPoint = pointsById.get(id);
+        const result = await Swal.fire({
+          title: `Are you sure you want to delete ${selectedPoint.get(
+            'name'
+          )}?`,
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!',
+          reverseButtons: true
+        });
+        if (result.value) {
+          dispatch(deletePoint(id));
+        }
+      }
+      showModal();
+    },
+    [dispatch, pointsById]
+  );
 
-  handleAdd = () => {
-    const { addPoint: createPoint } = this.props;
-    const { newName } = this.state;
-    createPoint(newName);
-    this.toggleModal();
-  };
-
-  handleChange = e => {
-    const name = e.target.value;
-    this.setState({
-      newName: name
-    });
-  };
-
-  toggleModal = (mode = null, id = null) => {
-    this.setState(prevState => {
-      return {
-        showModal: !prevState.showModal,
-        selectedId: id,
-        mode,
-        newName: ''
-      };
-    });
-  };
-
-  showErrors = () => {
-    const { errors } = this.props;
-
-    return (
-      <Row>
-        {errors.map(error => {
-          return (
-            <Alert key={error} color="danger" className="w-100">
-              {error}
-            </Alert>
-          );
-        })}
-      </Row>
-    );
-  };
-
-  getModal = () => {
-    const { points } = this.props;
-    const { showModal, selectedId, mode } = this.state;
-
-    let modal = null;
-    if (mode === modes.UPDATE) {
-      modal = (
-        <PointModalEdit
-          point={points[selectedId].name}
-          onCancel={this.toggleModal}
-          onToggle={this.toggleModal}
-          onChangeText={this.handleChange}
-          showModal={showModal}
-          onSave={this.handleUpdate}
-        />
-      );
-    } else if (mode === modes.DELETE) {
-      modal = (
-        <PointModalDelete
-          point={points[selectedId]}
-          onCancel={this.toggleModal}
-          onToggle={this.toggleModal}
-          onDelete={this.handleDelete}
-          showModal={showModal}
-        />
-      );
-    } else if (mode === modes.ADD) {
-      modal = (
-        <PointModalAdd
-          onCancel={this.toggleModal}
-          onToggle={this.toggleModal}
-          onSave={this.handleAdd}
-          onChangeText={this.handleChange}
-          showModal={showModal}
-        />
-      );
+  const handleAdd = useCallback(() => {
+    async function showModal() {
+      const result = await Swal.fire({
+        title: 'Enter a new point name',
+        input: 'text',
+        inputValue: '',
+        showCancelButton: true,
+        confirmButtonText: 'Add',
+        confirmButtonColor: '#28a745',
+        cancelButtonText: 'Cancel',
+        cancelButtonColor: '#007bff',
+        reverseButtons: true,
+        inputValidator: value => {
+          if (!value) {
+            return 'Name cannot be empty';
+          }
+          return null;
+        }
+      });
+      if (result.value) {
+        dispatch(addPoint(result.value));
+      }
     }
-    return modal;
-  };
+    showModal();
+  }, [dispatch]);
 
-  render() {
-    const { ids, points, errors, actionInProgress } = this.props;
-
-    const modal = this.getModal();
-
-    const shownPoints = ids.map(id => {
-      return points[id];
-    });
-
-    return (
-      <AppLayout>
-        <Helmet>
-          <title>Points</title>
-        </Helmet>
-        <Container>
-          {modal}
-          {errors.length > 0 && this.showErrors()}
-          {actionInProgress && (
-            <Row>
-              <Alert color="primary" className="w-100">
-                Action in progress <Spinner color="primary" size="sm" />
-              </Alert>
-            </Row>
-          )}
-          <Row className="my-2 d-flex justify-content-center align-items-center">
-            <Col xs="9">
-              <h1>Points System</h1>
-            </Col>
-            <Col xs="3" className="d-flex justify-content-end">
-              <Button
-                color="success"
-                size="md"
-                onClick={() => this.toggleModal(modes.ADD)}
-              >
-                Add
-              </Button>
-            </Col>
-          </Row>
+  return (
+    <Layout>
+      <Helmet>
+        <title>Points</title>
+      </Helmet>
+      <Container>
+        {errors.size > 0 && (
           <Row>
-            <Col md="12">
-              <PointsTable
-                modes={modes}
-                points={shownPoints}
-                toggle={this.toggleModal}
-              />
-            </Col>
+            {errors.map(error => {
+              return (
+                <Alert key={error} color="danger" className="w-100">
+                  {error}
+                </Alert>
+              );
+            })}
           </Row>
-        </Container>
-      </AppLayout>
-    );
-  }
+        )}
+        {actionInProgress !== 0 && (
+          <Row>
+            <Alert color="primary" className="w-100">
+              {actionInProgress} action(s) in progress{' '}
+              <Spinner color="primary" size="sm" />
+            </Alert>
+          </Row>
+        )}
+        <Row className="my-2 d-flex justify-content-center align-items-center">
+          <Col xs="9">
+            <h1>Points System</h1>
+          </Col>
+          <Col xs="3" className="d-flex justify-content-end">
+            <Button color="success" size="md" onClick={handleAdd}>
+              Add
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col md="12">
+            <PointsTable
+              handleDelete={handleDelete}
+              handleUpdate={handleUpdate}
+              points={points}
+            />
+          </Col>
+        </Row>
+      </Container>
+    </Layout>
+  );
 }
 
-Points.propTypes = {
-  ids: PropTypes.arrayOf(PropTypes.string).isRequired,
-  points: PropTypes.shape({
-    id: PropTypes.string
-  }).isRequired,
-  errors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  addPoint: PropTypes.func.isRequired,
-  deletePoint: PropTypes.func.isRequired,
-  updatePoint: PropTypes.func.isRequired,
-  actionInProgress: PropTypes.bool.isRequired
-};
-
-const mapStateToProps = state => ({
-  ids: state.points.get('ids'),
-  points: state.points.get('points'),
-  errors: state.pages.points.get('errors'),
-  actionInProgress: state.pages.points.get('actionInProgress')
-});
-
-const mapDispatchToProps = {
-  addPoint,
-  deletePoint,
-  updatePoint
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Points);
+export default memo(Points);

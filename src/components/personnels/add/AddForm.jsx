@@ -10,6 +10,7 @@ import {
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { List } from 'immutable';
 
 const AddFormSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
@@ -17,12 +18,12 @@ const AddFormSchema = Yup.object().shape({
   platoon: Yup.string().required('Platoon is required')
 });
 
-const AddForm = ({ handleSubmit, ranks, rankIds, platoons, platoonIds }) => {
+const AddForm = ({ handleSubmit, ranks, platoons }) => {
   const formik = useFormik({
     initialValues: {
       name: '',
-      rank: rankIds[0] || '',
-      platoon: platoonIds[0] || ''
+      rank: ranks.has(0) ? ranks.getIn(['0', '_id']) : '',
+      platoon: platoons.has(0) ? platoons.getIn(['0', '_id']) : ''
     },
     validationSchema: AddFormSchema,
     onSubmit: handleSubmit
@@ -62,10 +63,10 @@ const AddForm = ({ handleSubmit, ranks, rankIds, platoons, platoonIds }) => {
           onChange={formik.handleChange}
           value={formik.values.rank}
         >
-          {rankIds.map(id => {
+          {ranks.map(rank => {
             return (
-              <option value={id} key={id}>
-                {ranks[id].name}
+              <option value={rank.get('_id')} key={rank.get('_id')}>
+                {rank.get('name')}
               </option>
             );
           })}
@@ -88,10 +89,10 @@ const AddForm = ({ handleSubmit, ranks, rankIds, platoons, platoonIds }) => {
           onChange={formik.handleChange}
           value={formik.values.platoon}
         >
-          {platoonIds.map(id => {
+          {platoons.map(platoon => {
             return (
-              <option value={id} key={id}>
-                {platoons[id].name}
+              <option value={platoon.get('_id')} key={platoon.get('_id')}>
+                {platoon.get('name')}
               </option>
             );
           })}
@@ -114,15 +115,7 @@ const AddForm = ({ handleSubmit, ranks, rankIds, platoons, platoonIds }) => {
 
 AddForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
-  ranks: PropTypes.shape({
-    _id: PropTypes.string,
-    name: PropTypes.string
-  }).isRequired,
-  rankIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-  platoons: PropTypes.shape({
-    _id: PropTypes.string,
-    name: PropTypes.string
-  }).isRequired,
-  platoonIds: PropTypes.arrayOf(PropTypes.string).isRequired
+  ranks: PropTypes.instanceOf(List).isRequired,
+  platoons: PropTypes.instanceOf(List).isRequired
 };
 export default AddForm;

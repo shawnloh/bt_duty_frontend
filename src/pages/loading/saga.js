@@ -83,9 +83,9 @@ function* loadPlatoons() {
       const platoons = {};
       const ids = [];
 
-      response.data.forEach(rank => {
-        const { _id: id } = rank;
-        platoons[id] = rank;
+      response.data.forEach(platoon => {
+        const { _id: id } = platoon;
+        platoons[id] = platoon;
         ids.push(id);
       });
       yield put(loadPlatoonsSuccess({ ids, platoons }));
@@ -106,9 +106,9 @@ function* loadEvents() {
       const events = {};
       const ids = [];
 
-      response.data.forEach(rank => {
-        const { _id: id } = rank;
-        events[id] = rank;
+      response.data.forEach(event => {
+        const { _id: id } = event;
+        events[id] = event;
         ids.push(id);
       });
       yield put(loadEventsSuccess({ ids, events }));
@@ -129,9 +129,9 @@ function* loadPersonnels() {
       const personnels = {};
       const ids = [];
 
-      response.data.forEach(rank => {
-        const { _id: id } = rank;
-        personnels[id] = rank;
+      response.data.forEach(person => {
+        const { _id: id } = person;
+        personnels[id] = person;
         ids.push(id);
       });
       yield put(loadPersonnelsSuccess({ ids, personnels }));
@@ -152,9 +152,9 @@ function* loadStatuses() {
       const statuses = {};
       const ids = [];
 
-      response.data.forEach(rank => {
-        const { _id: id } = rank;
-        statuses[id] = rank;
+      response.data.forEach(status => {
+        const { _id: id } = status;
+        statuses[id] = status;
         ids.push(id);
       });
       yield put(loadStatusesSuccess({ ids, statuses }));

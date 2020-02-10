@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Table, Button } from 'reactstrap';
 import { Link, useRouteMatch } from 'react-router-dom';
+import { List } from 'immutable';
 
 const Details = ({ name, rank, platoon, eventsDate }) => {
   const { url } = useRouteMatch();
@@ -15,11 +16,11 @@ const Details = ({ name, rank, platoon, eventsDate }) => {
           </tr>
           <tr>
             <th className="text-center">Rank:</th>
-            <td className="text-center">{rank.name}</td>
+            <td className="text-center">{rank}</td>
           </tr>
           <tr>
             <th className="text-center">Platoon:</th>
-            <td className="text-center">{platoon.name}</td>
+            <td className="text-center">{platoon}</td>
           </tr>
         </tbody>
       </Table>
@@ -52,20 +53,14 @@ const Details = ({ name, rank, platoon, eventsDate }) => {
 };
 
 Details.defaultProps = {
-  eventsDate: []
+  eventsDate: List()
 };
 
 Details.propTypes = {
   name: PropTypes.string.isRequired,
-  eventsDate: PropTypes.arrayOf(PropTypes.string),
-  rank: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired
-  }).isRequired,
-  platoon: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired
-  }).isRequired
+  rank: PropTypes.string.isRequired,
+  platoon: PropTypes.string.isRequired,
+  eventsDate: PropTypes.oneOfType([PropTypes.instanceOf(List)])
 };
 
 export default Details;

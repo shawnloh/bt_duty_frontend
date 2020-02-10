@@ -13,27 +13,28 @@ import {
   FormText
 } from 'reactstrap';
 import moment from 'moment-timezone';
+import { List } from 'immutable';
 
 const checkDateValid = date => {
   return (
     moment(date, 'DDMMYY', true).isValid() || date.toLowerCase() === 'permanent'
   );
 };
+const today = moment()
+  .tz('Asia/Singapore')
+  .format('DDMMYY');
 
-const AddStatus = ({ handleAdd, statuses, statusIds }) => {
-  const today = moment()
-    .tz('Asia/Singapore')
-    .format('DDMMYY');
-
+const AddStatus = ({ handleAdd, statuses }) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const [status, setStatus] = useState(statusIds[0] || '');
+  const [status, setStatus] = useState(
+    statuses.has(0) ? statuses.getIn(['0', '_id']) : ''
+  );
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(today);
 
   const toggle = () => {
     setIsOpen(!isOpen);
-    setStatus(statusIds[0] || '');
+    setStatus(statuses.has(0) ? statuses.getIn(['0', '_id']) : '');
     setStartDate(today);
     setEndDate(today);
   };
@@ -76,10 +77,10 @@ const AddStatus = ({ handleAdd, statuses, statusIds }) => {
                     id="statusSelect"
                     onChange={changeStatus}
                   >
-                    {statusIds.map(id => {
+                    {statuses.map(stat => {
                       return (
-                        <option value={id} key={id}>
-                          {statuses[id].name}
+                        <option value={stat.get('_id')} key={stat.get('_id')}>
+                          {stat.get('name')}
                         </option>
                       );
                     })}
@@ -133,13 +134,8 @@ const AddStatus = ({ handleAdd, statuses, statusIds }) => {
 
 AddStatus.propTypes = {
   handleAdd: PropTypes.func.isRequired,
-  statuses: PropTypes.shape({
-    id: PropTypes.shape({
-      _id: PropTypes.string,
-      name: PropTypes.string
-    })
-  }).isRequired,
-  statusIds: PropTypes.arrayOf(PropTypes.string).isRequired
+  statuses: PropTypes.oneOfType([PropTypes.instanceOf(List).isRequired])
+    .isRequired
 };
 
 export default AddStatus;

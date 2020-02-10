@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { fromJS, List } from 'immutable';
 import {
   LOAD_PLATOONS_FAILURE,
   LOAD_PLATOONS_SUCCESS
@@ -9,7 +9,7 @@ import {
   UPDATE_PLATOON_SUCCESS
 } from '../pages/platoons/constants';
 
-const initialState = Map({
+const initialState = fromJS({
   ids: [],
   platoons: {},
   errors: []
@@ -17,21 +17,27 @@ const initialState = Map({
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
-    case ADD_PLATOON_SUCCESS:
-    case DELETE_PLATOON_SUCCESS:
     case LOAD_PLATOONS_SUCCESS:
       return state.merge({
-        ids: payload.ids,
-        platoons: payload.platoons,
-        errors: []
+        ids: List(payload.ids),
+        platoons: fromJS(payload.platoons),
+        errors: List()
+      });
+    case ADD_PLATOON_SUCCESS:
+      return state.merge({
+        ids: state.get('ids').push(payload._id),
+        platoons: state.get('platoons').set(payload._id, fromJS(payload))
+      });
+    case DELETE_PLATOON_SUCCESS:
+      return state.merge({
+        ids: state.get('ids').delete(state.get('ids').indexOf(payload)),
+        platoons: state.get('platoons').delete(payload)
       });
     case UPDATE_PLATOON_SUCCESS:
-      return state.merge({
-        platoons: payload
-      });
+      return state.setIn(['platoons', payload._id], fromJS(payload));
     case LOAD_PLATOONS_FAILURE:
       return state.merge({
-        errors: payload
+        errors: List(payload)
       });
     default:
       return state;

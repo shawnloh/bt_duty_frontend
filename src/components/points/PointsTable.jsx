@@ -1,8 +1,9 @@
 import React from 'react';
 import { Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
+import { List } from 'immutable';
 
-const PointTable = ({ points, toggle, modes }) => {
+const PointTable = ({ points, handleUpdate, handleDelete }) => {
   return (
     <Table striped responsive>
       <thead>
@@ -16,17 +17,17 @@ const PointTable = ({ points, toggle, modes }) => {
       <tbody>
         {points.map(point => {
           return (
-            <tr key={point._id}>
-              <td className="text-center">{point.name}</td>
+            <tr key={point.get('_id')}>
+              <td className="text-center">{point.get('name')}</td>
               <td className="text-center">
                 <Button
                   color="primary"
-                  onClick={() => toggle(modes.UPDATE, point._id)}
+                  onClick={() => handleUpdate(point.get('_id'))}
                 >
                   Edit
                 </Button>{' '}
                 <Button
-                  onClick={() => toggle(modes.DELETE, point._id)}
+                  onClick={() => handleDelete(point.get('_id'))}
                   color="danger"
                 >
                   Delete
@@ -41,18 +42,9 @@ const PointTable = ({ points, toggle, modes }) => {
 };
 
 PointTable.propTypes = {
-  points: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string,
-      name: PropTypes.string
-    })
-  ).isRequired,
-  toggle: PropTypes.func.isRequired,
-  modes: PropTypes.shape({
-    UPDATE: PropTypes.string.isRequired,
-    DELETE: PropTypes.string.isRequired,
-    ADD: PropTypes.string.isRequired
-  }).isRequired
+  points: PropTypes.instanceOf(List).isRequired,
+  handleDelete: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func.isRequired
 };
 
 export default PointTable;

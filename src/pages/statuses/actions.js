@@ -7,7 +7,8 @@ import {
   DELETE_STATUS_SUCCESS,
   UPDATE_STATUS,
   UPDATE_STATUS_FAILURE,
-  UPDATE_STATUS_SUCCESS
+  UPDATE_STATUS_SUCCESS,
+  CLEAR_ERROR
 } from './constants';
 
 export const addStatus = name => ({
@@ -15,12 +16,9 @@ export const addStatus = name => ({
   payload: name
 });
 
-export const addStatusSuccess = ({ ids, statuses }) => ({
+export const addStatusSuccess = newStatus => ({
   type: ADD_STATUS_SUCCESS,
-  payload: {
-    ids,
-    statuses
-  }
+  payload: newStatus
 });
 
 export const addStatusFailure = errors => ({
@@ -51,12 +49,16 @@ export const updateStatus = (id, name) => ({
   }
 });
 
-export const updateStatusSuccess = statuses => ({
+export const updateStatusSuccess = updatedStatus => ({
   type: UPDATE_STATUS_SUCCESS,
-  payload: statuses
+  payload: updatedStatus
 });
 
 export const updateStatusFailure = errors => ({
   type: UPDATE_STATUS_FAILURE,
   payload: errors
+});
+
+export const clearErrors = () => ({
+  type: CLEAR_ERROR
 });

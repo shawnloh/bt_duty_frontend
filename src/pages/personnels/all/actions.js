@@ -1,7 +1,8 @@
 import {
   DELETE_PERSONNEL,
   DELETE_PERSONNEL_FAILURE,
-  DELETE_PERSONNEL_SUCCESS
+  DELETE_PERSONNEL_SUCCESS,
+  CLEAR_ERROR_MESSAGE
 } from './constants';
 
 export const deletePersonnel = id => ({
@@ -9,15 +10,15 @@ export const deletePersonnel = id => ({
   payload: id
 });
 
-export const deletePersonnelSuccess = ({ ids, personnels }) => ({
+export const deletePersonnelSuccess = id => ({
   type: DELETE_PERSONNEL_SUCCESS,
-  payload: {
-    ids,
-    personnels
-  }
+  payload: id
 });
 
 export const deletePersonnelFailure = errors => ({
   type: DELETE_PERSONNEL_FAILURE,
   payload: errors
+});
+export const clearErrorMessage = () => ({
+  type: CLEAR_ERROR_MESSAGE
 });

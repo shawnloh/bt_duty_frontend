@@ -7,7 +7,8 @@ import {
   DELETE_POINT_SUCCESS,
   UPDATE_POINT,
   UPDATE_POINT_FAILURE,
-  UPDATE_POINT_SUCCESS
+  UPDATE_POINT_SUCCESS,
+  CLEAR_ERROR
 } from './constants';
 
 export const addPoint = name => ({
@@ -15,12 +16,9 @@ export const addPoint = name => ({
   payload: name
 });
 
-export const addPointSuccess = ({ ids, points }) => ({
+export const addPointSuccess = newPoint => ({
   type: ADD_POINT_SUCCESS,
-  payload: {
-    ids,
-    points
-  }
+  payload: newPoint
 });
 
 export const addPointFailure = errors => ({
@@ -51,12 +49,17 @@ export const updatePoint = (id, name) => ({
   }
 });
 
-export const updatePointSuccess = points => ({
+export const updatePointSuccess = updatedPoint => ({
   type: UPDATE_POINT_SUCCESS,
-  payload: points
+  payload: updatedPoint
 });
 
 export const updatePointFailure = errors => ({
   type: UPDATE_POINT_FAILURE,
   payload: errors
+});
+
+export const clearErrors = payload => ({
+  type: CLEAR_ERROR,
+  payload
 });

@@ -60,9 +60,9 @@ function* refreshPersonnelsFromServer() {
       const personnels = {};
       const ids = [];
 
-      response.data.forEach(rank => {
-        const { _id: id } = rank;
-        personnels[id] = rank;
+      response.data.forEach(person => {
+        const { _id: id } = person;
+        personnels[id] = person;
         ids.push(id);
       });
       yield put(loadPersonnelsSuccess({ ids, personnels }));
@@ -76,19 +76,22 @@ function* refreshPersonnelsFromServer() {
   }
 }
 function* updatePersonnelsPointSystemName() {
-  const personnelsState = yield select(state => state.personnels);
-  const { ...points } = yield select(state => state.points.get('points'));
+  const points = yield select(state => state.points.get('points'));
 
-  const ids = personnelsState.get('ids');
-  const { ...personnels } = personnelsState.get('personnels');
+  const ids = yield select(state => state.personnels.get('ids'));
+  let personnels = yield select(state => state.personnels.get('personnels'));
 
   ids.forEach(id => {
-    const person = personnels[id];
-    person.points = person.points.map(point => {
-      const currPoint = point;
-      currPoint.pointSystem = points[currPoint.pointSystem._id];
+    const person = personnels.get(id);
+    const newPoints = person.get('points').map(point => {
+      let currPoint = point;
+      currPoint = currPoint.set(
+        'pointSystem',
+        points.get(currPoint.getIn(['pointSystem', '_id']))
+      );
       return currPoint;
     });
+    personnels = personnels.setIn([id, 'points'], newPoints);
   });
   yield put(personnelsUpdatePointsSystem(personnels));
 }
@@ -102,12 +105,13 @@ function* deletePersonnelsPointsSystem(action) {
   if (success) {
     const personnelsState = yield select(state => state.personnels);
     const ids = personnelsState.get('ids');
-    const { ...personnels } = personnelsState.get('personnels');
+    let personnels = personnelsState.get('personnels');
     ids.forEach(id => {
-      const person = personnels[id];
-      person.points = person.points.filter(point => {
-        return point.pointSystem._id !== eventIdToDelete;
+      const person = personnels.get(id);
+      const newPoints = person.get('points').filter(point => {
+        return point.getIn(['pointSystem', '_id']) !== eventIdToDelete;
       });
+      personnels = personnels.setIn([id, 'points'], newPoints);
     });
 
     yield put(personnelsUpdatePointsSystem(personnels));
@@ -116,29 +120,38 @@ function* deletePersonnelsPointsSystem(action) {
 
 function* deleteEventUpdatePoints(action) {
   const { revert, eventId } = action.payload;
-  const allEvents = yield select(state => state.events.get('events'));
-  const event = allEvents[eventId];
   if (revert) {
+    const event = yield select(state =>
+      state.events.get('events').get(eventId)
+    );
     const { success } = yield race({
       success: take(DELETE_EVENT_SUCCESS),
       failure: take(DELETE_EVENT_FAILURE)
     });
     if (success) {
-      const { ...personnels } = yield select(state =>
+      let personnels = yield select(state =>
         state.personnels.get('personnels')
       );
-      const personnelIds = event.personnels.map(person => person._id);
+      const personnelIds = event.get('personnels').map(person => person._id);
 
       personnelIds.forEach(id => {
-        const person = personnels[id];
-        person.points = person.points.map(point => {
-          if (point.pointSystem._id === event.pointSystem._id) {
-            const currPoint = point;
-            currPoint.points -= event.pointsAllocation;
+        const person = personnels.get(id);
+        const newPoints = person.get('points').map(point => {
+          let currPoint = point;
+          if (
+            point.getIn(['pointSystem', '_id']) ===
+            event.getIn(['pointSystem', '_id'])
+          ) {
+            currPoint = currPoint.set(
+              'points',
+              currPoint.get('points') - event.get('pointsAllocation')
+            );
             return currPoint;
           }
-          return point;
+          return currPoint;
         });
+
+        personnels = personnels.setIn([id, 'points'], newPoints);
       });
       yield put(personnelsUpdateEventPoints(personnels));
     }
@@ -154,12 +167,13 @@ function* updatePersonnelsPlatoonName(action) {
   if (success) {
     const personnelsState = yield select(state => state.personnels);
     const ids = personnelsState.get('ids');
-    const { ...personnels } = personnelsState.get('personnels');
+    let personnels = personnelsState.get('personnels');
     ids.forEach(personId => {
-      const person = personnels[personId];
-      if (person.platoon._id === id) {
-        person.platoon.name = String(name).toUpperCase();
+      let person = personnels.get(personId);
+      if (person.getIn(['platoon', '_id']) === id) {
+        person = person.setIn(['platoon', 'name'], String(name).toUpperCase());
       }
+      personnels = personnels.set(personId, person);
     });
     yield put(personnelsUpdatePlatoon(personnels));
   }
@@ -175,12 +189,13 @@ function* updatePersonnelsRankName(action) {
   if (success) {
     const personnelsState = yield select(state => state.personnels);
     const ids = personnelsState.get('ids');
-    const { ...personnels } = personnelsState.get('personnels');
+    let personnels = personnelsState.get('personnels');
     ids.forEach(personId => {
-      const person = personnels[personId];
-      if (person.rank._id === id) {
-        person.rank.name = String(name).toUpperCase();
+      let person = personnels.get(personId);
+      if (person.getIn(['rank', '_id']) === id) {
+        person = person.setIn(['rank', 'name'], String(name).toUpperCase());
       }
+      personnels = personnels.set(personId, person);
     });
     yield put(personnelsUpdateRank(personnels));
   }
@@ -196,16 +211,20 @@ function* updateStatusesName(action) {
   if (success) {
     const personnelsState = yield select(state => state.personnels);
     const ids = personnelsState.get('ids');
-    const { ...personnels } = personnelsState.get('personnels');
+    let personnels = personnelsState.get('personnels');
     ids.forEach(personId => {
-      const person = personnels[personId];
-      person.statuses = person.statuses.map(status => {
-        const currStatus = status;
-        if (currStatus.statusId._id === id) {
-          currStatus.statusId.name = String(name).toUpperCase();
+      const person = personnels.get(personId);
+      const newStatuses = person.get('statuses').map(status => {
+        let currStatus = status;
+        if (status.getIn(['statusId', '_id']) === id) {
+          currStatus = currStatus.setIn(
+            ['statusId', 'name'],
+            String(name).toUpperCase()
+          );
         }
         return currStatus;
       });
+      personnels = personnels.setIn([personId, 'statuses'], newStatuses);
     });
     yield put(personnelsUpdateStatus(personnels));
   }

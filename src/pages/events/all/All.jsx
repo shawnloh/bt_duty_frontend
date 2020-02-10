@@ -1,142 +1,94 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 import { Container, Row, Button, Col, Label, Input } from 'reactstrap';
 import { Helmet } from 'react-helmet';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Link, useRouteMatch } from 'react-router-dom';
 import EventsTable from '../../../components/events/all/EventsTable';
 import Pagination from '../../../components/commons/Pagination';
-import AppLayout from '../../shared/AppLayout';
+import Layout from '../../shared/AppLayout';
+import { getEvents, getPoints } from './selectors';
 
-export class All extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      rowsPerPage: 10,
-      page: 1,
-      filterBy: 'ALL'
-    };
-  }
+export function All() {
+  const { path } = useRouteMatch();
+  const [rowsPerPage] = useState(10);
+  const [page, setPage] = useState(1);
+  const [filterBy, setFilterBy] = useState('ALL');
+  const events = useSelector(getEvents);
+  const points = useSelector(getPoints);
 
-  getEvents = () => {
-    const { ids, events } = this.props;
-    const { rowsPerPage, page, filterBy } = this.state;
+  // Slice events
+  const shownEvents = useMemo(() => {
     const lastIndex = page * rowsPerPage;
     const firstIndex = lastIndex - rowsPerPage;
     if (filterBy === 'ALL') {
-      const shownIds = ids.slice(firstIndex, lastIndex);
-      const shownEvents = shownIds.map(id => events[id]);
-      return { shownEvents, ids };
+      return events.slice(firstIndex, lastIndex);
     }
 
-    const filteredIds = ids.filter(
-      id => events[id].pointSystem.name === filterBy
-    );
-    const shownIds = filteredIds.slice(firstIndex, lastIndex);
-    const shownEvents = shownIds.map(id => events[id]);
-    return { shownEvents, ids: filteredIds };
-  };
-
-  setPage = page => {
-    this.setState({
-      page
+    const filteredEvents = events.filter(event => {
+      return event.getIn(['pointSystem', 'name']) === filterBy;
     });
-  };
 
-  filter = e => {
-    this.setState({
-      filterBy: e.target.value
-    });
-  };
+    return filteredEvents.slice(firstIndex, lastIndex);
+  }, [events, filterBy, page, rowsPerPage]);
 
-  render() {
-    const {
-      pointIds,
-      points,
-      match: { path }
-    } = this.props;
-    const { rowsPerPage } = this.state;
-    const { shownEvents, ids } = this.getEvents();
+  const filter = useCallback(({ target: { value } }) => setFilterBy(value), []);
 
-    return (
-      <AppLayout>
-        <Helmet>
-          <title>Events</title>
-        </Helmet>
-        <Container>
-          <Row className="my-2 d-flex justify-content-center align-items-center">
-            <Col xs="9">
-              <h1>Events</h1>
-            </Col>
-            <Col xs="3" className="d-flex justify-content-end">
-              <Button color="success" size="md" tag={Link} to={`${path}/add`}>
-                Add
-              </Button>
-            </Col>
-          </Row>
-          <Row>
-            <Col xs="12">
-              <p className="text-danger">
-                Note: Past events that have expired will automatically be
-                removed, points will be retained.
-              </p>
-            </Col>
-          </Row>
+  return (
+    <Layout>
+      <Helmet>
+        <title>Events</title>
+      </Helmet>
+      <Container>
+        <Row className="my-2 d-flex justify-content-center align-items-center">
+          <Col xs="9">
+            <h1>Events</h1>
+          </Col>
+          <Col xs="3" className="d-flex justify-content-end">
+            <Button color="success" size="md" tag={Link} to={`${path}/add`}>
+              Add
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col xs="12">
+            <p className="text-danger">
+              Note: Past events that have expired will automatically be removed,
+              points will be retained.
+            </p>
+          </Col>
+        </Row>
 
-          <Row className="my-2">
-            <Col xs="12">
-              <Label for="filterSelect">Filter</Label>
-              <Input
-                type="select"
-                name="filterSelect"
-                id="filterSelect"
-                onChange={this.filter}
-              >
-                <option value="ALL">ALL</option>
-                {pointIds.map(id => (
-                  <option key={id} value={points[id].name}>
-                    {points[id].name}
-                  </option>
-                ))}
-              </Input>
-            </Col>
-          </Row>
-          <Row>
-            <EventsTable events={shownEvents} path={path} />
-          </Row>
-          <Row className="justify-content-center align-items-center">
-            <Pagination
-              rowsPerPage={rowsPerPage}
-              setPage={this.setPage}
-              totalPosts={ids.length}
-            />
-          </Row>
-        </Container>
-      </AppLayout>
-    );
-  }
+        <Row className="my-2">
+          <Col xs="12">
+            <Label for="filterSelect">Filter</Label>
+            <Input
+              type="select"
+              name="filterSelect"
+              id="filterSelect"
+              onChange={filter}
+            >
+              <option value="ALL">ALL</option>
+              {points.map(point => (
+                <option key={point.get('_id')} value={point.get('name')}>
+                  {point.get('name')}
+                </option>
+              ))}
+            </Input>
+          </Col>
+        </Row>
+        <Row className="my-2">
+          <EventsTable events={shownEvents} path={path} />
+        </Row>
+        <Row className="justify-content-center align-items-center">
+          <Pagination
+            rowsPerPage={rowsPerPage}
+            setPage={setPage}
+            totalPosts={events.size}
+          />
+        </Row>
+      </Container>
+    </Layout>
+  );
 }
 
-All.propTypes = {
-  ids: PropTypes.arrayOf(PropTypes.string).isRequired,
-  events: PropTypes.shape({
-    id: PropTypes.string
-  }).isRequired,
-  pointIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-  points: PropTypes.shape({
-    id: PropTypes.string
-  }).isRequired,
-  match: PropTypes.shape({
-    path: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired
-  }).isRequired
-};
-
-const mapStateToProps = state => ({
-  ids: state.events.get('ids'),
-  events: state.events.get('events'),
-  pointIds: state.points.get('ids'),
-  points: state.points.get('points')
-});
-
-export default connect(mapStateToProps)(All);
+export default memo(All);

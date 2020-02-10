@@ -1,203 +1,152 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React, { useCallback, memo } from 'react';
 import { Container, Col, Row, Button, Alert, Spinner } from 'reactstrap';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
+import Swal from 'sweetalert2';
+import { getPlatoons } from './selectors';
 
-import AppLayout from '../shared/AppLayout';
+import Layout from '../shared/AppLayout';
 import PlatoonsTable from '../../components/platoons/PlatoonsTable';
-import PlatoonModalEdit from '../../components/platoons/PlatoonModalEdit';
-import PlatoonModalDelete from '../../components/platoons/PlatoonModalDelete';
-import PlatoonModalAdd from '../../components/platoons/PlatoonModalAdd';
 
 import { addPlatoon, deletePlatoon, updatePlatoon } from './actions';
 
-const modes = {
-  UPDATE: 'UPDATE',
-  DELETE: 'DELETE',
-  ADD: 'ADD'
-};
+export function Platoons() {
+  const dispatch = useDispatch();
+  const platoonsById = useSelector(state => state.platoons.get('platoons'));
+  const platoons = useSelector(getPlatoons);
+  const errors = useSelector(state => state.pages.platoons.get('errors'));
+  const actionInProgress = useSelector(state =>
+    state.pages.platoons.get('actionInProgress')
+  );
+  const handleUpdate = useCallback(
+    id => {
+      async function showModal() {
+        const selectedPlatoon = platoonsById.get(id);
+        const result = await Swal.fire({
+          title: `Enter a new platoon name for ${selectedPlatoon.get('name')}`,
+          input: 'text',
+          inputValue: '',
+          inputPlaceholder: selectedPlatoon.get('name'),
+          showCancelButton: true,
+          confirmButtonText: 'Update',
+          confirmButtonColor: '#28a745',
+          cancelButtonText: 'Cancel',
+          cancelButtonColor: '#007bff',
+          reverseButtons: true,
+          inputValidator: value => {
+            if (!value) {
+              return 'Updating a platoon name cannot be empty';
+            }
+            return null;
+          }
+        });
+        if (result.value) {
+          dispatch(updatePlatoon(id, result.value));
+        }
+      }
+      showModal();
+    },
+    [dispatch, platoonsById]
+  );
 
-export class Platoons extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedId: null,
-      showModal: false,
-      mode: null,
-      newName: ''
-    };
-  }
+  const handleDelete = useCallback(
+    id => {
+      async function showModal() {
+        const selectedPlatoon = platoonsById.get(id);
+        const result = await Swal.fire({
+          title: `Are you sure you want to delete ${selectedPlatoon.get(
+            'name'
+          )}?`,
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!',
+          reverseButtons: true
+        });
+        if (result.value) {
+          dispatch(deletePlatoon(id));
+        }
+      }
+      showModal();
+    },
+    [dispatch, platoonsById]
+  );
 
-  handleUpdate = () => {
-    const { updatePlatoon: modifyPlatoon } = this.props;
-    const { selectedId, newName } = this.state;
-    modifyPlatoon(selectedId, newName);
-    this.toggleModal();
-  };
-
-  handleDelete = () => {
-    const { deletePlatoon: removePlatoon } = this.props;
-    const { selectedId } = this.state;
-    removePlatoon(selectedId);
-    this.toggleModal();
-  };
-
-  handleAdd = () => {
-    const { addPlatoon: createPlatoon } = this.props;
-    const { newName } = this.state;
-    createPlatoon(newName);
-    this.toggleModal();
-  };
-
-  handleChange = e => {
-    const name = e.target.value;
-    this.setState({
-      newName: name
-    });
-  };
-
-  toggleModal = (mode = null, id = null) => {
-    this.setState(prevState => {
-      return {
-        showModal: !prevState.showModal,
-        selectedId: id,
-        mode,
-        newName: ''
-      };
-    });
-  };
-
-  showErrors = () => {
-    const { errors } = this.props;
-
-    return (
-      <Row>
-        {errors.map(error => {
-          return (
-            <Alert key={error} color="danger" className="w-100">
-              {error}
-            </Alert>
-          );
-        })}
-      </Row>
-    );
-  };
-
-  getModal = () => {
-    let modal = null;
-    const { showModal, selectedId, mode } = this.state;
-    const { platoons } = this.props;
-    if (mode === modes.UPDATE) {
-      modal = (
-        <PlatoonModalEdit
-          platoon={platoons[selectedId].name}
-          onCancel={this.toggleModal}
-          onToggle={this.toggleModal}
-          onChangeText={this.handleChange}
-          showModal={showModal}
-          onSave={this.handleUpdate}
-        />
-      );
-    } else if (mode === modes.DELETE) {
-      modal = (
-        <PlatoonModalDelete
-          platoon={platoons[selectedId]}
-          onCancel={this.toggleModal}
-          onToggle={this.toggleModal}
-          onDelete={this.handleDelete}
-          showModal={showModal}
-        />
-      );
-    } else if (mode === modes.ADD) {
-      modal = (
-        <PlatoonModalAdd
-          onCancel={this.toggleModal}
-          onToggle={this.toggleModal}
-          onSave={this.handleAdd}
-          onChangeText={this.handleChange}
-          showModal={showModal}
-        />
-      );
+  const handleAdd = useCallback(() => {
+    async function showModal() {
+      const result = await Swal.fire({
+        title: 'Enter a new platoon name',
+        input: 'text',
+        inputValue: '',
+        showCancelButton: true,
+        confirmButtonText: 'Add',
+        confirmButtonColor: '#28a745',
+        cancelButtonText: 'Cancel',
+        cancelButtonColor: '#007bff',
+        reverseButtons: true,
+        inputValidator: value => {
+          if (!value) {
+            return 'Name cannot be empty';
+          }
+          return null;
+        }
+      });
+      if (result.value) {
+        dispatch(addPlatoon(result.value));
+      }
     }
-    return modal;
-  };
+    showModal();
+  }, [dispatch]);
 
-  render() {
-    const { ids, platoons, errors, actionInProgress } = this.props;
-    const modal = this.getModal();
-
-    const shownPlatoons = ids.map(id => {
-      return platoons[id];
-    });
-
-    return (
-      <AppLayout>
-        <Helmet>
-          <title>Platoons</title>
-        </Helmet>
-        <Container>
-          {modal}
-          {errors.length > 0 && this.showErrors()}
-          {actionInProgress && (
-            <Row>
-              <Alert color="primary" className="w-100">
-                Action in progress <Spinner color="primary" size="sm" />
-              </Alert>
-            </Row>
-          )}
-          <Row className="my-2 d-flex justify-content-center align-items-center">
-            <Col xs="9">
-              <h1>Platoons</h1>
-            </Col>
-            <Col xs="3" className="d-flex justify-content-end">
-              <Button
-                color="success"
-                size="md"
-                onClick={() => this.toggleModal(modes.ADD)}
-              >
-                Add
-              </Button>
-            </Col>
-          </Row>
+  return (
+    <Layout>
+      <Helmet>
+        <title>Platoons</title>
+      </Helmet>
+      <Container>
+        {errors.size > 0 && (
           <Row>
-            <Col md="12">
-              <PlatoonsTable
-                modes={modes}
-                platoons={shownPlatoons}
-                toggle={this.toggleModal}
-              />
-            </Col>
+            {errors.map(error => {
+              return (
+                <Alert key={error} color="danger" className="w-100">
+                  {error}
+                </Alert>
+              );
+            })}
           </Row>
-        </Container>
-      </AppLayout>
-    );
-  }
+        )}
+        {actionInProgress !== 0 && (
+          <Row>
+            <Alert color="primary" className="w-100">
+              {actionInProgress} action(s) in progress{' '}
+              <Spinner color="primary" size="sm" />
+            </Alert>
+          </Row>
+        )}
+        <Row className="my-2 d-flex justify-content-center align-items-center">
+          <Col xs="9">
+            <h1>Platoons</h1>
+          </Col>
+          <Col xs="3" className="d-flex justify-content-end">
+            <Button color="success" size="md" onClick={handleAdd}>
+              Add
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col md="12">
+            <PlatoonsTable
+              platoons={platoons}
+              handleUpdate={handleUpdate}
+              handleDelete={handleDelete}
+            />
+          </Col>
+        </Row>
+      </Container>
+    </Layout>
+  );
 }
 
-Platoons.propTypes = {
-  ids: PropTypes.arrayOf(PropTypes.string).isRequired,
-  platoons: PropTypes.shape({
-    id: PropTypes.string
-  }).isRequired,
-  errors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  actionInProgress: PropTypes.bool.isRequired,
-  addPlatoon: PropTypes.func.isRequired,
-  deletePlatoon: PropTypes.func.isRequired,
-  updatePlatoon: PropTypes.func.isRequired
-};
-
-const mapStateToProps = state => ({
-  ids: state.platoons.get('ids'),
-  platoons: state.platoons.get('platoons'),
-  errors: state.pages.platoons.get('errors'),
-  actionInProgress: state.pages.platoons.get('actionInProgress')
-});
-
-const mapDispatchToProps = {
-  addPlatoon,
-  deletePlatoon,
-  updatePlatoon
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Platoons);
+export default memo(Platoons);

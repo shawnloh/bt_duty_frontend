@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { fromJS, List } from 'immutable';
 import {
   LOAD_PERSONNELS_FAILURE,
   LOAD_PERSONNELS_SUCCESS,
@@ -19,7 +19,7 @@ import {
   UPDATE_PERSON_SUCCESS
 } from '../pages/personnels/constants';
 
-const initialState = Map({
+const initialState = fromJS({
   ids: [],
   personnels: {},
   errors: []
@@ -28,18 +28,51 @@ const initialState = Map({
 export default (state = initialState, { type, payload }) => {
   switch (type) {
     case LOAD_PERSONNELS_SUCCESS:
-    case DELETE_PERSONNEL_SUCCESS:
-    case ADD_PERSONNEL_SUCCESS:
       return state.merge({
-        ids: payload.ids,
-        personnels: payload.personnels
+        ids: List(payload.ids),
+        personnels: fromJS(payload.personnels),
+        errors: List()
       });
-    case DELETE_STATUS_SUCCESS:
+    case LOAD_PERSONNELS_FAILURE:
+      return state.merge({
+        errors: List(payload)
+      });
+    case DELETE_PERSONNEL_SUCCESS:
+      return state.merge({
+        ids: state.get('ids').delete(state.get('ids').indexOf(payload)),
+        personnels: state.get('personnels').delete(payload)
+      });
     case ADD_STATUS_SUCCESS:
+      return state.updateIn(
+        ['personnels', payload.personnelId, 'statuses'],
+        statuses => statuses.push(fromJS(payload.status))
+      );
+    case DELETE_STATUS_SUCCESS:
+      return state.updateIn(
+        ['personnels', payload.personnelId, 'statuses'],
+        statuses =>
+          statuses.filter(status => status.get('_id') !== payload.statusId)
+      );
     case ADD_BLOCKOUT_SUCCESS:
     case DELETE_BLOCKOUT_SUCCESS:
+      return state.setIn(
+        ['personnels', payload.personnelId, 'blockOutDates'],
+        List(payload.blockoutDates)
+      );
     case EDIT_PERSONNEL_POINT_SUCCESS:
+      return state.updateIn(
+        ['personnels', payload.personnelId, 'points'],
+        points => {
+          return points.map(point => {
+            if (point.get('_id') === payload.personnelPointId) {
+              return point.set('points', payload.points);
+            }
+            return point;
+          });
+        }
+      );
     case UPDATE_PERSON_SUCCESS:
+      return state.mergeIn(['personnels', payload._id], fromJS(payload));
     case PERSONNELS_UPDATE_EVENT_POINTS:
     case PERSONNELS_UPDATE_PLATOON_NAME:
     case PERSONNELS_UPDATE_RANK_NAME:
@@ -48,9 +81,10 @@ export default (state = initialState, { type, payload }) => {
       return state.merge({
         personnels: payload
       });
-    case LOAD_PERSONNELS_FAILURE:
+    case ADD_PERSONNEL_SUCCESS:
       return state.merge({
-        errors: payload
+        ids: state.get('ids').push(payload._id),
+        personnels: state.get('personnels').set(payload._id, fromJS(payload))
       });
     default:
       return state;

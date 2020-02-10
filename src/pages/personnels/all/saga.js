@@ -1,16 +1,16 @@
-import { call, takeLatest, select, put, delay } from 'redux-saga/effects';
+import { call, takeEvery, put, delay } from 'redux-saga/effects';
 import { DELETE_PERSONNEL } from './constants';
-import { deletePersonnelFailure, deletePersonnelSuccess } from './actions';
+import {
+  deletePersonnelFailure,
+  deletePersonnelSuccess,
+  clearErrorMessage
+} from './actions';
 import { logout } from '../../../actions/authActions';
 import PersonnelsService from '../../../services/personnels';
 
 function* clearError() {
-  try {
-    yield delay(4000);
-    yield put(deletePersonnelFailure([]));
-  } catch (error) {
-    yield put(deletePersonnelFailure([]));
-  }
+  yield delay(4000);
+  yield put(clearErrorMessage());
 }
 
 function* deletePersonnel(action) {
@@ -18,14 +18,7 @@ function* deletePersonnel(action) {
     const deleteId = action.payload;
     const response = yield call(PersonnelsService.deletePersonnel, deleteId);
     if (response.ok) {
-      let ids = yield select(state => state.personnels.get('ids'));
-      const { ...personnels } = yield select(state =>
-        state.personnels.get('personnels')
-      );
-
-      ids = ids.filter(id => id !== deleteId);
-      delete personnels[deleteId];
-      yield put(deletePersonnelSuccess({ ids, personnels }));
+      yield put(deletePersonnelSuccess(deleteId));
     } else if (response.status === 401) {
       yield put(logout());
     } else {
@@ -47,7 +40,7 @@ function* deletePersonnel(action) {
 }
 
 function* allWatcher() {
-  yield takeLatest(DELETE_PERSONNEL, deletePersonnel);
+  yield takeEvery(DELETE_PERSONNEL, deletePersonnel);
 }
 
 export default allWatcher;

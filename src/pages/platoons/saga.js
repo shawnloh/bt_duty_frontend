@@ -1,4 +1,4 @@
-import { takeLatest, call, select, put, all, delay } from 'redux-saga/effects';
+import { takeLatest, call, put, all, delay } from 'redux-saga/effects';
 import { ADD_PLATOON, DELETE_PLATOON, UPDATE_PLATOON } from './constants';
 import {
   addPlatoonSuccess,
@@ -6,18 +6,15 @@ import {
   deletePlatoonSuccess,
   deletePlatoonFailure,
   updatePlatoonSuccess,
-  updatePlatoonFailure
+  updatePlatoonFailure,
+  clearErrors
 } from './actions';
 import { logout } from '../../actions/authActions';
 import PlatoonsService from '../../services/platoons';
 
-function* clearError(funcToClear) {
-  try {
-    yield delay(4000);
-    yield put(funcToClear([]));
-  } catch (error) {
-    yield put(funcToClear([]));
-  }
+function* clearError() {
+  yield delay(4000);
+  yield put(clearErrors());
 }
 
 function* addPlatoon(action) {
@@ -27,20 +24,15 @@ function* addPlatoon(action) {
       yield put(
         addPlatoonFailure(['Cannot give an empty name for new platoon'])
       );
-      yield call(clearError, addPlatoonFailure);
+      yield call(clearError);
     } else {
-      const ids = yield select(state => state.platoons.get('ids'));
-      const platoons = yield select(state => state.platoons.get('platoons'));
       const response = yield call(PlatoonsService.createPlatoon, name);
-
       if (response.ok) {
-        const newPlatoon = response.data;
-        ids.push(newPlatoon._id);
-        platoons[newPlatoon._id] = {
-          _id: newPlatoon._id,
-          name: newPlatoon.name
+        const newPlatoon = {
+          _id: response.data._id,
+          name: response.data.name
         };
-        yield put(addPlatoonSuccess({ ids, platoons }));
+        yield put(addPlatoonSuccess(newPlatoon));
       } else if (response.status === 401) {
         yield put(logout());
       } else {
@@ -53,12 +45,12 @@ function* addPlatoon(action) {
           errors = errors.concat(response.data.errors);
         }
         yield put(addPlatoonFailure(errors));
-        yield call(clearError, addPlatoonFailure);
+        yield call(clearError);
       }
     }
   } catch (error) {
-    yield put(addPlatoonFailure([error.message]));
-    yield call(clearError, addPlatoonFailure);
+    yield put(addPlatoonFailure([error.message || 'Please try again later']));
+    yield call(clearError);
   }
 }
 
@@ -67,13 +59,7 @@ function* deletePlatoon(action) {
     const deleteId = action.payload;
     const response = yield call(PlatoonsService.deletePlatoon, deleteId);
     if (response.ok) {
-      let ids = yield select(state => state.platoons.get('ids'));
-      const { ...platoons } = yield select(state =>
-        state.platoons.get('platoons')
-      );
-      ids = ids.filter(id => id !== deleteId);
-      delete platoons[deleteId];
-      yield put(deletePlatoonSuccess({ ids, platoons }));
+      yield put(deletePlatoonSuccess(deleteId));
     } else if (response.status === 401) {
       yield put(logout());
     } else {
@@ -86,11 +72,13 @@ function* deletePlatoon(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(deletePlatoonFailure(errors));
-      yield call(clearError, deletePlatoonFailure);
+      yield call(clearError);
     }
   } catch (error) {
-    yield put(deletePlatoonFailure([error.message]));
-    yield call(clearError, deletePlatoonFailure);
+    yield put(
+      deletePlatoonFailure([error.message || 'Please try again later'])
+    );
+    yield call(clearError);
   }
 }
 
@@ -99,19 +87,15 @@ function* updatePlatoon(action) {
     const { id, name } = action.payload;
     if (!name) {
       yield put(updatePlatoonFailure([`Cannot give an empty name`]));
-      yield call(clearError, updatePlatoonFailure);
+      yield call(clearError);
     } else {
       const response = yield call(PlatoonsService.updatePlatoon, id, name);
       if (response.ok) {
-        const { ...platoons } = yield select(state =>
-          state.platoons.get('platoons')
-        );
-        platoons[id] = {
+        const updatedPlatoon = {
           _id: response.data._id,
           name: response.data.name
         };
-
-        yield put(updatePlatoonSuccess(platoons));
+        yield put(updatePlatoonSuccess(updatedPlatoon));
       } else if (response.status === 401) {
         yield put(logout());
       } else if (response.status === 304) {
@@ -120,7 +104,7 @@ function* updatePlatoon(action) {
             'Updating platoon must not be the same name as before'
           ])
         );
-        yield call(clearError, updatePlatoonFailure);
+        yield call(clearError);
       } else {
         let errors = [];
         if (response.data.message) {
@@ -131,12 +115,14 @@ function* updatePlatoon(action) {
           errors = errors.concat(response.data.errors);
         }
         yield put(updatePlatoonFailure(errors));
-        yield call(clearError, updatePlatoonFailure);
+        yield call(clearError);
       }
     }
   } catch (error) {
-    yield put(updatePlatoonFailure([error.message]));
-    yield call(clearError, updatePlatoonFailure);
+    yield put(
+      updatePlatoonFailure([error.message || 'Please try again later'])
+    );
+    yield call(clearError);
   }
 }
 

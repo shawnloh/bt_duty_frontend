@@ -1,4 +1,4 @@
-import { takeLatest, call, select, put, all, delay } from 'redux-saga/effects';
+import { takeLatest, call, put, all, delay } from 'redux-saga/effects';
 import { ADD_STATUS, DELETE_STATUS, UPDATE_STATUS } from './constants';
 import {
   addStatusSuccess,
@@ -6,34 +6,27 @@ import {
   deleteStatusSuccess,
   deleteStatusFailure,
   updateStatusSuccess,
-  updateStatusFailure
+  updateStatusFailure,
+  clearErrors
 } from './actions';
 import { logout } from '../../actions/authActions';
 import StatusesService from '../../services/statuses';
 
-function* clearError(funcToClear) {
-  try {
-    yield delay(4000);
-    yield put(funcToClear([]));
-  } catch (error) {
-    yield put(funcToClear([]));
-  }
+function* clearError() {
+  yield delay(4000);
+  yield put(clearErrors());
 }
 function* addStatus(action) {
   try {
     const name = action.payload;
-    const ids = yield select(state => state.statuses.get('ids'));
-    const statuses = yield select(state => state.statuses.get('statuses'));
     const response = yield call(StatusesService.createStatus, name);
 
     if (response.ok) {
-      const newStatus = response.data;
-      ids.push(newStatus._id);
-      statuses[newStatus._id] = {
-        _id: newStatus._id,
-        name: newStatus.name
+      const newStatus = {
+        _id: response.data._id,
+        name: response.data.name
       };
-      yield put(addStatusSuccess({ ids, statuses }));
+      yield put(addStatusSuccess(newStatus));
     } else if (response.status === 401) {
       yield put(logout());
     } else {
@@ -46,11 +39,11 @@ function* addStatus(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(addStatusFailure(errors));
-      yield call(clearError, addStatusFailure);
+      yield call(clearError);
     }
   } catch (error) {
-    yield put(addStatusFailure([error.message]));
-    yield call(clearError, addStatusFailure);
+    yield put(addStatusFailure([error.message || 'Please try again later']));
+    yield call(clearError);
   }
 }
 
@@ -59,13 +52,7 @@ function* deleteStatus(action) {
     const deleteId = action.payload;
     const response = yield call(StatusesService.deleteStatus, deleteId);
     if (response.ok) {
-      let ids = yield select(state => state.statuses.get('ids'));
-      const { ...statuses } = yield select(state =>
-        state.statuses.get('statuses')
-      );
-      ids = ids.filter(id => id !== deleteId);
-      delete statuses[deleteId];
-      yield put(deleteStatusSuccess({ ids, statuses }));
+      yield put(deleteStatusSuccess(deleteId));
     } else if (response.status === 401) {
       yield put(logout());
     } else {
@@ -78,11 +65,11 @@ function* deleteStatus(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(deleteStatusFailure(errors));
-      yield call(clearError, deleteStatusFailure);
+      yield call(clearError);
     }
   } catch (error) {
-    yield put(deleteStatusFailure([error.message]));
-    yield call(clearError, deleteStatusFailure);
+    yield put(deleteStatusFailure([error.message || 'Please try again later']));
+    yield call(clearError);
   }
 }
 
@@ -91,22 +78,18 @@ function* updateStatus(action) {
     const { id, name } = action.payload;
     const response = yield call(StatusesService.updateStatus, id, name);
     if (response.ok) {
-      const { ...statuses } = yield select(state =>
-        state.statuses.get('statuses')
-      );
-      statuses[id] = {
+      const updatedStatus = {
         _id: response.data._id,
         name: response.data.name
       };
-
-      yield put(updateStatusSuccess(statuses));
+      yield put(updateStatusSuccess(updatedStatus));
     } else if (response.status === 401) {
       yield put(logout());
     } else if (response.status === 304) {
       yield put(
         updateStatusFailure(['Updating status must not be the same as before'])
       );
-      yield call(clearError, updateStatusFailure);
+      yield call(clearError);
     } else {
       let errors = [];
       if (response.data.message) {
@@ -117,11 +100,11 @@ function* updateStatus(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(updateStatusFailure(errors));
-      yield call(clearError, updateStatusFailure);
+      yield call(clearError);
     }
   } catch (error) {
-    yield put(updateStatusFailure([error.message]));
-    yield call(clearError, updateStatusFailure);
+    yield put(updateStatusFailure([error.message || 'Please try again later']));
+    yield call(clearError);
   }
 }
 

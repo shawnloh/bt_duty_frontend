@@ -7,7 +7,8 @@ import {
   DELETE_PLATOON_SUCCESS,
   UPDATE_PLATOON,
   UPDATE_PLATOON_FAILURE,
-  UPDATE_PLATOON_SUCCESS
+  UPDATE_PLATOON_SUCCESS,
+  CLEAR_ERROR
 } from './constants';
 
 export const addPlatoon = name => ({
@@ -15,12 +16,9 @@ export const addPlatoon = name => ({
   payload: name
 });
 
-export const addPlatoonSuccess = ({ ids, platoons }) => ({
+export const addPlatoonSuccess = platoon => ({
   type: ADD_PLATOON_SUCCESS,
-  payload: {
-    ids,
-    platoons
-  }
+  payload: platoon
 });
 
 export const addPlatoonFailure = errors => ({
@@ -51,12 +49,16 @@ export const updatePlatoon = (id, name) => ({
   }
 });
 
-export const updatePlatoonSuccess = platoons => ({
+export const updatePlatoonSuccess = updatedPlatoon => ({
   type: UPDATE_PLATOON_SUCCESS,
-  payload: platoons
+  payload: updatedPlatoon
 });
 
 export const updatePlatoonFailure = errors => ({
   type: UPDATE_PLATOON_FAILURE,
   payload: errors
+});
+
+export const clearErrors = () => ({
+  type: CLEAR_ERROR
 });

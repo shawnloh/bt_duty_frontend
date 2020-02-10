@@ -9,6 +9,7 @@ import {
 } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
+import { List, Map } from 'immutable';
 import * as Yup from 'yup';
 
 const EditFormSchema = Yup.object().shape({
@@ -17,20 +18,12 @@ const EditFormSchema = Yup.object().shape({
   platoon: Yup.string().required('Platoon is required')
 });
 
-const EditForm = ({
-  person,
-  handleSubmit,
-  rankIds,
-  ranks,
-  platoonIds,
-  platoons,
-  isUpdating
-}) => {
+const EditForm = ({ person, handleSubmit, ranks, platoons, isUpdating }) => {
   const formik = useFormik({
     initialValues: {
-      name: person.name,
-      rank: person.rank._id,
-      platoon: person.platoon._id
+      name: person.get('name'),
+      rank: person.getIn(['rank', '_id']),
+      platoon: person.getIn(['platoon', '_id'])
     },
     validationSchema: EditFormSchema,
     onSubmit: handleSubmit
@@ -72,10 +65,10 @@ const EditForm = ({
           value={formik.values.rank}
           disabled={isUpdating}
         >
-          {rankIds.map(id => {
+          {ranks.map(rank => {
             return (
-              <option value={id} key={id}>
-                {ranks[id].name}
+              <option value={rank.get('_id')} key={rank.get('_id')}>
+                {rank.get('name')}
               </option>
             );
           })}
@@ -99,10 +92,10 @@ const EditForm = ({
           onChange={formik.handleChange}
           value={formik.values.platoon}
         >
-          {platoonIds.map(id => {
+          {platoons.map(platoon => {
             return (
-              <option value={id} key={id}>
-                {platoons[id].name}
+              <option value={platoon.get('_id')} key={platoon.get('_id')}>
+                {platoon.get('name')}
               </option>
             );
           })}
@@ -125,28 +118,9 @@ const EditForm = ({
 
 EditForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
-  person: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    rank: PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired
-    }).isRequired,
-    platoon: PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired
-    }).isRequired
-  }).isRequired,
-  ranks: PropTypes.shape({
-    _id: PropTypes.string,
-    name: PropTypes.string
-  }).isRequired,
-  rankIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-  platoons: PropTypes.shape({
-    _id: PropTypes.string,
-    name: PropTypes.string
-  }).isRequired,
-  platoonIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+  person: PropTypes.instanceOf(Map).isRequired,
+  ranks: PropTypes.instanceOf(List).isRequired,
+  platoons: PropTypes.instanceOf(List).isRequired,
   isUpdating: PropTypes.bool.isRequired
 };
 

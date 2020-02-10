@@ -1,8 +1,9 @@
 import React from 'react';
 import { Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
+import { List } from 'immutable';
 
-const PlatoonTable = ({ platoons, toggle, modes }) => {
+const PlatoonTable = ({ platoons, handleUpdate, handleDelete }) => {
   return (
     <Table striped responsive>
       <thead>
@@ -16,17 +17,17 @@ const PlatoonTable = ({ platoons, toggle, modes }) => {
       <tbody>
         {platoons.map(platoon => {
           return (
-            <tr key={platoon._id}>
-              <td className="text-center">{platoon.name}</td>
+            <tr key={platoon.get('_id')}>
+              <td className="text-center">{platoon.get('name')}</td>
               <td className="text-center">
                 <Button
                   color="primary"
-                  onClick={() => toggle(modes.UPDATE, platoon._id)}
+                  onClick={() => handleUpdate(platoon.get('_id'))}
                 >
                   Edit
                 </Button>{' '}
                 <Button
-                  onClick={() => toggle(modes.DELETE, platoon._id)}
+                  onClick={() => handleDelete(platoon.get('_id'))}
                   color="danger"
                 >
                   Delete
@@ -41,18 +42,9 @@ const PlatoonTable = ({ platoons, toggle, modes }) => {
 };
 
 PlatoonTable.propTypes = {
-  platoons: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string,
-      name: PropTypes.string
-    })
-  ).isRequired,
-  toggle: PropTypes.func.isRequired,
-  modes: PropTypes.shape({
-    UPDATE: PropTypes.string.isRequired,
-    DELETE: PropTypes.string.isRequired,
-    ADD: PropTypes.string.isRequired
-  }).isRequired
+  platoons: PropTypes.instanceOf(List).isRequired,
+  handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired
 };
 
 export default PlatoonTable;

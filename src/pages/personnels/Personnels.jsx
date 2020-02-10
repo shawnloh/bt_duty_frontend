@@ -1,37 +1,26 @@
-import React, { PureComponent } from 'react';
-import { Switch, Route } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import React, { memo } from 'react';
+import { Switch, Route, useRouteMatch } from 'react-router-dom';
 
-import AppLayout from '../shared/AppLayout';
+import Layout from '../shared/AppLayout';
 // SUB-PAGES
 import All from './all';
 import Add from './add';
 import Single from './single';
 import Edit from './edit';
 
-export class Personnels extends PureComponent {
-  render() {
-    const {
-      match: { path }
-    } = this.props;
-    return (
-      <AppLayout>
-        <Switch>
-          <Route exact path={path} component={All} />
-          <Route path={`${path}/add`} component={Add} />
-          <Route path={`${path}/:personnelId`} exact component={Single} />
-          <Route path={`${path}/:personnelId/edit`} component={Edit} />
-        </Switch>
-      </AppLayout>
-    );
-  }
+export function Personnels() {
+  const { path } = useRouteMatch();
+
+  return (
+    <Layout>
+      <Switch>
+        <Route exact path={path} component={All} />
+        <Route path={`${path}/add`} component={Add} />
+        <Route path={`${path}/:personnelId`} exact component={Single} />
+        <Route path={`${path}/:personnelId/edit`} component={Edit} />
+      </Switch>
+    </Layout>
+  );
 }
 
-Personnels.propTypes = {
-  match: PropTypes.shape({
-    path: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired
-  }).isRequired
-};
-
-export default Personnels;
+export default memo(Personnels);

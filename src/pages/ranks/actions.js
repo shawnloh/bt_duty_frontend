@@ -7,7 +7,8 @@ import {
   DELETE_RANK_SUCCESS,
   UPDATE_RANK,
   UPDATE_RANK_FAILURE,
-  UPDATE_RANK_SUCCESS
+  UPDATE_RANK_SUCCESS,
+  CLEAR_ERROR
 } from './constants';
 
 export const addRank = name => ({
@@ -15,12 +16,9 @@ export const addRank = name => ({
   payload: name
 });
 
-export const addRankSuccess = ({ ids, ranks }) => ({
+export const addRankSuccess = rank => ({
   type: ADD_RANK_SUCCESS,
-  payload: {
-    ids,
-    ranks
-  }
+  payload: rank
 });
 
 export const addRankFailure = errors => ({
@@ -59,4 +57,8 @@ export const updateRankSuccess = ranks => ({
 export const updateRankFailure = errors => ({
   type: UPDATE_RANK_FAILURE,
   payload: errors
+});
+
+export const clearErrors = () => ({
+  type: CLEAR_ERROR
 });

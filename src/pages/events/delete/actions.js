@@ -12,12 +12,9 @@ export const deleteEvent = ({ eventId, revert = false }) => ({
   }
 });
 
-export const deleteEventSuccess = ({ ids, events }) => ({
+export const deleteEventSuccess = id => ({
   type: DELETE_EVENT_SUCCESS,
-  payload: {
-    ids,
-    events
-  }
+  payload: id
 });
 
 export const deleteEventFailure = errors => ({

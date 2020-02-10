@@ -15,7 +15,14 @@ function* login(action) {
           loginFailure(['Too many login request, please login in 30mins time'])
         );
       }
-      yield put(loginFailure([response.data]));
+      const errors = [];
+      if (response.data.errors) {
+        errors.push(response.data.errors);
+      }
+      if (response.data.message) {
+        errors.push(response.data.message);
+      }
+      yield put(loginFailure(errors));
     } else {
       yield put(loginSuccess());
       yield put(checkAuth());

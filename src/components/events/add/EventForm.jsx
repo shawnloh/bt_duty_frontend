@@ -15,6 +15,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { Map, List } from 'immutable';
 import GenerateForm from './GenerateForm';
 
 const EventFormSchema = Yup.object().shape({
@@ -38,12 +39,8 @@ const EventFormSchema = Yup.object().shape({
 
 const EventForm = ({
   points,
-  pointIds,
-  platoonIds,
   platoons,
-  rankIds,
   ranks,
-  statusIds,
   statuses,
   personnels,
   isAdding,
@@ -53,7 +50,7 @@ const EventForm = ({
     initialValues: {
       name: '',
       date: '',
-      pointSystem: pointIds[0] || '',
+      pointSystem: points.has(0) ? points.getIn(['0', '_id']) : '',
       pointAllocation: 1,
       selectedPersonnels: []
     },
@@ -104,9 +101,9 @@ const EventForm = ({
                 formik.errors.pointSystem !== ''
               }
             >
-              {pointIds.map(id => (
-                <option key={id} value={id}>
-                  {points[id].name}
+              {points.map(point => (
+                <option key={point.get('_id')} value={point.get('_id')}>
+                  {point.get('name')}
                 </option>
               ))}
             </Input>
@@ -181,11 +178,8 @@ const EventForm = ({
         </Col>
         <Col className="d-flex justify-content-end align-items-center">
           <GenerateForm
-            platoonIds={platoonIds}
             platoons={platoons}
-            rankIds={rankIds}
             ranks={ranks}
-            statusIds={statusIds}
             statuses={statuses}
             setSelectedPersonnels={setSelectedPersonnels}
             pointSystem={formik.values.pointSystem}
@@ -196,12 +190,13 @@ const EventForm = ({
       <Row className="my-2">
         <Col className="overflow-auto" style={{ maxHeight: '150px' }}>
           {formik.values.selectedPersonnels.map(id => {
-            const person = personnels[id];
+            const person = personnels.get(id);
             return (
               <Row key={id}>
                 <Col>
                   <p>
-                    {person.platoon.name} {person.rank.name} {person.name}
+                    {person.getIn(['platoon', 'name'])}{' '}
+                    {person.getIn(['rank', 'name'])} {person.get('name')}
                   </p>
                 </Col>
               </Row>
@@ -234,47 +229,11 @@ const EventForm = ({
 };
 
 EventForm.propTypes = {
-  points: PropTypes.shape({
-    id: PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired
-    })
-  }).isRequired,
-  pointIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-  ranks: PropTypes.shape({
-    id: PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired
-    })
-  }).isRequired,
-  rankIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-  platoons: PropTypes.shape({
-    id: PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired
-    })
-  }).isRequired,
-  platoonIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-  statuses: PropTypes.shape({
-    id: PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired
-    })
-  }).isRequired,
-  statusIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-  personnels: PropTypes.shape({
-    id: PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      rank: PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired
-      }).isRequired,
-      platoon: PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired
-      }).isRequired
-    })
-  }).isRequired,
+  points: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
+  ranks: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
+  platoons: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
+  statuses: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
+  personnels: PropTypes.oneOfType([PropTypes.instanceOf(Map)]).isRequired,
   isAdding: PropTypes.bool.isRequired,
   handleSubmit: PropTypes.func.isRequired
 };

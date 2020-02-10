@@ -1,11 +1,11 @@
-import { Map } from 'immutable';
+import { fromJS, List } from 'immutable';
 import {
   CREATE_EVENT,
   CREATE_EVENT_FAILURE,
   CREATE_EVENT_SUCCESS
 } from './constants';
 
-const initialState = Map({
+const initialState = fromJS({
   errors: [],
   isAdding: false
 });
@@ -15,17 +15,17 @@ export default (state = initialState, { type, payload }) => {
     case CREATE_EVENT:
       return state.merge({
         isAdding: true,
-        errors: []
+        errors: List()
       });
     case CREATE_EVENT_SUCCESS:
       return state.merge({
         isAdding: false,
-        errors: []
+        errors: List()
       });
     case CREATE_EVENT_FAILURE:
       return state.merge({
         isAdding: false,
-        errors: payload
+        errors: List(payload)
       });
     default:
       return state;

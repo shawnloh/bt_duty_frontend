@@ -1,4 +1,4 @@
-import { takeLatest, call, put, select, delay } from 'redux-saga/effects';
+import { call, put, delay, takeEvery } from 'redux-saga/effects';
 import { DELETE_EVENT } from './constants';
 import { deleteEventFailure, deleteEventSuccess } from './actions';
 import { logout } from '../../../actions/authActions';
@@ -19,12 +19,7 @@ function* deleteEvent(action) {
     const response = yield call(EventsService.deleteEvent, eventId, revert);
     if (response.ok) {
       const { event } = response.data;
-
-      let ids = yield select(state => state.events.get('ids'));
-      const { ...events } = yield select(state => state.events.get('events'));
-      ids = ids.filter(id => id !== event._id);
-      delete events[event._id];
-      yield put(deleteEventSuccess({ ids, events }));
+      yield put(deleteEventSuccess(event));
     } else if (response.status === 401) {
       yield put(logout());
     } else {
@@ -40,13 +35,13 @@ function* deleteEvent(action) {
       yield call(clearError);
     }
   } catch (error) {
-    yield put(deleteEventFailure([error.message]));
+    yield put(deleteEventFailure([error.message || 'Please try again later']));
     yield call(clearError);
   }
 }
 
 function* deleteWatcher() {
-  yield takeLatest(DELETE_EVENT, deleteEvent);
+  yield takeEvery(DELETE_EVENT, deleteEvent);
 }
 
 export default deleteWatcher;

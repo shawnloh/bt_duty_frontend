@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
+import { List } from 'immutable';
 
 const BlockoutTable = ({ handleDelete, blockoutDates }) => {
   return (
@@ -31,7 +32,7 @@ const BlockoutTable = ({ handleDelete, blockoutDates }) => {
 
 BlockoutTable.propTypes = {
   handleDelete: PropTypes.func.isRequired,
-  blockoutDates: PropTypes.arrayOf(PropTypes.string).isRequired
+  blockoutDates: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired
 };
 
 export default BlockoutTable;

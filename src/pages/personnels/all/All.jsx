@@ -1,81 +1,76 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import { Container, Row, Col, Button, Alert, Spinner } from 'reactstrap';
 import Helmet from 'react-helmet';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { Link, useRouteMatch } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 import PersonnelsTable from '../../../components/personnels/all/PersonnelsTable';
 import Pagination from '../../../components/commons/Pagination';
 import Search from '../../../components/personnels/all/Search';
-import PersonnelModalDelete from '../../../components/personnels/all/PersonnelModalDelete';
+// import PersonnelModalDelete from '../../../components/personnels/all/PersonnelModalDelete';
 
 import { deletePersonnel } from './actions';
+import { getPersonnels } from './selectors';
 
-class All extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      rowsPerPage: 10,
-      page: 1,
-      search: '',
-      selectedId: null,
-      showDeleteModal: false
-    };
-  }
+export function All() {
+  const [rowsPerPage] = useState(10);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const { path } = useRouteMatch();
 
-  showErrors = () => {
-    const { errors } = this.props;
+  const personnels = useSelector(getPersonnels);
+  const errors = useSelector(state => state.pages.personnels.all.get('errors'));
+  const actionInProgress = useSelector(state =>
+    state.pages.personnels.all.get('actionInProgress')
+  );
 
-    return (
-      <Row>
-        {errors.map(error => {
-          return (
-            <Alert key={error} color="danger" className="w-100">
-              {error}
-            </Alert>
-          );
-        })}
-      </Row>
-    );
-  };
+  const dispatch = useDispatch();
 
-  onChangeSearch = e => {
-    this.setState({
-      search: e.target.value,
-      page: 1
-    });
-  };
+  const onChangeSearch = useCallback(
+    ({ target: { value } }) => {
+      setSearch(value);
+      if (page !== 1) setPage(1);
+    },
+    [page]
+  );
+  const clearSearch = useCallback(() => {
+    setSearch('');
+  }, []);
 
-  setPage = number => {
-    this.setState({
-      page: number
-    });
-  };
+  const handleDelete = useCallback(
+    person => {
+      Swal.fire({
+        title: 'Are you sure?',
+        html: `
+        <p>You are deleting: ${person.get('name')}</p>
+        <p>You won't be able to revert this!</p>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonColor: '#3085d6'
+      }).then(result => {
+        if (result.value) {
+          dispatch(deletePersonnel(person.get('_id')));
+        }
+      });
+    },
+    [dispatch]
+  );
 
-  clearSearch = () => {
-    this.setState({
-      search: ''
-    });
-  };
-
-  getPersonnels = () => {
-    const { ids, personnels } = this.props;
-    const { rowsPerPage, page, search } = this.state;
-    const lastIndex = page * rowsPerPage;
-    const firstIndex = lastIndex - rowsPerPage;
+  const lastIndex = page * rowsPerPage;
+  const firstIndex = lastIndex - rowsPerPage;
+  const shownPersonnels = useMemo(() => {
     if (search === '') {
-      const shownIds = ids.slice(firstIndex, lastIndex);
-      const shownPersonnels = shownIds.map(id => personnels[id]);
-      return { shownPersonnels, ids };
+      return personnels.slice(firstIndex, lastIndex);
     }
-
-    // Handle search
-    const idsToReturn = ids.filter(id => {
-      const name = personnels[id].name.toLowerCase();
-      const platoon = personnels[id].platoon.name.toLowerCase();
-      const rank = personnels[id].rank.name.toLowerCase();
-      const searchInput = search.toLowerCase();
+    const searchInput = search.toLowerCase();
+    const filteredPersonnels = personnels.filter(person => {
+      const name = person.get('name').toLowerCase();
+      const platoon = person.getIn(['platoon', 'name']).toLowerCase();
+      const rank = person.getIn(['rank', 'name']).toLowerCase();
       return (
         name.indexOf(searchInput) > -1 ||
         platoon.indexOf(searchInput) > -1 ||
@@ -83,129 +78,67 @@ class All extends PureComponent {
       );
     });
 
-    const shownIds = idsToReturn.slice(firstIndex, lastIndex);
-    const shownPersonnels = shownIds.map(id => personnels[id]);
+    return filteredPersonnels.slice(firstIndex, lastIndex);
+  }, [firstIndex, lastIndex, personnels, search]);
 
-    return { shownPersonnels, ids: idsToReturn };
-  };
-
-  toggleDeleteModal = (id = null) => {
-    this.setState(prevState => {
-      return {
-        showDeleteModal: !prevState.showDeleteModal,
-        selectedId: id
-      };
-    });
-  };
-
-  handleDelete = () => {
-    const { selectedId } = this.state;
-    const { removePersonnel } = this.props;
-    removePersonnel(selectedId);
-    this.toggleDeleteModal();
-  };
-
-  getDeleteModal = () => {
-    const { selectedId, showDeleteModal } = this.state;
-    const { personnels } = this.props;
-    if (!selectedId) return null;
-
-    return (
-      <PersonnelModalDelete
-        onCancel={this.toggleDeleteModal}
-        onDelete={this.handleDelete}
-        onToggle={this.toggleDeleteModal}
-        showModal={showDeleteModal}
-        person={personnels[selectedId]}
-      />
-    );
-  };
-
-  render() {
-    const {
-      errors,
-      actionInProgress,
-      match: { path }
-    } = this.props;
-    const { rowsPerPage, search } = this.state;
-
-    const { shownPersonnels, ids } = this.getPersonnels();
-    const modal = this.getDeleteModal();
-
-    return (
-      <>
-        <Helmet>
-          <title>Personnels</title>P
-        </Helmet>
-        <Container>
-          {modal}
-          {errors.length > 0 && this.showErrors()}
-          {actionInProgress && (
-            <Row>
-              <Alert color="primary" className="w-100">
-                Action in progress <Spinner color="primary" size="sm" />
-              </Alert>
-            </Row>
-          )}
-          <Row className="my-2 justify-content-center align-items-center">
-            <Col xs="9">
-              <h1>Personnels</h1>
-            </Col>
-            <Col xs="3" className="d-flex justify-content-end">
-              <Button tag={Link} to={`${path}/add`} color="success" size="md">
-                Add
-              </Button>
-            </Col>
-          </Row>
-          <Row className="my-2 mx-1">
-            <Search
-              onChange={this.onChangeSearch}
-              onClear={this.clearSearch}
-              search={search}
-            />
-          </Row>
+  return (
+    <>
+      <Helmet>
+        <title>Personnels</title>P
+      </Helmet>
+      <Container>
+        {errors.size > 0 && (
           <Row>
-            <PersonnelsTable
-              personnels={shownPersonnels}
-              onDelete={this.toggleDeleteModal}
-            />
+            {errors.map(error => {
+              return (
+                <Alert key={error} color="danger" className="w-100">
+                  {error}
+                </Alert>
+              );
+            })}
           </Row>
-          <Row className="justify-content-center align-items-center">
-            <Pagination
-              rowsPerPage={rowsPerPage}
-              setPage={this.setPage}
-              totalPosts={ids.length}
-            />
+        )}
+        {actionInProgress !== 0 && (
+          <Row>
+            <Alert color="primary" className="w-100">
+              {actionInProgress} action(s) in progress{' '}
+              <Spinner color="primary" size="sm" />
+            </Alert>
           </Row>
-        </Container>
-      </>
-    );
-  }
+        )}
+        <Row className="my-2 justify-content-center align-items-center">
+          <Col xs="9">
+            <h1>Personnels</h1>
+          </Col>
+          <Col xs="3" className="d-flex justify-content-end">
+            <Button tag={Link} to={`${path}/add`} color="success" size="md">
+              Add
+            </Button>
+          </Col>
+        </Row>
+        <Row className="my-2 mx-1">
+          <Search
+            onChange={onChangeSearch}
+            onClear={clearSearch}
+            search={search}
+          />
+        </Row>
+        <Row>
+          <PersonnelsTable
+            personnels={shownPersonnels}
+            onDelete={handleDelete}
+          />
+        </Row>
+        <Row className="justify-content-center align-items-center">
+          <Pagination
+            rowsPerPage={rowsPerPage}
+            setPage={setPage}
+            totalPosts={personnels.size}
+          />
+        </Row>
+      </Container>
+    </>
+  );
 }
 
-All.propTypes = {
-  ids: PropTypes.arrayOf(PropTypes.string).isRequired,
-  personnels: PropTypes.shape({
-    id: PropTypes.string
-  }).isRequired,
-  errors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  actionInProgress: PropTypes.bool.isRequired,
-  removePersonnel: PropTypes.func.isRequired,
-  match: PropTypes.shape({
-    path: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired
-  }).isRequired
-};
-
-const mapStateToProps = state => ({
-  ids: state.personnels.get('ids'),
-  personnels: state.personnels.get('personnels'),
-  errors: state.pages.personnels.all.get('errors'),
-  actionInProgress: state.pages.personnels.all.get('actionInProgress')
-});
-
-const mapDispatchToProps = {
-  removePersonnel: deletePersonnel
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(All);
+export default memo(All);

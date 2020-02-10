@@ -2,7 +2,7 @@ import {
   ADD_PERSONNEL,
   ADD_PERSONNEL_FAILURE,
   ADD_PERSONNEL_SUCCESS,
-  TOGGLE_ADD_PERSONNEL_SUCCESS_MESSAGE
+  CLEAR_ADD_PERSONNEL_ERROR
 } from './constants';
 
 export const addPersonnel = (name, platoon, rank) => ({
@@ -14,12 +14,9 @@ export const addPersonnel = (name, platoon, rank) => ({
   }
 });
 
-export const addPersonnelSuccess = ({ ids, personnels }) => ({
+export const addPersonnelSuccess = person => ({
   type: ADD_PERSONNEL_SUCCESS,
-  payload: {
-    ids,
-    personnels
-  }
+  payload: person
 });
 
 export const addPersonnelFailure = errors => ({
@@ -27,8 +24,6 @@ export const addPersonnelFailure = errors => ({
   payload: errors
 });
 
-export const toggleAddPersonnelSuccessMessage = () => {
-  return {
-    type: TOGGLE_ADD_PERSONNEL_SUCCESS_MESSAGE
-  };
-};
+export const clearPersonnelError = () => ({
+  type: CLEAR_ADD_PERSONNEL_ERROR
+});

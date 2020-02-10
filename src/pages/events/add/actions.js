@@ -9,9 +9,9 @@ export const createEvent = payload => ({
   payload
 });
 
-export const createEventSuccess = ({ ids, events }) => ({
+export const createEventSuccess = payload => ({
   type: CREATE_EVENT_SUCCESS,
-  payload: { ids, events }
+  payload
 });
 
 export const createEventFailure = errors => ({

@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { fromJS, List } from 'immutable';
 import {
   ADD_PLATOON_FAILURE,
   ADD_PLATOON,
@@ -8,12 +8,13 @@ import {
   DELETE_PLATOON_FAILURE,
   UPDATE_PLATOON,
   UPDATE_PLATOON_FAILURE,
-  UPDATE_PLATOON_SUCCESS
+  UPDATE_PLATOON_SUCCESS,
+  CLEAR_ERROR
 } from './constants';
 
-const initialState = Map({
+const initialState = fromJS({
   errors: [],
-  actionInProgress: false
+  actionInProgress: 0
 });
 
 export default (state = initialState, { type, payload }) => {
@@ -22,24 +23,27 @@ export default (state = initialState, { type, payload }) => {
     case DELETE_PLATOON:
     case UPDATE_PLATOON:
       return state.merge({
-        actionInProgress: true,
-        errors: []
+        actionInProgress: state.get('actionInProgress') + 1,
+        errors: List()
       });
     case ADD_PLATOON_SUCCESS:
     case DELETE_PLATOON_SUCCESS:
     case UPDATE_PLATOON_SUCCESS:
       return state.merge({
-        actionInProgress: false,
-        errors: []
+        actionInProgress: state.get('actionInProgress') - 1,
+        errors: List()
       });
     case ADD_PLATOON_FAILURE:
     case DELETE_PLATOON_FAILURE:
     case UPDATE_PLATOON_FAILURE:
       return state.merge({
-        errors: payload,
-        actionInProgress: false
+        errors: List(payload),
+        actionInProgress: state.get('actionInProgress') - 1
       });
-
+    case CLEAR_ERROR:
+      return state.merge({
+        errors: []
+      });
     default:
       return state;
   }

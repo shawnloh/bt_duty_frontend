@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { fromJS, List } from 'immutable';
 import { LOAD_POINTS_FAILURE, LOAD_POINTS_SUCCESS } from '../actions/constants';
 import {
   ADD_POINT_SUCCESS,
@@ -6,7 +6,7 @@ import {
   UPDATE_POINT_SUCCESS
 } from '../pages/points/constants';
 
-const initialState = Map({
+const initialState = fromJS({
   ids: [],
   points: {},
   errors: []
@@ -14,21 +14,27 @@ const initialState = Map({
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
-    case ADD_POINT_SUCCESS:
-    case DELETE_POINT_SUCCESS:
     case LOAD_POINTS_SUCCESS:
       return state.merge({
-        ids: payload.ids,
-        points: payload.points,
-        errors: []
+        ids: List(payload.ids),
+        points: fromJS(payload.points),
+        errors: List()
+      });
+    case ADD_POINT_SUCCESS:
+      return state.merge({
+        ids: state.get('ids').push(payload._id),
+        points: state.get('points').set(payload._id, fromJS(payload))
+      });
+    case DELETE_POINT_SUCCESS:
+      return state.merge({
+        ids: state.get('ids').delete(state.get('ids').indexOf(payload)),
+        points: state.get('points').delete(payload)
       });
     case UPDATE_POINT_SUCCESS:
-      return state.merge({
-        points: payload
-      });
+      return state.setIn(['points', payload._id], fromJS(payload));
     case LOAD_POINTS_FAILURE:
       return state.merge({
-        errors: payload
+        errors: List(payload)
       });
     default:
       return state;

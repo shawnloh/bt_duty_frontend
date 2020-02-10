@@ -1,12 +1,12 @@
-import { Map } from 'immutable';
+import { fromJS, List } from 'immutable';
 import { LOGIN, LOGIN_FAIL } from './constants';
 import {
   CHECK_AUTH_SUCCESS,
   CHECK_AUTH_FAILURE
 } from '../../actions/constants';
 
-const initialState = Map({
-  isLoading: false,
+const initialState = fromJS({
+  isAuthenticating: false,
   errors: []
 });
 
@@ -14,18 +14,18 @@ export default (state = initialState, { type, payload }) => {
   switch (type) {
     case LOGIN:
       return state.merge({
-        isLoading: true,
-        errors: []
+        isAuthenticating: true,
+        errors: List()
       });
     case CHECK_AUTH_SUCCESS:
     case CHECK_AUTH_FAILURE:
       return state.merge({
-        isLoading: false
+        isAuthenticating: false
       });
     case LOGIN_FAIL:
       return state.merge({
-        isLoading: false,
-        errors: payload
+        isAuthenticating: false,
+        errors: List(payload)
       });
     default:
       return state;

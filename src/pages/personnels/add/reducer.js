@@ -1,41 +1,37 @@
-import { Map } from 'immutable';
+import { List, fromJS } from 'immutable';
 import {
   ADD_PERSONNEL,
   ADD_PERSONNEL_FAILURE,
   ADD_PERSONNEL_SUCCESS,
-  TOGGLE_ADD_PERSONNEL_SUCCESS_MESSAGE
+  CLEAR_ADD_PERSONNEL_ERROR
 } from './constants';
 
-const initialState = Map({
+const initialState = fromJS({
   actionInProgress: false,
-  errors: [],
-  success: false
+  errors: []
 });
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
     case ADD_PERSONNEL:
       return state.merge({
-        errors: [],
-        actionInProgress: true,
-        success: false
+        errors: List(),
+        actionInProgress: true
       });
     case ADD_PERSONNEL_SUCCESS:
       return state.merge({
         actionInProgress: false,
-        errors: [],
-        success: true
-      });
-    case TOGGLE_ADD_PERSONNEL_SUCCESS_MESSAGE:
-      return state.merge({
-        success: !state.get('success')
+        errors: List()
       });
     case ADD_PERSONNEL_FAILURE:
       return state.merge({
         actionInProgress: false,
-        errors: payload
+        errors: List(payload)
       });
-
+    case CLEAR_ADD_PERSONNEL_ERROR:
+      return state.merge({
+        errors: List()
+      });
     default:
       return state;
   }

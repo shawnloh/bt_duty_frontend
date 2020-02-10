@@ -1,4 +1,4 @@
-import { takeLatest, call, select, put, all, delay } from 'redux-saga/effects';
+import { takeLatest, call, put, all, delay } from 'redux-saga/effects';
 import { ADD_POINT, DELETE_POINT, UPDATE_POINT } from './constants';
 import {
   addPointSuccess,
@@ -6,18 +6,15 @@ import {
   deletePointSuccess,
   deletePointFailure,
   updatePointSuccess,
-  updatePointFailure
+  updatePointFailure,
+  clearErrors
 } from './actions';
 import { logout } from '../../actions/authActions';
 import PointsService from '../../services/points';
 
-function* clearError(funcToClear) {
-  try {
-    yield delay(4000);
-    yield put(funcToClear([]));
-  } catch (error) {
-    yield put(funcToClear([]));
-  }
+function* clearError() {
+  yield delay(4000);
+  yield put(clearErrors());
 }
 
 function* addPoint(action) {
@@ -27,20 +24,15 @@ function* addPoint(action) {
       yield put(
         addPointFailure(['Cannot give an empty name for new point system'])
       );
-      yield call(clearError, addPointFailure);
+      yield call(clearError);
     } else {
-      const ids = yield select(state => state.points.get('ids'));
-      const points = yield select(state => state.points.get('points'));
       const response = yield call(PointsService.createPoint, name);
-
       if (response.ok) {
-        const newPoint = response.data;
-        ids.push(newPoint._id);
-        points[newPoint._id] = {
-          _id: newPoint._id,
-          name: newPoint.name
+        const newPoint = {
+          _id: response.data._id,
+          name: response.data.name
         };
-        yield put(addPointSuccess({ ids, points }));
+        yield put(addPointSuccess(newPoint));
       } else if (response.status === 401) {
         yield put(logout());
       } else {
@@ -53,11 +45,11 @@ function* addPoint(action) {
           errors = errors.concat(response.data.errors);
         }
         yield put(addPointFailure(errors));
-        yield call(clearError, addPointFailure);
+        yield call(clearError);
       }
     }
   } catch (error) {
-    yield put(addPointFailure([error.message]));
+    yield put(addPointFailure([error.message || 'Please try again later']));
     yield call(clearError, addPointFailure);
   }
 }
@@ -67,11 +59,7 @@ function* deletePoint(action) {
     const deleteId = action.payload;
     const response = yield call(PointsService.deletePoint, deleteId);
     if (response.ok) {
-      let ids = yield select(state => state.points.get('ids'));
-      const { ...points } = yield select(state => state.points.get('points'));
-      ids = ids.filter(id => id !== deleteId);
-      delete points[deleteId];
-      yield put(deletePointSuccess({ ids, points }));
+      yield put(deletePointSuccess(deleteId));
     } else if (response.status === 401) {
       yield put(logout());
     } else {
@@ -84,11 +72,11 @@ function* deletePoint(action) {
         errors = errors.concat(response.data.errors);
       }
       yield put(deletePointFailure(errors));
-      yield call(clearError, deletePointFailure);
+      yield call(clearError);
     }
   } catch (error) {
-    yield put(deletePointFailure([error.message]));
-    yield call(clearError, deletePointFailure);
+    yield put(deletePointFailure([error.message || 'Please try again later']));
+    yield call(clearError);
   }
 }
 
@@ -99,24 +87,23 @@ function* updatePoint(action) {
       yield put(
         updatePointFailure(['Cannot update a point system with empty name'])
       );
-      yield call(clearError, updatePointFailure);
+      yield call(clearError);
     } else {
       const response = yield call(PointsService.updatePoint, id, name);
       if (response.ok) {
-        const { ...points } = yield select(state => state.points.get('points'));
-        points[id] = {
+        const updatedPoint = {
           _id: response.data._id,
           name: response.data.name
         };
 
-        yield put(updatePointSuccess(points));
+        yield put(updatePointSuccess(updatedPoint));
       } else if (response.status === 401) {
         yield put(logout());
       } else if (response.status === 304) {
         yield put(
           updatePointFailure(['Updating point must not be the same as before'])
         );
-        yield call(clearError, updatePointFailure);
+        yield call(clearError);
       } else {
         let errors = [];
         if (response.data.message) {
@@ -127,12 +114,12 @@ function* updatePoint(action) {
           errors = errors.concat(response.data.errors);
         }
         yield put(updatePointFailure(errors));
-        yield call(clearError, updatePointFailure);
+        yield call(clearError);
       }
     }
   } catch (error) {
-    yield put(updatePointFailure([error.message]));
-    yield call(clearError, updatePointFailure);
+    yield put(updatePointFailure([error.message || 'Please try again later']));
+    yield call(clearError);
   }
 }
 

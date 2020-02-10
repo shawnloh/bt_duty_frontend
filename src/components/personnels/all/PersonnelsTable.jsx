@@ -2,6 +2,7 @@ import React from 'react';
 import { Table, Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { List } from 'immutable';
 
 const PersonnelsTable = ({ personnels, onDelete }) => {
   return (
@@ -16,17 +17,18 @@ const PersonnelsTable = ({ personnels, onDelete }) => {
       </thead>
       <tbody>
         {personnels.map(person => {
-          const { name: rank } = person.rank;
-          const { name: platoon } = person.platoon;
-          const { name, _id } = person;
+          const rank = person.getIn(['rank', 'name']);
+          const platoon = person.getIn(['platoon', 'name']);
+          const id = person.get('_id');
+          const name = person.get('name');
           return (
-            <tr key={person._id}>
+            <tr key={id}>
               <td className="text-center">{`${platoon} ${rank} ${name}`}</td>
               <td className="text-center">
-                <Button color="primary" tag={Link} to={`/personnels/${_id}`}>
+                <Button color="primary" tag={Link} to={`/personnels/${id}`}>
                   Edit
                 </Button>{' '}
-                <Button color="danger" onClick={() => onDelete(_id)}>
+                <Button color="danger" onClick={() => onDelete(person)}>
                   Delete
                 </Button>
               </td>
@@ -39,19 +41,7 @@ const PersonnelsTable = ({ personnels, onDelete }) => {
 };
 
 PersonnelsTable.propTypes = {
-  personnels: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      rank: PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired
-      }),
-      platoon: PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired
-      })
-    })
-  ).isRequired,
+  personnels: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
   onDelete: PropTypes.func.isRequired
 };
 

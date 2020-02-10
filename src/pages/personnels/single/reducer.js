@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { fromJS, List } from 'immutable';
 import {
   ADD_STATUS,
   ADD_STATUS_FAILURE,
@@ -18,8 +18,8 @@ import {
   EDIT_PERSONNEL_POINT_SUCCESS
 } from './constants';
 
-const initialState = Map({
-  actionInProgress: false,
+const initialState = fromJS({
+  actionInProgress: 0,
   errors: []
 });
 
@@ -31,18 +31,15 @@ export default (state = initialState, { type, payload }) => {
     case DELETE_BLOCKOUT:
     case EDIT_PERSONNEL_POINT:
       return state.merge({
-        actionInProgress: true,
-        errors: []
+        actionInProgress: state.get('actionInProgress') + 1
       });
     case ADD_STATUS_SUCCESS:
     case DELETE_STATUS_SUCCESS:
     case ADD_BLOCKOUT_SUCCESS:
     case DELETE_BLOCKOUT_SUCCESS:
     case EDIT_PERSONNEL_POINT_SUCCESS:
-    case CLEAR_ERRORS:
       return state.merge({
-        actionInProgress: false,
-        errors: []
+        actionInProgress: state.get('actionInProgress') - 1
       });
 
     case ADD_STATUS_FAILURE:
@@ -51,8 +48,12 @@ export default (state = initialState, { type, payload }) => {
     case DELETE_BLOCKOUT_FAILURE:
     case EDIT_PERSONNEL_POINT_FAILURE:
       return state.merge({
-        actionInProgress: false,
-        errors: payload
+        actionInProgress: state.get('actionInProgress') - 1,
+        errors: List(payload)
+      });
+    case CLEAR_ERRORS:
+      return state.merge({
+        errors: List()
       });
     default:
       return state;

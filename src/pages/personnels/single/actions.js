@@ -27,9 +27,12 @@ export const addStatus = (personnelId, statusId, startDate, endDate) => ({
   }
 });
 
-export const addStatusSuccess = payload => ({
+export const addStatusSuccess = ({ personnelId, status }) => ({
   type: ADD_STATUS_SUCCESS,
-  payload
+  payload: {
+    personnelId,
+    status
+  }
 });
 
 export const addStatusFailure = errors => ({
@@ -45,9 +48,12 @@ export const deleteStatus = (personnelId, pStatusId) => ({
   }
 });
 
-export const deleteStatusSuccess = payload => ({
+export const deleteStatusSuccess = ({ personnelId, statusId }) => ({
   type: DELETE_STATUS_SUCCESS,
-  payload
+  payload: {
+    personnelId,
+    statusId
+  }
 });
 
 export const deleteStatusFailure = errors => ({
@@ -63,9 +69,12 @@ export const addBlockout = (personnelId, date) => ({
   }
 });
 
-export const addBlockoutSuccess = payload => ({
+export const addBlockoutSuccess = (personnelId, blockoutDates) => ({
   type: ADD_BLOCKOUT_SUCCESS,
-  payload
+  payload: {
+    personnelId,
+    blockoutDates
+  }
 });
 
 export const addBlockoutFailure = errors => ({
@@ -81,9 +90,12 @@ export const deleteBlockout = (personnelId, date) => ({
   }
 });
 
-export const deleteBlockoutSuccess = payload => ({
+export const deleteBlockoutSuccess = (personnelId, blockoutDates) => ({
   type: DELETE_BLOCKOUT_SUCCESS,
-  payload
+  payload: {
+    personnelId,
+    blockoutDates
+  }
 });
 
 export const deleteBlockoutFailure = errors => ({
@@ -104,9 +116,17 @@ export const editPersonnelPoint = (personnelId, personnelPointId, point) => ({
   }
 });
 
-export const editPersonnelPointSuccess = payload => ({
+export const editPersonnelPointSuccess = (
+  personnelId,
+  personnelPointId,
+  points
+) => ({
   type: EDIT_PERSONNEL_POINT_SUCCESS,
-  payload
+  payload: {
+    personnelId,
+    personnelPointId,
+    points
+  }
 });
 
 export const editPersonnelPointFailure = errors => ({

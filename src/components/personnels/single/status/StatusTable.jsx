@@ -2,15 +2,16 @@ import React from 'react';
 import { Row, Col, Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
+import { List } from 'immutable';
 
-const toggleDelete = async (status, handleDelete) => {
+const toggleDeleteModal = async (status, handleDelete) => {
   const { value: confirm } = await Swal.fire({
     title: 'Are you sure?',
     html: `
       <p class="font-weight-bold">You won't be able to revert this!</p>
       <p>You are deleting:</p>
-      <p>${status.statusId.name}</p>
-      <p>Date: ${status.startDate} - ${status.endDate}</p>
+      <p>${status.getIn(['statusId', 'name'])}</p>
+      <p>Date: ${status.get('startDate')} - ${status.get('endDate')}</p>
       `,
     icon: 'warning',
     showCancelButton: true,
@@ -19,9 +20,10 @@ const toggleDelete = async (status, handleDelete) => {
     confirmButtonText: 'Delete'
   });
   if (confirm) {
-    handleDelete(status._id);
+    handleDelete(status.get('_id'));
   }
 };
+
 const StatusTable = ({ statuses, handleDelete }) => {
   return (
     <Row>
@@ -36,17 +38,17 @@ const StatusTable = ({ statuses, handleDelete }) => {
             </tr>
           </thead>
           <tbody>
-            {statuses.map(s => {
+            {statuses.map(status => {
               return (
-                <tr key={s._id}>
-                  <th>{s.statusId.name}</th>
-                  <td>{s.startDate}</td>
-                  <td>{s.endDate}</td>
+                <tr key={status.get('_id')}>
+                  <th>{status.getIn(['statusId', 'name'])}</th>
+                  <td>{status.get('startDate')}</td>
+                  <td>{status.get('endDate')}</td>
                   <td>
                     <Button
                       color="danger"
                       onClick={() => {
-                        toggleDelete(s, handleDelete);
+                        toggleDeleteModal(status, handleDelete);
                       }}
                     >
                       Delete
@@ -62,7 +64,7 @@ const StatusTable = ({ statuses, handleDelete }) => {
   );
 };
 StatusTable.propTypes = {
-  statuses: PropTypes.arrayOf(PropTypes.object).isRequired,
+  statuses: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
   handleDelete: PropTypes.func.isRequired
 };
 export default StatusTable;

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col } from 'reactstrap';
 import moment from 'moment-timezone';
+import { List } from 'immutable';
 import BlockoutTable from './blockout/BlockoutTable';
 import AddBlockout from './blockout/AddBlockout';
 import Pagination from '../../commons/Pagination';
@@ -43,7 +44,7 @@ function BlockoutDetails({ blockoutDates, handleDelete, handleAdd }) {
           <Pagination
             currentPage={page}
             rowsPerPage={rowsPerPage}
-            totalPosts={blockoutDates.length}
+            totalPosts={blockoutDates.size}
             setPage={setPage}
           />
         </Col>
@@ -53,11 +54,12 @@ function BlockoutDetails({ blockoutDates, handleDelete, handleAdd }) {
 }
 
 BlockoutDetails.defaultProps = {
-  blockoutDates: []
+  blockoutDates: List()
 };
 
 BlockoutDetails.propTypes = {
-  blockoutDates: PropTypes.arrayOf(PropTypes.string),
+  // blockoutDates: PropTypes.arrayOf(PropTypes.string),
+  blockoutDates: PropTypes.oneOfType([PropTypes.instanceOf(List)]),
   handleDelete: PropTypes.func.isRequired,
   handleAdd: PropTypes.func.isRequired
 };

@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import {
   Container,
   Row,
@@ -9,9 +9,8 @@ import {
   BreadcrumbItem,
   Alert
 } from 'reactstrap';
-import { Link, Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import { Link, Redirect, useParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 
 import {
   addStatus,
@@ -20,6 +19,8 @@ import {
   deleteBlockout,
   editPersonnelPoint
 } from './actions';
+import { getStatuses } from './selectors';
+
 import Details from '../../../components/personnels/single/Details';
 import Tabs from '../../../components/personnels/single/Tabs';
 import Status from '../../../components/personnels/single/Status';
@@ -27,220 +28,146 @@ import ActionAlert from '../../../components/commons/ActionAlert';
 import BlockoutDetails from '../../../components/personnels/single/BlockoutDetails';
 import PointsDetails from '../../../components/personnels/single/PointsDetails';
 
-export class Single extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeTab: '1'
-    };
-  }
+export function Single() {
+  const params = useParams();
 
-  setTab = tab => {
-    const { activeTab } = this.state;
-    if (tab !== activeTab) this.setState({ activeTab: tab });
-  };
+  const [activeTab, setActiveTab] = useState('1');
+  const statuses = useSelector(getStatuses);
+  const personnels = useSelector(state => state.personnels.get('personnels'));
+  const actionInProgress = useSelector(state =>
+    state.pages.personnels.single.get('actionInProgress')
+  );
+  const errors = useSelector(state =>
+    state.pages.personnels.single.get('errors')
+  );
+  const dispatch = useDispatch();
 
-  handleDeleteStatus = id => {
-    const {
-      deletePersonnelStatus,
-      match: {
-        params: { personnelId }
+  const handleDeleteStatus = useCallback(
+    id => {
+      dispatch(deleteStatus(params.personnelId, id));
+    },
+    [dispatch, params.personnelId]
+  );
+
+  const handleAddStatus = useCallback(
+    ({ statusId, startDate, endDate }) => {
+      dispatch(addStatus(params.personnelId, statusId, startDate, endDate));
+    },
+    [dispatch, params.personnelId]
+  );
+
+  const handleAddBlockout = useCallback(
+    ({ startDate, endDate = null }) => {
+      const date = {
+        startDate
+      };
+
+      if (endDate) {
+        date.endDate = endDate;
       }
-    } = this.props;
-    deletePersonnelStatus(personnelId, id);
-  };
 
-  handleAddStatus = ({ statusId, startDate, endDate }) => {
-    const {
-      match: {
-        params: { personnelId }
-      },
-      addPersonnelStatus
-    } = this.props;
-    addPersonnelStatus(personnelId, statusId, startDate, endDate);
-  };
+      dispatch(addBlockout(params.personnelId, date));
+    },
+    [dispatch, params.personnelId]
+  );
 
-  handleAddBlockoutDate = ({ startDate, endDate }) => {
-    const {
-      match: {
-        params: { personnelId }
-      },
-      addBlockoutDate
-    } = this.props;
+  const handleDeleteBlockout = useCallback(
+    date => {
+      dispatch(deleteBlockout(params.personnelId, date));
+    },
+    [dispatch, params.personnelId]
+  );
 
-    const date = {
-      startDate
-    };
+  const handleEditPoint = useCallback(
+    (personnelPointId, newPoint) => {
+      dispatch(
+        editPersonnelPoint(params.personnelId, personnelPointId, newPoint)
+      );
+    },
+    [dispatch, params.personnelId]
+  );
 
-    if (endDate) {
-      date.endDate = endDate;
-    }
-
-    addBlockoutDate(personnelId, date);
-  };
-
-  handleDeleteBlockoutDate = date => {
-    const {
-      match: {
-        params: { personnelId }
-      },
-      deleteBlockoutDate
-    } = this.props;
-    deleteBlockoutDate(personnelId, date);
-  };
-
-  handleEditPoint = (personnelPointId, newPoint) => {
-    const {
-      match: {
-        params: { personnelId }
-      },
-      editPoint
-    } = this.props;
-
-    editPoint(personnelId, personnelPointId, newPoint);
-  };
-
-  showErrors = () => {
-    const { errors } = this.props;
-
-    return (
-      <Row className="my-2 flex-column">
+  const person = personnels.get(params.personnelId);
+  if (!person) {
+    return <Redirect to="/personnels" />;
+  }
+  return (
+    <Container>
+      <Row className="my-2 justify-content-center align-items-center">
         <Col>
-          <Alert color="danger" className="w-100">
-            {errors.map(error => {
-              return <p key={error}>{error}</p>;
-            })}
-          </Alert>
+          <Breadcrumb tag="nav" listTag="div">
+            <BreadcrumbItem tag={Link} to="/personnels">
+              Personnels
+            </BreadcrumbItem>
+            <BreadcrumbItem tag="span">Details</BreadcrumbItem>
+            <BreadcrumbItem active tag="span">
+              {person.name}
+            </BreadcrumbItem>
+          </Breadcrumb>
         </Col>
       </Row>
-    );
-  };
-
-  render() {
-    const {
-      match: {
-        params: { personnelId }
-      },
-      personnels,
-      statuses,
-      statusIds,
-      actionInProgress,
-      errors
-    } = this.props;
-    const { activeTab } = this.state;
-
-    const person = personnels[personnelId];
-    if (!person) {
-      return <Redirect to="/personnels" />;
-    }
-    return (
-      <Container>
-        <Row className="my-2 justify-content-center align-items-center">
+      {errors.size > 0 && (
+        <Row className="my-2 flex-column">
           <Col>
-            <Breadcrumb tag="nav" listTag="div">
-              <BreadcrumbItem tag={Link} to="/personnels">
-                Personnels
-              </BreadcrumbItem>
-              <BreadcrumbItem tag="span">Details</BreadcrumbItem>
-              <BreadcrumbItem active tag="span">
-                {person.name}
-              </BreadcrumbItem>
-            </Breadcrumb>
+            <Alert color="danger" className="w-100">
+              {errors.map(error => {
+                return <p key={error}>{error}</p>;
+              })}
+            </Alert>
           </Col>
         </Row>
-        {errors.length > 0 && this.showErrors()}
-        {actionInProgress && <ActionAlert name="Action" />}
-        <Row className="my-2 align-items-center">
-          <Col>
-            <h1>Details</h1>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <p className="text-danger">
-              Note: Event dates, status and blockout dates that expired will be
-              automatically removed
-            </p>
-          </Col>
-        </Row>
+      )}
+      {actionInProgress !== 0 && (
+        <ActionAlert name={`${actionInProgress} action(s)`} />
+      )}
+      <Row className="my-2 align-items-center">
+        <Col>
+          <h1>Details</h1>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <p className="text-danger">
+            Note: Event dates, status and blockout dates that expired will be
+            automatically removed
+          </p>
+        </Col>
+      </Row>
 
-        <Tabs activeTab={activeTab} setTab={this.setTab} />
-        <TabContent activeTab={activeTab}>
-          <TabPane tabId="1">
-            <Details
-              name={person.name}
-              rank={person.rank}
-              platoon={person.platoon}
-              eventsDate={person.eventsDate || ['None']}
-            />
-          </TabPane>
-          <TabPane tabId="2">
-            <Status
-              handleDelete={this.handleDeleteStatus}
-              personStatuses={person.statuses}
-              statusIds={statusIds}
-              statuses={statuses}
-              handleAdd={this.handleAddStatus}
-            />
-          </TabPane>
-          <TabPane tabId="3">
-            <BlockoutDetails
-              handleAdd={this.handleAddBlockoutDate}
-              blockoutDates={person.blockOutDates}
-              handleDelete={this.handleDeleteBlockoutDate}
-            />
-          </TabPane>
-          <TabPane tabId="4">
-            <PointsDetails
-              points={person.points}
-              handleEdit={this.handleEditPoint}
-            />
-          </TabPane>
-        </TabContent>
-      </Container>
-    );
-  }
+      <Tabs activeTab={activeTab} setTab={setActiveTab} />
+      <TabContent activeTab={activeTab}>
+        <TabPane tabId="1">
+          <Details
+            name={person.get('name')}
+            rank={person.getIn(['rank', 'name'])}
+            platoon={person.getIn(['platoon', 'name'])}
+            eventsDate={person.get('eventsDate')}
+          />
+        </TabPane>
+        <TabPane tabId="2">
+          <Status
+            handleDelete={handleDeleteStatus}
+            personStatuses={person.get('statuses')}
+            statuses={statuses}
+            handleAdd={handleAddStatus}
+          />
+        </TabPane>
+        <TabPane tabId="3">
+          <BlockoutDetails
+            handleAdd={handleAddBlockout}
+            blockoutDates={person.get('blockOutDates')}
+            handleDelete={handleDeleteBlockout}
+          />
+        </TabPane>
+        <TabPane tabId="4">
+          <PointsDetails
+            points={person.get('points')}
+            handleEdit={handleEditPoint}
+          />
+        </TabPane>
+      </TabContent>
+    </Container>
+  );
 }
 
-Single.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      personnelId: PropTypes.string.isRequired
-    }).isRequired
-  }).isRequired,
-  personnels: PropTypes.shape({
-    id: PropTypes.string
-  }).isRequired,
-  statuses: PropTypes.shape({
-    id: PropTypes.shape({
-      _id: PropTypes.string,
-      name: PropTypes.string
-    })
-  }).isRequired,
-  statusIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-  addPersonnelStatus: PropTypes.func.isRequired,
-  deletePersonnelStatus: PropTypes.func.isRequired,
-  addBlockoutDate: PropTypes.func.isRequired,
-  deleteBlockoutDate: PropTypes.func.isRequired,
-  editPoint: PropTypes.func.isRequired,
-  actionInProgress: PropTypes.bool.isRequired,
-  errors: PropTypes.arrayOf(PropTypes.string).isRequired
-};
-
-const mapStateToProps = state => ({
-  personnels: state.personnels.get('personnels'),
-  statuses: state.statuses.get('statuses'),
-  statusIds: state.statuses.get('ids'),
-  actionInProgress: state.pages.personnels.single.get('actionInProgress'),
-  errors: state.pages.personnels.single.get('errors')
-});
-
-const mapDispatchToProps = {
-  addPersonnelStatus: addStatus,
-  deletePersonnelStatus: deleteStatus,
-  addBlockoutDate: addBlockout,
-  deleteBlockoutDate: deleteBlockout,
-  editPoint: editPersonnelPoint
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Single);
+export default memo(Single);

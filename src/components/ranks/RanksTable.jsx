@@ -1,8 +1,9 @@
 import React from 'react';
 import { Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
+import { List } from 'immutable';
 
-const RankTable = ({ ranks, toggle, modes }) => {
+const RankTable = ({ ranks, handleUpdate, handleDelete }) => {
   return (
     <Table striped responsive>
       <thead>
@@ -16,17 +17,17 @@ const RankTable = ({ ranks, toggle, modes }) => {
       <tbody>
         {ranks.map(rank => {
           return (
-            <tr key={rank._id}>
-              <td className="text-center">{rank.name}</td>
+            <tr key={rank.get('_id')}>
+              <td className="text-center">{rank.get('name')}</td>
               <td className="text-center">
                 <Button
                   color="primary"
-                  onClick={() => toggle(modes.UPDATE, rank._id)}
+                  onClick={() => handleUpdate(rank.get('_id'))}
                 >
                   Edit
                 </Button>{' '}
                 <Button
-                  onClick={() => toggle(modes.DELETE, rank._id)}
+                  onClick={() => handleDelete(rank.get('_id'))}
                   color="danger"
                 >
                   Delete
@@ -41,18 +42,9 @@ const RankTable = ({ ranks, toggle, modes }) => {
 };
 
 RankTable.propTypes = {
-  ranks: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string,
-      name: PropTypes.string
-    })
-  ).isRequired,
-  toggle: PropTypes.func.isRequired,
-  modes: PropTypes.shape({
-    UPDATE: PropTypes.string.isRequired,
-    DELETE: PropTypes.string.isRequired,
-    ADD: PropTypes.string.isRequired
-  }).isRequired
+  ranks: PropTypes.instanceOf(List).isRequired,
+  handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired
 };
 
 export default RankTable;

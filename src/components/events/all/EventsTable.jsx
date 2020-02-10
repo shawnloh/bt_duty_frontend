@@ -2,9 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Table, Button, Row } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import { List } from 'immutable';
 
 const EventsTable = ({ events, path }) => {
-  if (events.length === 0) {
+  if (events.size === 0) {
     return <Row className="my-2 mx-2">No events available</Row>;
   }
   return (
@@ -20,15 +21,17 @@ const EventsTable = ({ events, path }) => {
       <tbody>
         {events.map(event => {
           return (
-            <tr key={event._id}>
-              <td className="text-center">{event.name}</td>
-              <td className="text-center">{event.date}</td>
-              <td className="text-center">{event.pointSystem.name}</td>
+            <tr key={event.get('_id')}>
+              <td className="text-center">{event.get('name')}</td>
+              <td className="text-center">{event.get('date')}</td>
+              <td className="text-center">
+                {event.getIn(['pointSystem', 'name'])}
+              </td>
               <td className="text-center">
                 <Row>
                   <Button
                     tag={Link}
-                    to={`${path}/${event._id}`}
+                    to={`${path}/${event.get('_id')}`}
                     color="primary"
                   >
                     View
@@ -38,7 +41,7 @@ const EventsTable = ({ events, path }) => {
                   <Button
                     color="danger"
                     tag={Link}
-                    to={`${path}/${event._id}/delete`}
+                    to={`${path}/${event.get('_id')}/delete`}
                   >
                     Delete
                   </Button>
@@ -53,24 +56,8 @@ const EventsTable = ({ events, path }) => {
 };
 
 EventsTable.propTypes = {
-  events: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      personnels: PropTypes.arrayOf(
-        PropTypes.shape({
-          _id: PropTypes.string.isRequired,
-          name: PropTypes.string.isRequired
-        })
-      ).isRequired,
-      name: PropTypes.string.isRequired,
-      date: PropTypes.string.isRequired,
-      pointSystem: PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired
-      }).isRequired,
-      pointsAllocation: PropTypes.number.isRequired
-    })
-  ).isRequired,
+  events: PropTypes.oneOfType([PropTypes.instanceOf(List).isRequired])
+    .isRequired,
   path: PropTypes.string.isRequired
 };
 

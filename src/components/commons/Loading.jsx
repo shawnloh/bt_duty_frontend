@@ -2,14 +2,14 @@ import React, { PureComponent } from 'react';
 import { Spinner, Row, Container } from 'reactstrap';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import AppLayout from '../../pages/shared/AppLayout';
+import Layout from '../../pages/shared/AppLayout';
 
 class Loading extends PureComponent {
   render() {
     const { isAuthenticated } = this.props;
     if (isAuthenticated) {
       return (
-        <AppLayout>
+        <Layout>
           <Container className="d-flex h-100 justify-content-center align-items-center flex-column">
             <Row>
               <Spinner type="grow" color="primary" />
@@ -22,7 +22,7 @@ class Loading extends PureComponent {
             </Row>
             <Row>Loading Page...</Row>
           </Container>
-        </AppLayout>
+        </Layout>
       );
     }
     return (

@@ -1,4 +1,4 @@
-import { takeLatest, call, put, select, all, delay } from 'redux-saga/effects';
+import { takeEvery, call, put, all, delay } from 'redux-saga/effects';
 import moment from 'moment-timezone';
 import {
   ADD_STATUS,
@@ -50,18 +50,16 @@ function* addStatus(action) {
     );
     if (response.ok) {
       const status = response.data;
-      const { ...personnels } = yield select(state =>
-        state.personnels.get('personnels')
-      );
-      const statusToPush = {
+
+      const newPersonnelStatus = {
         _id: status._id,
         expired: status.expired,
         statusId: status.statusId,
         startDate: status.startDate,
         endDate: status.endDate
       };
-      personnels[personnelId].statuses.push(statusToPush);
-      yield put(addStatusSuccess(personnels));
+
+      yield put(addStatusSuccess({ personnelId, status: newPersonnelStatus }));
     } else if (response.status === 401) {
       yield put(logout());
     } else {
@@ -77,7 +75,7 @@ function* addStatus(action) {
       yield call(clearError);
     }
   } catch (error) {
-    yield put(addStatusFailure([error.message]));
+    yield put(addStatusFailure([error.message || 'Please try again later']));
     yield call(clearError);
   }
 }
@@ -90,15 +88,9 @@ function* deleteStatus(action) {
       personnelId,
       pStatusId
     );
+
     if (response.ok) {
-      const status = response.data.personnelStatus;
-      const { ...personnels } = yield select(state =>
-        state.personnels.get('personnels')
-      );
-      personnels[personnelId].statuses = personnels[
-        personnelId
-      ].statuses.filter(pStatus => pStatus._id !== status._id);
-      yield put(deleteStatusSuccess(personnels));
+      yield put(deleteStatusSuccess({ personnelId, statusId: pStatusId }));
     } else if (response.status === 401) {
       yield put(logout());
     } else {
@@ -114,7 +106,7 @@ function* deleteStatus(action) {
       yield call(clearError);
     }
   } catch (error) {
-    yield put(deleteStatusFailure([error.message]));
+    yield put(deleteStatusFailure([error.message || 'Please try again later']));
     yield call(clearError);
   }
 }
@@ -144,12 +136,8 @@ function* addBlockout(action) {
     );
 
     if (response.ok) {
-      const { ...personnels } = yield select(state =>
-        state.personnels.get('personnels')
-      );
       const { blockOutDates, _id: id } = response.data;
-      personnels[id].blockOutDates = blockOutDates;
-      yield put(addBlockoutSuccess(personnels));
+      yield put(addBlockoutSuccess(id, blockOutDates));
     } else if (response.status === 304) {
       yield put(addBlockoutFailure(['Blockout date already exist']));
       yield call(clearError, addBlockoutFailure);
@@ -168,7 +156,7 @@ function* addBlockout(action) {
       yield call(clearError);
     }
   } catch (error) {
-    yield put(addBlockoutFailure([error.message]));
+    yield put(addBlockoutFailure([error.message || 'Please try again later']));
     yield call(clearError);
   }
 }
@@ -182,12 +170,8 @@ function* deleteBlockout(action) {
       date
     );
     if (response.ok) {
-      const { ...personnels } = yield select(state =>
-        state.personnels.get('personnels')
-      );
       const { blockOutDates, _id: id } = response.data;
-      personnels[id].blockOutDates = blockOutDates;
-      yield put(deleteBlockoutSuccess(personnels));
+      yield put(deleteBlockoutSuccess(id, blockOutDates));
     } else if (response.status === 401) {
       yield put(logout());
     } else {
@@ -219,21 +203,9 @@ function* editPersonnelPoint(action) {
       point
     );
     if (response.ok) {
-      const { ...personnels } = yield select(state =>
-        state.personnels.get('personnels')
-      );
       const { points, personId, _id } = response.data.personnelPoint;
-      const person = personnels[personId];
-      person.points = person.points.map(pPoint => {
-        if (_id === pPoint._id) {
-          const personPoint = pPoint;
-          personPoint.points = points;
-          return personPoint;
-        }
-        return pPoint;
-      });
 
-      yield put(editPersonnelPointSuccess(personnels));
+      yield put(editPersonnelPointSuccess(personId, _id, points));
     } else if (response.status === 304) {
       yield put(
         editPersonnelPointFailure([
@@ -256,18 +228,20 @@ function* editPersonnelPoint(action) {
       yield call(clearError);
     }
   } catch (error) {
-    yield put(editPersonnelPointFailure([error.message]));
+    yield put(
+      editPersonnelPointFailure([error.message || 'Please try again later'])
+    );
     yield call(clearError);
   }
 }
 
 function* singleWatcher() {
   yield all([
-    takeLatest(ADD_STATUS, addStatus),
-    takeLatest(DELETE_STATUS, deleteStatus),
-    takeLatest(ADD_BLOCKOUT, addBlockout),
-    takeLatest(DELETE_BLOCKOUT, deleteBlockout),
-    takeLatest(EDIT_PERSONNEL_POINT, editPersonnelPoint)
+    takeEvery(ADD_STATUS, addStatus),
+    takeEvery(DELETE_STATUS, deleteStatus),
+    takeEvery(ADD_BLOCKOUT, addBlockout),
+    takeEvery(DELETE_BLOCKOUT, deleteBlockout),
+    takeEvery(EDIT_PERSONNEL_POINT, editPersonnelPoint)
   ]);
 }
 

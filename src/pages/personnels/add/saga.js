@@ -1,19 +1,16 @@
-import { takeLatest, put, call, select, delay, all } from 'redux-saga/effects';
+import { takeLatest, put, call, delay } from 'redux-saga/effects';
 import { ADD_PERSONNEL } from './constants';
 import {
   addPersonnelFailure,
   addPersonnelSuccess,
-  toggleAddPersonnelSuccessMessage
+  clearPersonnelError
 } from './actions';
 import { logout } from '../../../actions/authActions';
 import PersonnelsService from '../../../services/personnels';
 
 function* clearMessage() {
   yield delay(4000);
-  yield all([
-    put(addPersonnelFailure([])),
-    put(toggleAddPersonnelSuccessMessage())
-  ]);
+  yield put(clearPersonnelError([]));
 }
 
 function* addPersonnel(action) {
@@ -26,14 +23,8 @@ function* addPersonnel(action) {
       platoon
     );
     if (response.ok) {
-      const [...ids] = yield select(state => state.personnels.get('ids'));
-      const { ...personnels } = yield select(state =>
-        state.personnels.get('personnels')
-      );
       const person = response.data;
-      ids.push(person._id);
-      personnels[person._id] = person;
-      yield put(addPersonnelSuccess({ ids, personnels }));
+      yield put(addPersonnelSuccess(person));
     } else if (response.status === 401) {
       yield put(logout());
     } else {
