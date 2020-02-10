@@ -33,7 +33,7 @@ function BlockoutDetails({ blockoutDates, handleDelete, handleAdd }) {
   const shownDates = sortedBlockoutDate.slice(firstIndex, lastIndex);
   return (
     <>
-      <AddBlockout handleAdd={handleAdd} />
+      <AddBlockout handleAdd={handleAdd} handleDelete={handleDelete} />
       {sortedBlockoutDate.length === 0 ? (
         <h3 className="my-2">No blockout date for this personnel</h3>
       ) : (

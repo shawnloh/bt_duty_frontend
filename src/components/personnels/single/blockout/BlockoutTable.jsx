@@ -18,7 +18,10 @@ const BlockoutTable = ({ handleDelete, blockoutDates }) => {
             <tr key={date}>
               <td className="text-center">{date}</td>
               <td className="text-center">
-                <Button color="danger" onClick={() => handleDelete(date)}>
+                <Button
+                  color="danger"
+                  onClick={() => handleDelete({ startDate: date })}
+                >
                   Delete
                 </Button>
               </td>

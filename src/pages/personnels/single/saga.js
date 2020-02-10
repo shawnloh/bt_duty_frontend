@@ -140,7 +140,7 @@ function* addBlockout(action) {
       yield put(addBlockoutSuccess(id, blockOutDates));
     } else if (response.status === 304) {
       yield put(addBlockoutFailure(['Blockout date already exist']));
-      yield call(clearError, addBlockoutFailure);
+      yield call(clearError);
     } else if (response.status === 401) {
       yield put(logout());
     } else {
@@ -164,14 +164,34 @@ function* addBlockout(action) {
 function* deleteBlockout(action) {
   try {
     const { personnelId, date } = action.payload;
+
+    const startDate = moment(date.startDate, 'DDMMYY', true).format(
+      'DD-MM-YYYY'
+    );
+
+    const dateToSubmit = {
+      startDate
+    };
+
+    if (date.endDate) {
+      dateToSubmit.endDate = moment(date.endDate, 'DDMMYY', true).format(
+        'DD-MM-YYYY'
+      );
+    }
+
     const response = yield call(
       PersonnelsService.deletePersonnelBlockout,
       personnelId,
-      date
+      dateToSubmit
     );
     if (response.ok) {
       const { blockOutDates, _id: id } = response.data;
       yield put(deleteBlockoutSuccess(id, blockOutDates));
+    } else if (response.status === 304) {
+      yield put(
+        deleteBlockoutFailure(['Blockout date(s) does not exist already'])
+      );
+      yield call(clearError);
     } else if (response.status === 401) {
       yield put(logout());
     } else {
@@ -183,6 +203,7 @@ function* deleteBlockout(action) {
       if (response.data.errors) {
         errors = errors.concat(response.data.errors);
       }
+
       yield put(deleteBlockoutFailure(errors));
       yield call(clearError);
     }

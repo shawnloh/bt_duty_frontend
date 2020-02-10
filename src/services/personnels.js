@@ -56,7 +56,7 @@ class PersonnelsService {
 
   static deletePersonnelBlockout(personnelId, date) {
     return api
-      .post(`/person/${personnelId}/blockout/delete`, { date })
+      .post(`/person/${personnelId}/blockout/delete`, { ...date })
       .then(response => response)
       .catch(error => error);
   }

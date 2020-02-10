@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import {
   Row,
@@ -37,11 +37,11 @@ const validate = values => {
   return errors;
 };
 
-const AddBlockout = ({ handleAdd }) => {
+const AddBlockout = ({ handleAdd, handleDelete }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = () => {
-    setIsOpen(!isOpen);
+    setIsOpen(open => !open);
   };
 
   const formik = useFormik({
@@ -49,28 +49,54 @@ const AddBlockout = ({ handleAdd }) => {
       startDate: '',
       endDate: ''
     },
-    validate,
-    onSubmit(values, { resetForm }) {
-      handleAdd(values);
-      resetForm();
-      toggle();
-    }
+    validate
   });
 
-  const today = moment()
-    .tz('Asia/Singapore')
-    .format('DDMMYY');
+  const today = useMemo(
+    () =>
+      moment()
+        .tz('Asia/Singapore')
+        .format('DDMMYY'),
+    []
+  );
+
+  const tomorrow = useMemo(
+    () =>
+      moment()
+        .tz('Asia/Singapore')
+        .add(1, 'd')
+        .format('DDMMYY'),
+    []
+  );
+
+  const handleAddBlockout = useCallback(() => {
+    formik.validateForm().then(() => {
+      handleAdd(formik.values);
+      toggle();
+    });
+  }, [formik, handleAdd]);
+
+  const handleRemoveBlockout = useCallback(() => {
+    formik.validateForm().then(() => {
+      handleDelete(formik.values);
+      toggle();
+    });
+  }, [formik, handleDelete]);
+
+  const handleOnSubmit = useCallback(e => {
+    e.preventDefault();
+  }, []);
 
   return (
     <>
       <Row className="flex-column justify-content-end align-items-end my-2 mx-2">
         <Button className="my-2" color="primary" onClick={toggle}>
-          Add Blockout
+          Actions
         </Button>
         <Collapse isOpen={isOpen} className="w-100">
           <Card>
             <CardBody>
-              <Form onSubmit={formik.handleSubmit}>
+              <Form onSubmit={handleOnSubmit}>
                 <FormGroup>
                   <Label for="dateInput">Date</Label>
                   <Input
@@ -101,7 +127,7 @@ const AddBlockout = ({ handleAdd }) => {
                     value={formik.values.endDate}
                     name="endDate"
                     id="untilDateInput"
-                    placeholder={`*OPTIONAL* e.g. ${today}`}
+                    placeholder={`*OPTIONAL* e.g. ${tomorrow}`}
                     invalid={
                       formik.touched.endDate &&
                       formik.errors.endDate &&
@@ -111,15 +137,25 @@ const AddBlockout = ({ handleAdd }) => {
                   />
                   <FormText color="muted">
                     This is optional, you can leave this blank if you want to
-                    add a single date
+                    add/remove a single date
                   </FormText>
                   {formik.touched.endDate && formik.errors.endDate ? (
                     <FormFeedback>{formik.errors.endDate}</FormFeedback>
                   ) : null}
                 </FormGroup>
-
-                <Button color="success" className="w-100" type="submit">
+                <Button
+                  color="success"
+                  className="w-100"
+                  onClick={handleAddBlockout}
+                >
                   Add
+                </Button>
+                <Button
+                  color="danger"
+                  className="mt-1 w-100"
+                  onClick={handleRemoveBlockout}
+                >
+                  Remove
                 </Button>
               </Form>
             </CardBody>
@@ -131,7 +167,8 @@ const AddBlockout = ({ handleAdd }) => {
 };
 
 AddBlockout.propTypes = {
-  handleAdd: PropTypes.func.isRequired
+  handleAdd: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired
 };
 
 export default AddBlockout;

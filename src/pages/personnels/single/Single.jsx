@@ -72,7 +72,14 @@ export function Single() {
   );
 
   const handleDeleteBlockout = useCallback(
-    date => {
+    ({ startDate, endDate = null }) => {
+      const date = {
+        startDate
+      };
+
+      if (endDate) {
+        date.endDate = endDate;
+      }
       dispatch(deleteBlockout(params.personnelId, date));
     },
     [dispatch, params.personnelId]
