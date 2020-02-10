@@ -38,20 +38,8 @@ const validate = values => {
 };
 
 const AddBlockout = ({ handleAdd, handleDelete }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggle = () => {
-    setIsOpen(open => !open);
-  };
-
-  const formik = useFormik({
-    initialValues: {
-      startDate: '',
-      endDate: ''
-    },
-    validate
-  });
-
+  const [isAddBlockoutOpen, setIsAddBlockoutOpen] = useState(false);
+  const [isDeleteBlockoutOpen, setIsDeleteBlockoutOpen] = useState(false);
   const today = useMemo(
     () =>
       moment()
@@ -68,55 +56,79 @@ const AddBlockout = ({ handleAdd, handleDelete }) => {
         .format('DDMMYY'),
     []
   );
+  const toggleAdd = useCallback(() => {
+    setIsAddBlockoutOpen(open => !open);
+    if (isDeleteBlockoutOpen) setIsDeleteBlockoutOpen(false);
+  }, [isDeleteBlockoutOpen]);
 
-  const handleAddBlockout = useCallback(() => {
-    formik.validateForm().then(() => {
-      handleAdd(formik.values);
-      toggle();
-    });
-  }, [formik, handleAdd]);
+  const toggleDelete = useCallback(() => {
+    setIsDeleteBlockoutOpen(open => !open);
+    if (isAddBlockoutOpen) setIsAddBlockoutOpen(false);
+  }, [isAddBlockoutOpen]);
 
-  const handleRemoveBlockout = useCallback(() => {
-    formik.validateForm().then(() => {
-      handleDelete(formik.values);
-      toggle();
-    });
-  }, [formik, handleDelete]);
-
-  const handleOnSubmit = useCallback(e => {
-    e.preventDefault();
-  }, []);
+  const addBlockoutFormik = useFormik({
+    initialValues: {
+      startDate: '',
+      endDate: ''
+    },
+    validate,
+    onSubmit: (values, { resetForm }) => {
+      handleAdd(values);
+      toggleAdd();
+      resetForm();
+    }
+  });
+  const deleteBlockoutFormik = useFormik({
+    initialValues: {
+      startDate: '',
+      endDate: ''
+    },
+    validate,
+    onSubmit: (values, { resetForm }) => {
+      handleDelete(values);
+      toggleDelete();
+      resetForm();
+    }
+  });
 
   return (
     <>
-      <Row className="flex-column justify-content-end align-items-end my-2 mx-2">
-        <Button className="my-2" color="primary" onClick={toggle}>
-          Actions
+      <Row className="justify-content-end align-items-end my-2 mx-2">
+        <Button className="m-2" color="primary" onClick={toggleAdd}>
+          Add Blockout
         </Button>
-        <Collapse isOpen={isOpen} className="w-100">
+        <Button className="m-2" color="primary" onClick={toggleDelete}>
+          Delete Blockout
+        </Button>
+      </Row>
+      <Row>
+        <Collapse isOpen={isAddBlockoutOpen} className="w-100">
           <Card>
             <CardBody>
-              <Form onSubmit={handleOnSubmit}>
+              <Form onSubmit={addBlockoutFormik.handleSubmit}>
                 <FormGroup>
                   <Label for="dateInput">Date</Label>
                   <Input
                     type="text"
-                    value={formik.values.startDate}
+                    value={addBlockoutFormik.values.startDate}
                     name="startDate"
                     id="dateInput"
                     placeholder={`e.g. ${today}`}
                     invalid={
-                      formik.touched.startDate &&
-                      formik.errors.startDate &&
-                      formik.errors.startDate !== ''
+                      addBlockoutFormik.touched.startDate &&
+                      addBlockoutFormik.errors.startDate &&
+                      addBlockoutFormik.errors.startDate !== ''
                     }
-                    onChange={formik.handleChange}
+                    onChange={addBlockoutFormik.handleChange}
                   />
                   <FormText color="muted">
                     Date must be in DDMMYY format
                   </FormText>
-                  {formik.touched.startDate && formik.errors.startDate ? (
-                    <FormFeedback>{formik.errors.startDate}</FormFeedback>
+                  {addBlockoutFormik.touched.startDate &&
+                  addBlockoutFormik.errors.startDate ? (
+                    <FormFeedback>
+                      {addBlockoutFormik.errors.startDate}
+                    </FormFeedback>
                   ) : null}
                 </FormGroup>
 
@@ -124,37 +136,93 @@ const AddBlockout = ({ handleAdd, handleDelete }) => {
                   <Label for="untilDateInput">Until</Label>
                   <Input
                     type="text"
-                    value={formik.values.endDate}
+                    value={addBlockoutFormik.values.endDate}
                     name="endDate"
                     id="untilDateInput"
                     placeholder={`*OPTIONAL* e.g. ${tomorrow}`}
                     invalid={
-                      formik.touched.endDate &&
-                      formik.errors.endDate &&
-                      formik.errors.endDate !== ''
+                      addBlockoutFormik.touched.endDate &&
+                      addBlockoutFormik.errors.endDate &&
+                      addBlockoutFormik.errors.endDate !== ''
                     }
-                    onChange={formik.handleChange}
+                    onChange={addBlockoutFormik.handleChange}
                   />
                   <FormText color="muted">
                     This is optional, you can leave this blank if you want to
-                    add/remove a single date
+                    add a single date
                   </FormText>
-                  {formik.touched.endDate && formik.errors.endDate ? (
-                    <FormFeedback>{formik.errors.endDate}</FormFeedback>
+                  {addBlockoutFormik.touched.endDate &&
+                  addBlockoutFormik.errors.endDate ? (
+                    <FormFeedback>
+                      {addBlockoutFormik.errors.endDate}
+                    </FormFeedback>
                   ) : null}
                 </FormGroup>
-                <Button
-                  color="success"
-                  className="w-100"
-                  onClick={handleAddBlockout}
-                >
+                <Button color="success" className="w-100" type="submit">
                   Add
                 </Button>
-                <Button
-                  color="danger"
-                  className="mt-1 w-100"
-                  onClick={handleRemoveBlockout}
-                >
+              </Form>
+            </CardBody>
+          </Card>
+        </Collapse>
+
+        <Collapse isOpen={isDeleteBlockoutOpen} className="w-100">
+          <Card>
+            <CardBody>
+              <Form onSubmit={deleteBlockoutFormik.handleSubmit}>
+                <FormGroup>
+                  <Label for="dateInput">Date</Label>
+                  <Input
+                    type="text"
+                    value={deleteBlockoutFormik.values.startDate}
+                    name="startDate"
+                    id="dateInput"
+                    placeholder={`e.g. ${today}`}
+                    invalid={
+                      deleteBlockoutFormik.touched.startDate &&
+                      deleteBlockoutFormik.errors.startDate &&
+                      deleteBlockoutFormik.errors.startDate !== ''
+                    }
+                    onChange={deleteBlockoutFormik.handleChange}
+                  />
+                  <FormText color="muted">
+                    Date must be in DDMMYY format
+                  </FormText>
+                  {deleteBlockoutFormik.touched.startDate &&
+                  deleteBlockoutFormik.errors.startDate ? (
+                    <FormFeedback>
+                      {deleteBlockoutFormik.errors.startDate}
+                    </FormFeedback>
+                  ) : null}
+                </FormGroup>
+
+                <FormGroup>
+                  <Label for="untilDateInput">Until</Label>
+                  <Input
+                    type="text"
+                    value={deleteBlockoutFormik.values.endDate}
+                    name="endDate"
+                    id="untilDateInput"
+                    placeholder={`*OPTIONAL* e.g. ${tomorrow}`}
+                    invalid={
+                      deleteBlockoutFormik.touched.endDate &&
+                      deleteBlockoutFormik.errors.endDate &&
+                      deleteBlockoutFormik.errors.endDate !== ''
+                    }
+                    onChange={deleteBlockoutFormik.handleChange}
+                  />
+                  <FormText color="muted">
+                    This is optional, you can leave this blank if you want to
+                    remove a single date
+                  </FormText>
+                  {deleteBlockoutFormik.touched.endDate &&
+                  deleteBlockoutFormik.errors.endDate ? (
+                    <FormFeedback>
+                      {deleteBlockoutFormik.errors.endDate}
+                    </FormFeedback>
+                  ) : null}
+                </FormGroup>
+                <Button color="danger" className="w-100" type="submit">
                   Remove
                 </Button>
               </Form>

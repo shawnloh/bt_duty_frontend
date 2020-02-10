@@ -164,10 +164,10 @@ function* addBlockout(action) {
 function* deleteBlockout(action) {
   try {
     const { personnelId, date } = action.payload;
-
-    const startDate = moment(date.startDate, 'DDMMYY', true).format(
-      'DD-MM-YYYY'
-    );
+    let { startDate } = date;
+    if (moment(date.startDate, 'DDMMYY', true).isValid()) {
+      startDate = moment(date.startDate, 'DDMMYY', true).format('DD-MM-YYYY');
+    }
 
     const dateToSubmit = {
       startDate
