@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink as Link } from 'react-router-dom';
+import { NavLink as Link, Link as RouterLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
   Collapse,
@@ -21,7 +21,9 @@ const TopNavBar = ({ username }) => {
 
   return (
     <Navbar color="dark" dark expand="md">
-      <NavbarBrand href="/">Duty App</NavbarBrand>
+      <NavbarBrand tag={RouterLink} to="/dashboard">
+        Duty App
+      </NavbarBrand>
       <NavbarToggler onClick={toggle} />
       <Collapse isOpen={isOpen} navbar>
         <Nav className="mr-auto" navbar>

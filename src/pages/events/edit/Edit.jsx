@@ -107,7 +107,9 @@ export function Edit() {
 
   return (
     <Layout>
-      <Helmet />
+      <Helmet>
+        <title>Edit Event</title>
+      </Helmet>
       <Container className="py-2">
         <Row>
           <Col>

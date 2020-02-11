@@ -7,6 +7,7 @@ import {
   BreadcrumbItem,
   Alert
 } from 'reactstrap';
+import { Helmet } from 'react-helmet';
 import { Link, Redirect, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { getPerson, getRanks, getPlatoons } from './selectors';
@@ -59,62 +60,70 @@ export function Edit() {
   }
 
   return (
-    <Container className="py-2">
-      <Row className="justify-content-center align-items-center">
-        <Col>
-          <Breadcrumb tag="nav" listTag="div">
-            <BreadcrumbItem tag={Link} to="/personnels">
-              Personnels
-            </BreadcrumbItem>
-            <BreadcrumbItem tag="span">Details</BreadcrumbItem>
-            <BreadcrumbItem tag={Link} to={`/personnels/${params.personnelId}`}>
-              {person.get('name')}
-            </BreadcrumbItem>
-            <BreadcrumbItem active tag="span">
-              Edit Details
-            </BreadcrumbItem>
-          </Breadcrumb>
-        </Col>
-      </Row>
-      {errors.size > 0 && (
-        <Row>
+    <>
+      <Helmet>
+        <title>Edit Personnel</title>
+      </Helmet>
+      <Container className="py-2">
+        <Row className="justify-content-center align-items-center">
           <Col>
-            <Alert color="danger" className="w-100">
-              {errors.map(error => {
-                return (
-                  <p className="mb-0" key={error}>
-                    {error}
-                  </p>
-                );
-              })}
-            </Alert>
+            <Breadcrumb tag="nav" listTag="div">
+              <BreadcrumbItem tag={Link} to="/personnels">
+                Personnels
+              </BreadcrumbItem>
+              <BreadcrumbItem tag="span">Details</BreadcrumbItem>
+              <BreadcrumbItem
+                tag={Link}
+                to={`/personnels/${params.personnelId}`}
+              >
+                {person.get('name')}
+              </BreadcrumbItem>
+              <BreadcrumbItem active tag="span">
+                Edit Details
+              </BreadcrumbItem>
+            </Breadcrumb>
           </Col>
         </Row>
-      )}
-      {isUpdating && (
+        {errors.size > 0 && (
+          <Row>
+            <Col>
+              <Alert color="danger" className="w-100">
+                {errors.map(error => {
+                  return (
+                    <p className="mb-0" key={error}>
+                      {error}
+                    </p>
+                  );
+                })}
+              </Alert>
+            </Col>
+          </Row>
+        )}
+        {isUpdating && (
+          <Row>
+            <Col>
+              <ActionAlert name="Updating" />
+            </Col>
+          </Row>
+        )}
         <Row>
           <Col>
-            <ActionAlert name="Updating" />
+            <h1>Editing {person.get('name')}</h1>
           </Col>
         </Row>
-      )}
-      <Row>
-        <Col>
-          <h1>Editing {person.get('name')}</h1>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <EditForm
-            handleSubmit={handleEdit}
-            person={person}
-            platoons={platoons}
-            ranks={ranks}
-            isUpdating={isUpdating}
-          />
-        </Col>
-      </Row>
-    </Container>
+        <Row>
+          <Col>
+            <EditForm
+              handleSubmit={handleEdit}
+              person={person}
+              platoons={platoons}
+              ranks={ranks}
+              isUpdating={isUpdating}
+            />
+          </Col>
+        </Row>
+      </Container>
+    </>
   );
 }
 

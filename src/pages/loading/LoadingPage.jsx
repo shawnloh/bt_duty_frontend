@@ -2,6 +2,7 @@ import React, { memo, useEffect, useCallback } from 'react';
 import { Redirect } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Container, Row, Button, Progress, Col } from 'reactstrap';
+import { Helmet } from 'react-helmet';
 import { loadApp } from './actions';
 import useReduxPageSelector from '../../hooks/useReduxPageSelector';
 
@@ -29,29 +30,39 @@ function LoadingPage() {
 
   if (appLoadedFailure) {
     return (
-      <Container className="h-100">
-        <Row className="h-100">
-          <Col className="my-auto mx-auto">
-            <p className="text-center">ERROR LOADING APPLICATION.</p>
-            <Button color="primary" onClick={loadApplication}>
-              Retry?
-            </Button>
-          </Col>
-        </Row>
-      </Container>
+      <>
+        <Helmet>
+          <title>Loading App...</title>
+        </Helmet>
+        <Container className="h-100">
+          <Row className="h-100">
+            <Col className="my-auto mx-auto">
+              <p className="text-center">ERROR LOADING APPLICATION.</p>
+              <Button color="primary" onClick={loadApplication}>
+                Retry?
+              </Button>
+            </Col>
+          </Row>
+        </Container>
+      </>
     );
   }
 
   const progress = (1 / taskLoading) * 100;
   return (
-    <Container className="h-100">
-      <Row className="h-100">
-        <Col className="my-auto mx-auto">
-          <Progress animated value={progress} />
-          <p className="text-center">Loading Application</p>
-        </Col>
-      </Row>
-    </Container>
+    <>
+      <Helmet>
+        <title>Loading App...</title>
+      </Helmet>
+      <Container className="h-100">
+        <Row className="h-100">
+          <Col className="my-auto mx-auto">
+            <Progress animated value={progress} />
+            <p className="text-center">Loading Application</p>
+          </Col>
+        </Row>
+      </Container>
+    </>
   );
 }
 

@@ -10,6 +10,7 @@ import {
 import { Link, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment-timezone';
+import { Helmet } from 'react-helmet';
 import Layout from '../../shared/AppLayout';
 import EventForm from '../../../components/events/add/EventForm';
 import {
@@ -68,6 +69,9 @@ export function Add() {
 
   return (
     <Layout>
+      <Helmet>
+        <title>Add Event</title>
+      </Helmet>
       <Container className="py-2">
         <Row>
           <Col>

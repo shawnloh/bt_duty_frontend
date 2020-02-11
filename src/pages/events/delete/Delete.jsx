@@ -11,6 +11,7 @@ import {
   CardTitle,
   CardText
 } from 'reactstrap';
+import { Helmet } from 'react-helmet';
 import { useSelector, useDispatch } from 'react-redux';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import useReduxPageSelector from '../../../hooks/useReduxPageSelector';
@@ -44,6 +45,7 @@ export function Delete() {
 
   return (
     <Layout>
+      <Helmet>Delete Event</Helmet>
       <Container className="py-2">
         {errors.size !== 0 ? (
           <Row>

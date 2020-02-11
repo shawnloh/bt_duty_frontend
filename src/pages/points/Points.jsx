@@ -25,7 +25,7 @@ export function Points() {
   return (
     <Layout>
       <Helmet>
-        <title>Points</title>
+        <title>Points System</title>
       </Helmet>
       <Container className="py-2">
         {errors.size > 0 && (
