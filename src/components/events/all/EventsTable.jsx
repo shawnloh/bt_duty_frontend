@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Table, Button, Row } from 'reactstrap';
 import { Link } from 'react-router-dom';
@@ -6,7 +6,7 @@ import { List } from 'immutable';
 
 const EventsTable = ({ events, path }) => {
   if (events.size === 0) {
-    return <Row className="my-2 mx-2">No events available</Row>;
+    return <p>No events available</p>;
   }
   return (
     <Table striped responsive>
@@ -61,4 +61,4 @@ EventsTable.propTypes = {
   path: PropTypes.string.isRequired
 };
 
-export default EventsTable;
+export default memo(EventsTable);

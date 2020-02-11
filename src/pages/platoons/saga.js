@@ -1,4 +1,4 @@
-import { takeLatest, call, put, all, delay } from 'redux-saga/effects';
+import { takeEvery, call, put, all, delay } from 'redux-saga/effects';
 import { ADD_PLATOON, DELETE_PLATOON, UPDATE_PLATOON } from './constants';
 import {
   addPlatoonSuccess,
@@ -128,9 +128,9 @@ function* updatePlatoon(action) {
 
 function* platoonsWatcher() {
   yield all([
-    takeLatest(ADD_PLATOON, addPlatoon),
-    takeLatest(DELETE_PLATOON, deletePlatoon),
-    takeLatest(UPDATE_PLATOON, updatePlatoon)
+    takeEvery(ADD_PLATOON, addPlatoon),
+    takeEvery(DELETE_PLATOON, deletePlatoon),
+    takeEvery(UPDATE_PLATOON, updatePlatoon)
   ]);
 }
 

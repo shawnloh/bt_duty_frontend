@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
@@ -38,4 +38,4 @@ BlockoutTable.propTypes = {
   blockoutDates: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired
 };
 
-export default BlockoutTable;
+export default memo(BlockoutTable);

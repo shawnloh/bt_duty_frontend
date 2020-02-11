@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
@@ -16,20 +16,16 @@ const RankTable = ({ ranks, handleUpdate, handleDelete }) => {
       </thead>
       <tbody>
         {ranks.map(rank => {
+          const name = rank.get('name');
+          const id = rank.get('_id');
           return (
-            <tr key={rank.get('_id')}>
-              <td className="text-center">{rank.get('name')}</td>
+            <tr key={id}>
+              <td className="text-center">{name}</td>
               <td className="text-center">
-                <Button
-                  color="primary"
-                  onClick={() => handleUpdate(rank.get('_id'))}
-                >
+                <Button color="primary" onClick={() => handleUpdate(id, name)}>
                   Edit
                 </Button>{' '}
-                <Button
-                  onClick={() => handleDelete(rank.get('_id'))}
-                  color="danger"
-                >
+                <Button onClick={() => handleDelete(id, name)} color="danger">
                   Delete
                 </Button>
               </td>
@@ -47,4 +43,4 @@ RankTable.propTypes = {
   handleDelete: PropTypes.func.isRequired
 };
 
-export default RankTable;
+export default memo(RankTable);

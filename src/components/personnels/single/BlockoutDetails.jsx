@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col } from 'reactstrap';
 import moment from 'moment-timezone';
@@ -59,9 +59,9 @@ BlockoutDetails.defaultProps = {
 
 BlockoutDetails.propTypes = {
   // blockoutDates: PropTypes.arrayOf(PropTypes.string),
-  blockoutDates: PropTypes.oneOfType([PropTypes.instanceOf(List)]),
+  blockoutDates: PropTypes.instanceOf(List),
   handleDelete: PropTypes.func.isRequired,
   handleAdd: PropTypes.func.isRequired
 };
 
-export default BlockoutDetails;
+export default memo(BlockoutDetails);

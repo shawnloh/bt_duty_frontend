@@ -27,11 +27,11 @@ export function Single() {
 
   return (
     <Layout>
-      <Container>
-        <Helmet>
-          <title>Event - Details</title>
-        </Helmet>
-        <Row className="my-2">
+      <Helmet>
+        <title>Event - Details</title>
+      </Helmet>
+      <Container className="py-2">
+        <Row>
           <Col>
             <Breadcrumb tag="nav">
               <BreadcrumbItem tag={Link} to="/events">
@@ -46,7 +46,7 @@ export function Single() {
             </Breadcrumb>
           </Col>
         </Row>
-        <Row className="my-2 justify-content-center align-items-center">
+        <Row className="justify-content-center align-items-center">
           <Col xs="9">
             <h1>Details</h1>
           </Col>
@@ -62,60 +62,66 @@ export function Single() {
           </Col>
         </Row>
         <Row>
-          <Table responsive striped>
-            <tbody>
-              <tr>
-                <th className="text-center">Name</th>
-                <td className="text-center">{event.get('name')}</td>
-              </tr>
-              <tr>
-                <th className="text-center">Date</th>
-                <td className="text-center">{event.get('date')}</td>
-              </tr>
-              <tr>
-                <th className="text-center">Point System</th>
-                <td className="text-center">
-                  {event.getIn(['pointSystem', 'name'])}
-                </td>
-              </tr>
-              <tr>
-                <th className="text-center">Points Allocation</th>
-                <td className="text-center">{event.get('pointsAllocation')}</td>
-              </tr>
-            </tbody>
-          </Table>
+          <Col>
+            <Table responsive striped>
+              <tbody>
+                <tr>
+                  <th className="text-center">Name</th>
+                  <td className="text-center">{event.get('name')}</td>
+                </tr>
+                <tr>
+                  <th className="text-center">Date</th>
+                  <td className="text-center">{event.get('date')}</td>
+                </tr>
+                <tr>
+                  <th className="text-center">Point System</th>
+                  <td className="text-center">
+                    {event.getIn(['pointSystem', 'name'])}
+                  </td>
+                </tr>
+                <tr>
+                  <th className="text-center">Points Allocation</th>
+                  <td className="text-center">
+                    {event.get('pointsAllocation')}
+                  </td>
+                </tr>
+              </tbody>
+            </Table>
+          </Col>
         </Row>
-        <Row className="my-2">
+        <Row>
           <Col>
             <h3>Personnels</h3>
           </Col>
         </Row>
         <Row>
-          <Table responsive striped>
-            <thead>
-              <tr>
-                <th className="text-center">Platoon</th>
-                <th className="text-center">Rank</th>
-                <th className="text-center">Name</th>
-              </tr>
-            </thead>
-            <tbody>
-              {event.get('personnels').map(personnel => {
-                const person = personnels.get(personnel.get('_id'));
-                return (
-                  <tr key={person.get('_id')}>
-                    <td className="text-center">
-                      {person.getIn(['platoon', 'name'])}
-                    </td>
-                    <td className="text-center">
-                      {person.getIn(['rank', 'name'])}
-                    </td>
-                    <td className="text-center">{person.get('name')}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </Table>
+          <Col>
+            <Table responsive striped>
+              <thead>
+                <tr>
+                  <th className="text-center">Platoon</th>
+                  <th className="text-center">Rank</th>
+                  <th className="text-center">Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {event.get('personnels').map(personnel => {
+                  const person = personnels.get(personnel.get('_id'));
+                  return (
+                    <tr key={person.get('_id')}>
+                      <td className="text-center">
+                        {person.getIn(['platoon', 'name'])}
+                      </td>
+                      <td className="text-center">
+                        {person.getIn(['rank', 'name'])}
+                      </td>
+                      <td className="text-center">{person.get('name')}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+          </Col>
         </Row>
       </Container>
     </Layout>

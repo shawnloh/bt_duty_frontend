@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, memo, useMemo } from 'react';
 import {
   Container,
   Row,
@@ -20,6 +20,16 @@ import {
   editPersonnelPoint
 } from './actions';
 import { getStatuses } from './selectors';
+import useReduxPageSelector from '../../../hooks/useReduxPageSelector';
+import {
+  useHandleAddStatus,
+  useHandleDeleteStatus
+} from './hooks/useHandleStatus';
+import {
+  useHandleAddBlockout,
+  useHandleDeleteBlockout
+} from './hooks/useHandleBlockout';
+import { useHandleEditPoint } from './hooks/useHandlePoint';
 
 import Details from '../../../components/personnels/single/Details';
 import Tabs from '../../../components/personnels/single/Tabs';
@@ -30,77 +40,44 @@ import PointsDetails from '../../../components/personnels/single/PointsDetails';
 
 export function Single() {
   const params = useParams();
+  const personId = params.personnelId;
 
   const [activeTab, setActiveTab] = useState('1');
   const statuses = useSelector(getStatuses);
   const personnels = useSelector(state => state.personnels.get('personnels'));
-  const actionInProgress = useSelector(state =>
-    state.pages.personnels.single.get('actionInProgress')
-  );
-  const errors = useSelector(state =>
-    state.pages.personnels.single.get('errors')
-  );
+  const pages = useMemo(() => ['personnels', 'single'], []);
+  const actionInProgress = useReduxPageSelector(pages, 'actionInProgress');
+  const errors = useReduxPageSelector(pages, 'errors');
   const dispatch = useDispatch();
-
-  const handleDeleteStatus = useCallback(
-    id => {
-      dispatch(deleteStatus(params.personnelId, id));
-    },
-    [dispatch, params.personnelId]
+  const handleDeleteStatus = useHandleDeleteStatus(
+    dispatch,
+    deleteStatus,
+    personId
+  );
+  const handleAddStatus = useHandleAddStatus(dispatch, addStatus, personId);
+  const handleAddBlockout = useHandleAddBlockout(
+    dispatch,
+    addBlockout,
+    personId
+  );
+  const handleDeleteBlockout = useHandleDeleteBlockout(
+    dispatch,
+    deleteBlockout,
+    personId
+  );
+  const handleEditPoint = useHandleEditPoint(
+    dispatch,
+    editPersonnelPoint,
+    personId
   );
 
-  const handleAddStatus = useCallback(
-    ({ statusId, startDate, endDate }) => {
-      dispatch(addStatus(params.personnelId, statusId, startDate, endDate));
-    },
-    [dispatch, params.personnelId]
-  );
-
-  const handleAddBlockout = useCallback(
-    ({ startDate, endDate = null }) => {
-      const date = {
-        startDate
-      };
-
-      if (endDate) {
-        date.endDate = endDate;
-      }
-
-      dispatch(addBlockout(params.personnelId, date));
-    },
-    [dispatch, params.personnelId]
-  );
-
-  const handleDeleteBlockout = useCallback(
-    ({ startDate, endDate = null }) => {
-      const date = {
-        startDate
-      };
-
-      if (endDate) {
-        date.endDate = endDate;
-      }
-      dispatch(deleteBlockout(params.personnelId, date));
-    },
-    [dispatch, params.personnelId]
-  );
-
-  const handleEditPoint = useCallback(
-    (personnelPointId, newPoint) => {
-      dispatch(
-        editPersonnelPoint(params.personnelId, personnelPointId, newPoint)
-      );
-    },
-    [dispatch, params.personnelId]
-  );
-
-  const person = personnels.get(params.personnelId);
-  if (!person) {
+  const person = personnels.get(personId);
+  if (!person || person.size === 0) {
     return <Redirect to="/personnels" />;
   }
   return (
-    <Container>
-      <Row className="my-2 justify-content-center align-items-center">
+    <Container className="py-2">
+      <Row className="justify-content-center align-items-center">
         <Col>
           <Breadcrumb tag="nav" listTag="div">
             <BreadcrumbItem tag={Link} to="/personnels">
@@ -118,16 +95,24 @@ export function Single() {
           <Col>
             <Alert color="danger" className="w-100">
               {errors.map(error => {
-                return <p key={error}>{error}</p>;
+                return (
+                  <p className="mb-0" key={error}>
+                    {error}
+                  </p>
+                );
               })}
             </Alert>
           </Col>
         </Row>
       )}
       {actionInProgress !== 0 && (
-        <ActionAlert name={`${actionInProgress} action(s)`} />
+        <Row>
+          <Col>
+            <ActionAlert name={`${actionInProgress} action(s)`} />
+          </Col>
+        </Row>
       )}
-      <Row className="my-2 align-items-center">
+      <Row className="align-items-center">
         <Col>
           <h1>Details</h1>
         </Col>
@@ -140,39 +125,42 @@ export function Single() {
           </p>
         </Col>
       </Row>
-
-      <Tabs activeTab={activeTab} setTab={setActiveTab} />
-      <TabContent activeTab={activeTab}>
-        <TabPane tabId="1">
-          <Details
-            name={person.get('name')}
-            rank={person.getIn(['rank', 'name'])}
-            platoon={person.getIn(['platoon', 'name'])}
-            eventsDate={person.get('eventsDate')}
-          />
-        </TabPane>
-        <TabPane tabId="2">
-          <Status
-            handleDelete={handleDeleteStatus}
-            personStatuses={person.get('statuses')}
-            statuses={statuses}
-            handleAdd={handleAddStatus}
-          />
-        </TabPane>
-        <TabPane tabId="3">
-          <BlockoutDetails
-            handleAdd={handleAddBlockout}
-            blockoutDates={person.get('blockOutDates')}
-            handleDelete={handleDeleteBlockout}
-          />
-        </TabPane>
-        <TabPane tabId="4">
-          <PointsDetails
-            points={person.get('points')}
-            handleEdit={handleEditPoint}
-          />
-        </TabPane>
-      </TabContent>
+      <Row>
+        <Col>
+          <Tabs activeTab={activeTab} setTab={setActiveTab} />
+          <TabContent activeTab={activeTab}>
+            <TabPane tabId="1">
+              <Details
+                name={person.get('name')}
+                rank={person.getIn(['rank', 'name'])}
+                platoon={person.getIn(['platoon', 'name'])}
+                eventsDate={person.get('eventsDate')}
+              />
+            </TabPane>
+            <TabPane tabId="2">
+              <Status
+                handleDelete={handleDeleteStatus}
+                personStatuses={person.get('statuses')}
+                statuses={statuses}
+                handleAdd={handleAddStatus}
+              />
+            </TabPane>
+            <TabPane tabId="3">
+              <BlockoutDetails
+                handleAdd={handleAddBlockout}
+                blockoutDates={person.get('blockOutDates')}
+                handleDelete={handleDeleteBlockout}
+              />
+            </TabPane>
+            <TabPane tabId="4">
+              <PointsDetails
+                points={person.get('points')}
+                handleEdit={handleEditPoint}
+              />
+            </TabPane>
+          </TabContent>
+        </Col>
+      </Row>
     </Container>
   );
 }

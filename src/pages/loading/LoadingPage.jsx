@@ -1,55 +1,58 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React, { memo, useEffect, useCallback } from 'react';
 import { Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { Container, Row, Spinner } from 'reactstrap';
-import { loadApp as loadAppAction } from './actions';
+import { useDispatch } from 'react-redux';
+import { Container, Row, Button, Progress, Col } from 'reactstrap';
+import { loadApp } from './actions';
+import useReduxPageSelector from '../../hooks/useReduxPageSelector';
 
-class LoadingPage extends PureComponent {
-  componentDidMount() {
-    const { loadApp, appLoaded, isAuthenticated } = this.props;
-    if (!appLoaded && isAuthenticated) {
-      loadApp();
+function LoadingPage() {
+  const page = 'loading';
+  const appLoaded = useReduxPageSelector(page, 'appLoaded');
+  const appLoadedFailure = useReduxPageSelector(page, 'appLoadedFailure');
+  const isLoading = useReduxPageSelector(page, 'isLoading');
+  const taskLoading = useReduxPageSelector(page, 'taskLoading');
+  const dispatch = useDispatch();
+
+  const loadApplication = useCallback(() => {
+    return dispatch(loadApp());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!appLoaded && !isLoading) {
+      loadApplication();
     }
+  }, [appLoaded, dispatch, isLoading, loadApplication]);
+
+  if (!isLoading && appLoaded && taskLoading === 0 && !appLoadedFailure) {
+    return <Redirect to="/dashboard" exact />;
   }
 
-  render() {
-    const { isLoading, appLoaded } = this.props;
-    if (!isLoading && appLoaded) {
-      return <Redirect to="/dashboard" exact />;
-    }
+  if (appLoadedFailure) {
     return (
-      <Container className="d-flex h-100 justify-content-center align-items-center flex-column">
-        <Row>
-          <Spinner type="grow" color="primary" />
-          <Spinner type="grow" color="secondary" />
-          <Spinner type="grow" color="success" />
-          <Spinner type="grow" color="danger" />
-          <Spinner type="grow" color="warning" />
-          <Spinner type="grow" color="info" />
-          <Spinner type="grow" color="dark" />
+      <Container className="h-100">
+        <Row className="h-100">
+          <Col className="my-auto mx-auto">
+            <p className="text-center">ERROR LOADING APPLICATION.</p>
+            <Button color="primary" onClick={loadApplication}>
+              Retry?
+            </Button>
+          </Col>
         </Row>
-        <Row>Loading Application</Row>
       </Container>
     );
   }
+
+  const progress = (1 / taskLoading) * 100;
+  return (
+    <Container className="h-100">
+      <Row className="h-100">
+        <Col className="my-auto mx-auto">
+          <Progress animated value={progress} />
+          <p className="text-center">Loading Application</p>
+        </Col>
+      </Row>
+    </Container>
+  );
 }
 
-LoadingPage.propTypes = {
-  loadApp: PropTypes.func.isRequired,
-  isLoading: PropTypes.bool.isRequired,
-  appLoaded: PropTypes.bool.isRequired,
-  isAuthenticated: PropTypes.bool.isRequired
-};
-
-const mapStateToProps = state => ({
-  isLoading: state.pages.loading.get('isLoading'),
-  appLoaded: state.pages.loading.get('appLoaded'),
-  isAuthenticated: state.auth.get('isAuthenticated')
-});
-
-const mapDispatchToProps = {
-  loadApp: loadAppAction
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(LoadingPage);
+export default memo(LoadingPage);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import {
   Container,
   Row,
@@ -14,6 +14,8 @@ import Layout from '../../shared/AppLayout';
 import EventForm from '../../../components/events/add/EventForm';
 import { getPlatoons, getPoints, getRanks, getStatuses } from './selectors';
 import { createEvent } from './actions';
+import { logout } from '../../../actions/authActions';
+import useReduxPageSelector from '../../../hooks/useReduxPageSelector';
 
 export function Add() {
   const history = useHistory();
@@ -24,8 +26,9 @@ export function Add() {
   const points = useSelector(getPoints);
   const ranks = useSelector(getRanks);
   const statuses = useSelector(getStatuses);
-  const isAdding = useSelector(state => state.pages.events.add.get('isAdding'));
-  const errors = useSelector(state => state.pages.events.add.get('errors'));
+  const pages = useMemo(() => ['events', 'add'], []);
+  const isAdding = useReduxPageSelector(pages, 'isAdding');
+  const errors = useReduxPageSelector(pages, 'errors');
   const personnels = useSelector(state => state.personnels.get('personnels'));
 
   const handleSubmit = useCallback(
@@ -43,6 +46,10 @@ export function Add() {
     [dispatch]
   );
 
+  const handleLogout = useCallback(() => {
+    dispatch(logout());
+  }, [dispatch]);
+
   useEffect(() => {
     let mounted = true;
     if (submit && !isAdding && errors.size === 0) {
@@ -55,8 +62,8 @@ export function Add() {
 
   return (
     <Layout>
-      <Container className="mb-2">
-        <Row className="mt-2">
+      <Container className="py-2">
+        <Row>
           <Col>
             <Breadcrumb tag="nav">
               <BreadcrumbItem tag={Link} to="/events">
@@ -70,30 +77,39 @@ export function Add() {
         </Row>
 
         {errors.size > 0 && (
-          <Row className="my-2">
+          <Row>
             <Col>
-              <Alert color="danger">
+              <Alert color="danger" className="w-100">
                 {errors.map(error => {
-                  return <p key={error}>{error}</p>;
+                  return (
+                    <p className="mb-0" key={error}>
+                      {error}
+                    </p>
+                  );
                 })}
               </Alert>
             </Col>
           </Row>
         )}
-        <Row className="my-2">
+        <Row>
           <Col>
             <h1>Add new event</h1>
           </Col>
         </Row>
-        <EventForm
-          points={points}
-          platoons={platoons}
-          ranks={ranks}
-          statuses={statuses}
-          personnels={personnels}
-          isAdding={isAdding}
-          handleSubmit={handleSubmit}
-        />
+        <Row>
+          <Col>
+            <EventForm
+              points={points}
+              platoons={platoons}
+              ranks={ranks}
+              statuses={statuses}
+              personnels={personnels}
+              isAdding={isAdding}
+              handleSubmit={handleSubmit}
+              handleLogout={handleLogout}
+            />
+          </Col>
+        </Row>
       </Container>
     </Layout>
   );

@@ -1,4 +1,4 @@
-import { takeLatest, call, put, all, delay } from 'redux-saga/effects';
+import { takeEvery, call, put, all, delay } from 'redux-saga/effects';
 import { ADD_STATUS, DELETE_STATUS, UPDATE_STATUS } from './constants';
 import {
   addStatusSuccess,
@@ -110,9 +110,9 @@ function* updateStatus(action) {
 
 function* statusesWatcher() {
   yield all([
-    takeLatest(ADD_STATUS, addStatus),
-    takeLatest(DELETE_STATUS, deleteStatus),
-    takeLatest(UPDATE_STATUS, updateStatus)
+    takeEvery(ADD_STATUS, addStatus),
+    takeEvery(DELETE_STATUS, deleteStatus),
+    takeEvery(UPDATE_STATUS, updateStatus)
   ]);
 }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import StatusTable from './status/StatusTable';
@@ -26,4 +26,4 @@ PersonnelStatus.propTypes = {
     .isRequired
 };
 
-export default PersonnelStatus;
+export default memo(PersonnelStatus);

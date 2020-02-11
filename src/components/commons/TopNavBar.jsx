@@ -15,7 +15,7 @@ import {
   DropdownItem
 } from 'reactstrap';
 
-const TopNavBar = ({ username, logout }) => {
+const TopNavBar = ({ username }) => {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen(!isOpen);
 
@@ -67,7 +67,9 @@ const TopNavBar = ({ username, logout }) => {
               Hello, {username}
             </DropdownToggle>
             <DropdownMenu right>
-              <DropdownItem onClick={logout}>Logout</DropdownItem>
+              <DropdownItem tag={Link} to="/logout" exact>
+                Logout
+              </DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown>
         </Nav>
@@ -77,8 +79,7 @@ const TopNavBar = ({ username, logout }) => {
 };
 
 TopNavBar.propTypes = {
-  username: PropTypes.string.isRequired,
-  logout: PropTypes.func.isRequired
+  username: PropTypes.string.isRequired
 };
 
 export default TopNavBar;

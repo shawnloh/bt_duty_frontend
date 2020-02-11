@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Row, Col, Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
@@ -67,4 +67,4 @@ StatusTable.propTypes = {
   statuses: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
   handleDelete: PropTypes.func.isRequired
 };
-export default StatusTable;
+export default memo(StatusTable);

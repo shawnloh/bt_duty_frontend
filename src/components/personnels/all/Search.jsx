@@ -1,19 +1,27 @@
-import React from 'react';
-import { InputGroup, Input, Button, InputGroupAddon } from 'reactstrap';
+import React, { memo } from 'react';
+import {
+  InputGroup,
+  Input,
+  Button,
+  InputGroupAddon,
+  FormGroup
+} from 'reactstrap';
 import PropTypes from 'prop-types';
 
 const Search = ({ search, onChange, onClear }) => {
   return (
-    <InputGroup>
-      <Input placeholder="search..." value={search} onChange={onChange} />
-      {search !== '' && (
-        <InputGroupAddon addonType="append">
-          <Button color="primary" onClick={onClear}>
-            Clear
-          </Button>
-        </InputGroupAddon>
-      )}
-    </InputGroup>
+    <FormGroup>
+      <InputGroup>
+        <Input placeholder="search..." value={search} onChange={onChange} />
+        {search !== '' && (
+          <InputGroupAddon addonType="append">
+            <Button color="primary" onClick={onClear}>
+              Clear
+            </Button>
+          </InputGroupAddon>
+        )}
+      </InputGroup>
+    </FormGroup>
   );
 };
 
@@ -23,4 +31,4 @@ Search.propTypes = {
   onClear: PropTypes.func.isRequired
 };
 
-export default Search;
+export default memo(Search);

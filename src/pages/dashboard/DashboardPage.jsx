@@ -24,7 +24,7 @@ export function DashboardPage() {
       </Helmet>
       <Container>
         <Row>
-          <Col sm="4 mt-2">
+          <Col sm="4" className="mt-2">
             <Card body className="text-center">
               <CardTitle>
                 <MdEvent fontSize="3em" />
@@ -38,7 +38,7 @@ export function DashboardPage() {
               </Button>
             </Card>
           </Col>
-          <Col sm="4 mt-2">
+          <Col sm="4" className="mt-2">
             <Card body className="text-center">
               <CardTitle>
                 <MdSettingsSystemDaydream fontSize="3em" />
@@ -52,7 +52,7 @@ export function DashboardPage() {
               </Button>
             </Card>
           </Col>
-          <Col sm="4 mt-2">
+          <Col sm="4" className="mt-2">
             <Card body className="text-center">
               <CardTitle>
                 <TiGroup fontSize="3em" />
@@ -68,7 +68,7 @@ export function DashboardPage() {
           </Col>
         </Row>
         <Row>
-          <Col sm="4 mt-2">
+          <Col sm="4" className="mt-2">
             <Card body className="text-center">
               <CardTitle>
                 <GiRank3 fontSize="3em" />
@@ -82,7 +82,7 @@ export function DashboardPage() {
               </Button>
             </Card>
           </Col>
-          <Col sm="4 mt-2">
+          <Col sm="4" className="mt-2">
             <Card body className="text-center">
               <CardTitle>
                 <GiGroupedDrops fontSize="3em" />
@@ -96,7 +96,7 @@ export function DashboardPage() {
               </Button>
             </Card>
           </Col>
-          <Col sm="4 mt-2">
+          <Col sm="4" className="mt-2">
             <Card body className="text-center">
               <CardTitle>
                 <IoMdPaper fontSize="3em" />

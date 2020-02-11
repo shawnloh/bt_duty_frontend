@@ -3,7 +3,6 @@ import { Container, Row, Col, Button, Alert, Spinner } from 'reactstrap';
 import Helmet from 'react-helmet';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useRouteMatch } from 'react-router-dom';
-import Swal from 'sweetalert2';
 
 import PersonnelsTable from '../../../components/personnels/all/PersonnelsTable';
 import Pagination from '../../../components/commons/Pagination';
@@ -12,6 +11,8 @@ import Search from '../../../components/personnels/all/Search';
 
 import { deletePersonnel } from './actions';
 import { getPersonnels } from './selectors';
+import useReduxPageSelector from '../../../hooks/useReduxPageSelector';
+import useDeleteModal from '../../../hooks/useDeleteModal';
 
 export function All() {
   const [rowsPerPage] = useState(10);
@@ -20,10 +21,9 @@ export function All() {
   const { path } = useRouteMatch();
 
   const personnels = useSelector(getPersonnels);
-  const errors = useSelector(state => state.pages.personnels.all.get('errors'));
-  const actionInProgress = useSelector(state =>
-    state.pages.personnels.all.get('actionInProgress')
-  );
+  const pages = useMemo(() => ['personnels', 'all'], []);
+  const errors = useReduxPageSelector(pages, 'errors');
+  const actionInProgress = useReduxPageSelector(pages, 'actionInProgress');
 
   const dispatch = useDispatch();
 
@@ -38,27 +38,7 @@ export function All() {
     setSearch('');
   }, []);
 
-  const handleDelete = useCallback(
-    person => {
-      Swal.fire({
-        title: 'Are you sure?',
-        html: `
-        <p>You are deleting: ${person.get('name')}</p>
-        <p>You won't be able to revert this!</p>
-        `,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonColor: '#3085d6'
-      }).then(result => {
-        if (result.value) {
-          dispatch(deletePersonnel(person.get('_id')));
-        }
-      });
-    },
-    [dispatch]
-  );
+  const handleDelete = useDeleteModal(dispatch, deletePersonnel);
 
   const lastIndex = page * rowsPerPage;
   const firstIndex = lastIndex - rowsPerPage;
@@ -86,27 +66,33 @@ export function All() {
       <Helmet>
         <title>Personnels</title>P
       </Helmet>
-      <Container>
+      <Container className="py-2">
         {errors.size > 0 && (
           <Row>
-            {errors.map(error => {
-              return (
-                <Alert key={error} color="danger" className="w-100">
-                  {error}
-                </Alert>
-              );
-            })}
+            <Col>
+              <Alert color="danger" className="w-100">
+                {errors.map(error => {
+                  return (
+                    <p className="mb-0" key={error}>
+                      {error}
+                    </p>
+                  );
+                })}
+              </Alert>
+            </Col>
           </Row>
         )}
         {actionInProgress !== 0 && (
           <Row>
-            <Alert color="primary" className="w-100">
-              {actionInProgress} action(s) in progress{' '}
-              <Spinner color="primary" size="sm" />
-            </Alert>
+            <Col>
+              <Alert color="primary" className="w-100">
+                {actionInProgress} action(s) in progress{' '}
+                <Spinner color="primary" size="sm" />
+              </Alert>
+            </Col>
           </Row>
         )}
-        <Row className="my-2 justify-content-center align-items-center">
+        <Row className="justify-content-center align-items-center">
           <Col xs="9">
             <h1>Personnels</h1>
           </Col>
@@ -116,25 +102,31 @@ export function All() {
             </Button>
           </Col>
         </Row>
-        <Row className="my-2 mx-1">
-          <Search
-            onChange={onChangeSearch}
-            onClear={clearSearch}
-            search={search}
-          />
+        <Row>
+          <Col>
+            <Search
+              onChange={onChangeSearch}
+              onClear={clearSearch}
+              search={search}
+            />
+          </Col>
         </Row>
         <Row>
-          <PersonnelsTable
-            personnels={shownPersonnels}
-            onDelete={handleDelete}
-          />
+          <Col>
+            <PersonnelsTable
+              personnels={shownPersonnels}
+              onDelete={handleDelete}
+            />
+          </Col>
         </Row>
         <Row className="justify-content-center align-items-center">
-          <Pagination
-            rowsPerPage={rowsPerPage}
-            setPage={setPage}
-            totalPosts={personnels.size}
-          />
+          <Col>
+            <Pagination
+              rowsPerPage={rowsPerPage}
+              setPage={setPage}
+              totalPosts={personnels.size}
+            />
+          </Col>
         </Row>
       </Container>
     </>

@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useCallback, useRef } from 'react';
+import React, { memo, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   Container,
   Row,
@@ -12,6 +12,7 @@ import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 
 import usePrevious from '../../../hooks/usePrevious';
+import useReduxPageSelector from '../../../hooks/useReduxPageSelector';
 import { addPersonnel } from './actions';
 import { getPlatoons, getRanks } from './selectors';
 
@@ -22,10 +23,11 @@ export function Add() {
   const history = useHistory();
   const isMounted = useRef(false);
 
-  const page = useSelector(state => state.pages.personnels.add);
-  const actionInProgress = page.get('actionInProgress');
+  const pages = useMemo(() => ['personnels', 'add'], []);
+  const actionInProgress = useReduxPageSelector(pages, 'actionInProgress');
+  const errors = useReduxPageSelector(pages, 'errors');
+
   const prevActionInProgress = usePrevious(actionInProgress);
-  const errors = page.get('errors');
   const ranks = useSelector(getRanks);
   const platoons = useSelector(getPlatoons);
   const dispatch = useDispatch();
@@ -62,8 +64,8 @@ export function Add() {
       <Helmet>
         <title>Add Personnel</title>
       </Helmet>
-      <Container>
-        <Row className="my-2 justify-content-center align-items-center">
+      <Container className="py-2">
+        <Row className="justify-content-center align-items-center">
           <Col>
             <Breadcrumb tag="nav" listTag="div">
               <BreadcrumbItem tag={Link} to="/personnels">
@@ -77,7 +79,7 @@ export function Add() {
         </Row>
         {ranks.size === 0 ||
           (platoons.size === 0 && (
-            <Row className="my-2">
+            <Row>
               <Col>
                 <Alert color="danger">
                   <Link to="/ranks">Rank</Link> /{' '}
@@ -88,18 +90,22 @@ export function Add() {
             </Row>
           ))}
         {errors.length > 0 && (
-          <Row className="my-2 flex-column">
+          <Row>
             <Col>
               <Alert color="danger" className="w-100">
                 {errors.map(error => {
-                  return <p key={error}>{error}</p>;
+                  return (
+                    <p className="mb-0" key={error}>
+                      {error}
+                    </p>
+                  );
                 })}
               </Alert>
             </Col>
           </Row>
         )}
         {actionInProgress && (
-          <Row className="my-2">
+          <Row>
             <Col>
               <ActionAlert name="Adding" />
             </Col>

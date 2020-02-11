@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Table, Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -28,7 +28,7 @@ const PersonnelsTable = ({ personnels, onDelete }) => {
                 <Button color="primary" tag={Link} to={`/personnels/${id}`}>
                   Edit
                 </Button>{' '}
-                <Button color="danger" onClick={() => onDelete(person)}>
+                <Button color="danger" onClick={() => onDelete(id, name)}>
                   Delete
                 </Button>
               </td>
@@ -45,4 +45,4 @@ PersonnelsTable.propTypes = {
   onDelete: PropTypes.func.isRequired
 };
 
-export default PersonnelsTable;
+export default memo(PersonnelsTable);

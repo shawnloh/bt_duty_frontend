@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import ReactPaginate from 'react-paginate';
 
@@ -10,15 +10,17 @@ const PaginationComponent = ({ rowsPerPage, totalPosts, setPage }) => {
     }
     return page;
   }, [totalPosts, rowsPerPage]);
+  const handlePageClick = useCallback(
+    ({ selected }) => {
+      const pageNumber = selected + 1;
+      setPage(pageNumber);
+    },
+    [setPage]
+  );
 
   if (pageNumbers.length === 0) {
     return null;
   }
-
-  const handlePageClick = ({ selected }) => {
-    const pageNumber = selected + 1;
-    setPage(pageNumber);
-  };
 
   return (
     <nav aria-label="Page pagination">

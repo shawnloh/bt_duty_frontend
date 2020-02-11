@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   Form,
   FormGroup,
@@ -118,4 +118,4 @@ AddForm.propTypes = {
   ranks: PropTypes.instanceOf(List).isRequired,
   platoons: PropTypes.instanceOf(List).isRequired
 };
-export default AddForm;
+export default memo(AddForm);

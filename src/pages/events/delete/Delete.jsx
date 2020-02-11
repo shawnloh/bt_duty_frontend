@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback, memo, useMemo } from 'react';
 import {
   Container,
   Row,
@@ -13,6 +13,7 @@ import {
 } from 'reactstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
+import useReduxPageSelector from '../../../hooks/useReduxPageSelector';
 import ActionsButton from '../../../components/events/delete/ActionsButtons';
 import { deleteEvent } from './actions';
 import Layout from '../../shared/AppLayout';
@@ -23,11 +24,9 @@ export function Delete() {
 
   const [revert, setRevert] = useState(false);
   const events = useSelector(state => state.events.get('events'));
-  const isDeleting = useSelector(state =>
-    state.pages.events.delete.get('isDeleting')
-  );
-
-  const errors = useSelector(state => state.pages.events.delete.get('errors'));
+  const pages = useMemo(() => ['events', 'delete'], []);
+  const isDeleting = useReduxPageSelector(pages, 'isDeleting');
+  const errors = useReduxPageSelector(pages, 'errors');
 
   const dispatch = useDispatch();
   const handleRevert = useCallback(({ target: { checked } }) => {
@@ -45,57 +44,25 @@ export function Delete() {
 
   return (
     <Layout>
-      <Container>
+      <Container className="py-2">
         {errors.size !== 0 ? (
-          <Row className="my-2">
+          <Row>
             <Col>
-              <Alert color="danger">
-                {errors.map(error => (
-                  <p key={error}>{error}</p>
-                ))}
+              <Alert color="danger" className="w-100">
+                {errors.map(error => {
+                  return (
+                    <p className="mb-0" key={error}>
+                      {error}
+                    </p>
+                  );
+                })}
               </Alert>
             </Col>
           </Row>
         ) : null}
-        <Row className="mt-2">
+        <Row>
           <Col>
             <h3 className="text-danger">Deleting event is irreversible!</h3>
-          </Col>
-        </Row>
-
-        <Row className="my-2 mx-1">
-          <Card body>
-            <CardTitle className="text-center">
-              <p className="font-weight-bold">Deleting</p>
-            </CardTitle>
-            <CardText>Name: {event.get('name')}</CardText>
-            <CardText>
-              Point System: {event.getIn(['pointSystem', 'name'])}
-            </CardText>
-            <CardText>Points: {event.get('pointsAllocation')}</CardText>
-          </Card>
-        </Row>
-        <Row>
-          <Col className="d-flex align-items-center justify-content-center">
-            <FormGroup check>
-              <Input
-                type="checkbox"
-                id="revertCheckBox"
-                checked={revert}
-                onChange={handleRevert}
-                disabled={isDeleting}
-              />
-              <Label for="revertCheckBox">Revert Points</Label>
-            </FormGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col className="d-flex align-items-center justify-content-center">
-            {revert && (
-              <p className="font-weight-bold">
-                Total Affected Personnels: {event.get('personnels').length}
-              </p>
-            )}
           </Col>
         </Row>
         <Row>
@@ -108,6 +75,41 @@ export function Delete() {
               <Alert color="success">
                 Removing this event will not deduct points
               </Alert>
+            )}
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Card body>
+              <CardTitle>
+                <p className="font-weight-bold mb-0">Deleting</p>
+              </CardTitle>
+              <CardText>
+                <p>Name: {event.get('name')}</p>
+                <p>Point System: {event.getIn(['pointSystem', 'name'])}</p>
+                <p>Points: {event.get('pointsAllocation')}</p>
+              </CardText>
+            </Card>
+          </Col>
+        </Row>
+        <Row className="my-2">
+          <Col sm={12} md={8} className="my-2 align-self-end">
+            <FormGroup check>
+              <Input
+                type="checkbox"
+                id="revertCheckBox"
+                checked={revert}
+                onChange={handleRevert}
+                disabled={isDeleting}
+              />
+              <Label for="revertCheckBox">Revert Points</Label>
+            </FormGroup>
+          </Col>
+          <Col sm={12} md={4} className="my-2">
+            {revert && (
+              <p className="font-weight-bold m-0 p-0">
+                Total Affected Personnels: {event.get('personnels').size}
+              </p>
             )}
           </Col>
         </Row>

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import PropTypes from 'prop-types';
 import { Table, Button } from 'reactstrap';
 import Swal from 'sweetalert2';
@@ -88,4 +88,4 @@ PointsDetails.propTypes = {
   points: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired
 };
 
-export default PointsDetails;
+export default memo(PointsDetails);

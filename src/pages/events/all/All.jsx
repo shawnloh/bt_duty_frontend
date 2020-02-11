@@ -1,5 +1,13 @@
 import React, { useState, useMemo, useCallback, memo } from 'react';
-import { Container, Row, Button, Col, Label, Input } from 'reactstrap';
+import {
+  Container,
+  Row,
+  Button,
+  Col,
+  Label,
+  Input,
+  FormGroup
+} from 'reactstrap';
 import { Helmet } from 'react-helmet';
 import { useSelector } from 'react-redux';
 import { Link, useRouteMatch } from 'react-router-dom';
@@ -38,8 +46,8 @@ export function All() {
       <Helmet>
         <title>Events</title>
       </Helmet>
-      <Container>
-        <Row className="my-2 d-flex justify-content-center align-items-center">
+      <Container className="py-2">
+        <Row className="justify-content-center align-items-center">
           <Col xs="9">
             <h1>Events</h1>
           </Col>
@@ -58,33 +66,39 @@ export function All() {
           </Col>
         </Row>
 
-        <Row className="my-2">
-          <Col xs="12">
-            <Label for="filterSelect">Filter</Label>
-            <Input
-              type="select"
-              name="filterSelect"
-              id="filterSelect"
-              onChange={filter}
-            >
-              <option value="ALL">ALL</option>
-              {points.map(point => (
-                <option key={point.get('_id')} value={point.get('name')}>
-                  {point.get('name')}
-                </option>
-              ))}
-            </Input>
+        <Row>
+          <Col>
+            <FormGroup>
+              <Label for="filterSelect">Filter</Label>
+              <Input
+                type="select"
+                name="filterSelect"
+                id="filterSelect"
+                onChange={filter}
+              >
+                <option value="ALL">ALL</option>
+                {points.map(point => (
+                  <option key={point.get('_id')} value={point.get('name')}>
+                    {point.get('name')}
+                  </option>
+                ))}
+              </Input>
+            </FormGroup>
           </Col>
         </Row>
-        <Row className="my-2">
-          <EventsTable events={shownEvents} path={path} />
+        <Row>
+          <Col>
+            <EventsTable events={shownEvents} path={path} />
+          </Col>
         </Row>
         <Row className="justify-content-center align-items-center">
-          <Pagination
-            rowsPerPage={rowsPerPage}
-            setPage={setPage}
-            totalPosts={events.size}
-          />
+          <Col>
+            <Pagination
+              rowsPerPage={rowsPerPage}
+              setPage={setPage}
+              totalPosts={events.size}
+            />
+          </Col>
         </Row>
       </Container>
     </Layout>

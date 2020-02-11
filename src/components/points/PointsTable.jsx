@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
@@ -16,20 +16,16 @@ const PointTable = ({ points, handleUpdate, handleDelete }) => {
       </thead>
       <tbody>
         {points.map(point => {
+          const name = point.get('name');
+          const id = point.get('_id');
           return (
-            <tr key={point.get('_id')}>
-              <td className="text-center">{point.get('name')}</td>
+            <tr key={id}>
+              <td className="text-center">{name}</td>
               <td className="text-center">
-                <Button
-                  color="primary"
-                  onClick={() => handleUpdate(point.get('_id'))}
-                >
+                <Button color="primary" onClick={() => handleUpdate(id, name)}>
                   Edit
                 </Button>{' '}
-                <Button
-                  onClick={() => handleDelete(point.get('_id'))}
-                  color="danger"
-                >
+                <Button onClick={() => handleDelete(id, name)} color="danger">
                   Delete
                 </Button>
               </td>
@@ -47,4 +43,4 @@ PointTable.propTypes = {
   handleUpdate: PropTypes.func.isRequired
 };
 
-export default PointTable;
+export default memo(PointTable);

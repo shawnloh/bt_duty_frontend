@@ -1,20 +1,15 @@
-import React, { memo, useCallback } from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import TopNavBar from '../../components/commons/TopNavBar';
-import { logout } from '../../actions/authActions';
 
 export function AppLayout({ children }) {
-  const dispatch = useDispatch();
   const username = useSelector(state => state.auth.get('username'));
-  const handleLogout = useCallback(() => {
-    dispatch(logout());
-  }, [dispatch]);
 
   return (
     <>
-      <TopNavBar username={username} logout={handleLogout} />
+      <TopNavBar username={username} />
       {children}
     </>
   );

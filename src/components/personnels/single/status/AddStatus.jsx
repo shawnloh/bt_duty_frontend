@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import PropTypes from 'prop-types';
 import {
   Row,
@@ -138,4 +138,4 @@ AddStatus.propTypes = {
     .isRequired
 };
 
-export default AddStatus;
+export default memo(AddStatus);

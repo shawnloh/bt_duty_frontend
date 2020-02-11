@@ -1,4 +1,4 @@
-import { takeLatest, call, put, all, delay } from 'redux-saga/effects';
+import { call, put, all, delay, takeEvery } from 'redux-saga/effects';
 import { ADD_POINT, DELETE_POINT, UPDATE_POINT } from './constants';
 import {
   addPointSuccess,
@@ -125,9 +125,9 @@ function* updatePoint(action) {
 
 function* pointsWatcher() {
   yield all([
-    takeLatest(ADD_POINT, addPoint),
-    takeLatest(DELETE_POINT, deletePoint),
-    takeLatest(UPDATE_POINT, updatePoint)
+    takeEvery(ADD_POINT, addPoint),
+    takeEvery(DELETE_POINT, deletePoint),
+    takeEvery(UPDATE_POINT, updatePoint)
   ]);
 }
 

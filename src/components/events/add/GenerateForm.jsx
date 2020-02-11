@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import {
   Button,
   Row,
@@ -53,7 +53,8 @@ const GenerateForm = ({
   statuses,
   pointSystem,
   date,
-  setSelectedPersonnels
+  setSelectedPersonnels,
+  handleLogout
 }) => {
   const [modal, setModal] = useState(false);
   const toggle = useCallback(() => {
@@ -120,7 +121,8 @@ const GenerateForm = ({
           setSelectedPersonnels(personnels);
           toggle();
         } else if (response.status === 401) {
-          setErrors(['Unauthenticated, please refresh the page or logout']);
+          handleLogout();
+          // setErrors(['Unauthenticated, please refresh the page or logout']);
         } else {
           let responseErrors = [];
           if (response.data.message) {
@@ -137,7 +139,7 @@ const GenerateForm = ({
       }
       setIsGenerating(false);
     },
-    [date, errors, pointSystem, setSelectedPersonnels, toggle]
+    [date, errors, handleLogout, pointSystem, setSelectedPersonnels, toggle]
   );
 
   const formik = useFormik({
@@ -223,206 +225,199 @@ const GenerateForm = ({
     );
   }
   return (
-    <Row className="my-2">
-      <Col>
-        <Modal isOpen={modal} toggle={toggle}>
-          <ModalHeader toggle={toggle}>Generate</ModalHeader>
-          <ModalBody>
-            <Row>
-              <Col>
-                <FormGroup>
-                  <Label for="PioneersQty">Pioneers Qty</Label>
-                  <Input
-                    type="number"
-                    name="pioneers"
-                    id="PioneersQty"
-                    value={formik.values.pioneers}
-                    onChange={formik.handleChange}
-                    invalid={
-                      formik.touched.pioneers &&
-                      formik.errors.pioneers &&
-                      formik.errors.pioneers !== ''
-                    }
-                    disabled={formik.isSubmitting}
-                  />
-                  {formik.touched.pioneers && formik.errors.pioneers ? (
-                    <FormFeedback>{formik.errors.pioneers}</FormFeedback>
-                  ) : null}
-                </FormGroup>
-                <FormGroup>
-                  <Label for="WSQty">WSpec Qty</Label>
-                  <Input
-                    type="number"
-                    name="wspecs"
-                    id="WSQty"
-                    value={formik.values.wspecs}
-                    onChange={formik.handleChange}
-                    invalid={
-                      formik.touched.wspecs &&
-                      formik.errors.wspecs &&
-                      formik.errors.wspecs !== ''
-                    }
-                    disabled={formik.isSubmitting}
-                  />
-                  {formik.touched.wspecs && formik.errors.wspecs ? (
-                    <FormFeedback>{formik.errors.wspecs}</FormFeedback>
-                  ) : null}
-                </FormGroup>
-                <FormGroup>
-                  <Label for="selectPlatoons">Platoons</Label>
-                  <Input
-                    type="select"
-                    name="platoons"
-                    id="selectPlatoons"
-                    multiple
-                    value={formik.values.platoons}
-                    onChange={formik.handleChange}
-                    invalid={
-                      formik.touched.platoons &&
-                      formik.errors.platoons &&
-                      formik.errors.platoons !== ''
-                    }
-                    disabled={formik.isSubmitting}
-                  >
-                    {platoons.map(platoon => {
-                      return (
-                        <option
-                          value={platoon.get('_id')}
-                          key={platoon.get('_id')}
-                        >
-                          {platoon.get('name')}
-                        </option>
-                      );
-                    })}
-                  </Input>
-                  <FormGroup check>
-                    <Label check>
-                      <Input
-                        type="checkbox"
-                        onChange={handleSelectAllPlatoons}
-                        disabled={formik.isSubmitting}
-                        checked={
-                          formik.values.platoons.length === platoons.size
-                        }
-                      />{' '}
-                      All Platoons
-                    </Label>
-                  </FormGroup>
-                  {formik.touched.platoons && formik.errors.platoons ? (
-                    <FormFeedback>{formik.errors.platoons}</FormFeedback>
-                  ) : null}
-                </FormGroup>
-                <FormGroup>
-                  <Label for="selectRanks">Ranks</Label>
-                  <Input
-                    type="select"
-                    name="ranks"
-                    id="selectRanks"
-                    multiple
-                    value={formik.values.ranks}
-                    onChange={formik.handleChange}
-                    invalid={
-                      formik.touched.ranks &&
-                      formik.errors.ranks &&
-                      formik.errors.ranks !== ''
-                    }
-                    disabled={formik.isSubmitting}
-                  >
-                    {ranks.map(rank => {
-                      return (
-                        <option value={rank.get('_id')} key={rank.get('_id')}>
-                          {rank.get('name')}
-                        </option>
-                      );
-                    })}
-                  </Input>
-                  <FormGroup check>
-                    <Label check>
-                      <Input
-                        type="checkbox"
-                        onChange={handleSelectAllRanks}
-                        disabled={formik.isSubmitting}
-                        checked={formik.values.ranks.length === ranks.size}
-                      />{' '}
-                      All Ranks
-                    </Label>
-                  </FormGroup>
-                  {formik.touched.ranks && formik.errors.ranks ? (
-                    <FormFeedback>{formik.errors.ranks}</FormFeedback>
-                  ) : null}
-                </FormGroup>
-
-                <FormGroup>
-                  <Label for="selectStatuses">Statuses not allowed</Label>
-                  <Input
-                    type="select"
-                    name="statusNotAllowed"
-                    id="selectStatuses"
-                    multiple
-                    value={formik.values.statusNotAllowed}
-                    onChange={formik.handleChange}
-                    disabled={formik.isSubmitting}
-                  >
-                    {statuses.map(status => {
-                      return (
-                        <option
-                          value={status.get('_id')}
-                          key={status.get('_id')}
-                        >
-                          {status.get('name')}
-                        </option>
-                      );
-                    })}
-                  </Input>
-                </FormGroup>
-                <FormGroup check>
-                  <Label check>
-                    <Input
-                      type="checkbox"
-                      onChange={handleExcludeStatus}
-                      disabled={formik.isSubmitting}
-                      checked={
-                        formik.values.statusNotAllowed.length === statuses.size
-                      }
-                    />{' '}
-                    Exclude All Status
-                  </Label>
-                </FormGroup>
-                <FormGroup check>
-                  <Label check>
-                    <Input
-                      type="checkbox"
-                      name="onlyStatus"
-                      disabled={formik.isSubmitting}
-                      onChange={handleStatusesOnly}
-                      checked={formik.values.onlyStatus}
-                    />{' '}
-                    Statuses Only
-                  </Label>
-                </FormGroup>
-              </Col>
-            </Row>
-            {errors.length > 0 && (
-              <Row>
-                <Col>
-                  {errors.map(error => {
+    <>
+      <Button color="primary" className="w-100" onClick={toggle}>
+        Generate Personnels
+      </Button>
+      <Modal isOpen={modal} toggle={toggle}>
+        <ModalHeader toggle={toggle}>Generate</ModalHeader>
+        <ModalBody>
+          <Row>
+            <Col>
+              <FormGroup>
+                <Label for="PioneersQty">Pioneers Qty</Label>
+                <Input
+                  type="number"
+                  name="pioneers"
+                  id="PioneersQty"
+                  value={formik.values.pioneers}
+                  onChange={formik.handleChange}
+                  invalid={
+                    formik.touched.pioneers &&
+                    formik.errors.pioneers &&
+                    formik.errors.pioneers !== ''
+                  }
+                  disabled={formik.isSubmitting}
+                />
+                {formik.touched.pioneers && formik.errors.pioneers ? (
+                  <FormFeedback>{formik.errors.pioneers}</FormFeedback>
+                ) : null}
+              </FormGroup>
+              <FormGroup>
+                <Label for="WSQty">WSpec Qty</Label>
+                <Input
+                  type="number"
+                  name="wspecs"
+                  id="WSQty"
+                  value={formik.values.wspecs}
+                  onChange={formik.handleChange}
+                  invalid={
+                    formik.touched.wspecs &&
+                    formik.errors.wspecs &&
+                    formik.errors.wspecs !== ''
+                  }
+                  disabled={formik.isSubmitting}
+                />
+                {formik.touched.wspecs && formik.errors.wspecs ? (
+                  <FormFeedback>{formik.errors.wspecs}</FormFeedback>
+                ) : null}
+              </FormGroup>
+              <FormGroup>
+                <Label for="selectPlatoons">Platoons</Label>
+                <Input
+                  type="select"
+                  name="platoons"
+                  id="selectPlatoons"
+                  multiple
+                  value={formik.values.platoons}
+                  onChange={formik.handleChange}
+                  invalid={
+                    formik.touched.platoons &&
+                    formik.errors.platoons &&
+                    formik.errors.platoons !== ''
+                  }
+                  disabled={formik.isSubmitting}
+                >
+                  {platoons.map(platoon => {
                     return (
-                      <p className="text-danger" key={error}>
-                        {error}
-                      </p>
+                      <option
+                        value={platoon.get('_id')}
+                        key={platoon.get('_id')}
+                      >
+                        {platoon.get('name')}
+                      </option>
                     );
                   })}
-                </Col>
-              </Row>
-            )}
-          </ModalBody>
-          <ModalFooter>{footer}</ModalFooter>
-        </Modal>
-        <Button color="primary" onClick={toggle}>
-          Generate Personnels
-        </Button>
-      </Col>
-    </Row>
+                </Input>
+                <FormGroup check>
+                  <Label check>
+                    <Input
+                      type="checkbox"
+                      onChange={handleSelectAllPlatoons}
+                      disabled={formik.isSubmitting}
+                      checked={formik.values.platoons.length === platoons.size}
+                    />{' '}
+                    All Platoons
+                  </Label>
+                </FormGroup>
+                {formik.touched.platoons && formik.errors.platoons ? (
+                  <FormFeedback>{formik.errors.platoons}</FormFeedback>
+                ) : null}
+              </FormGroup>
+              <FormGroup>
+                <Label for="selectRanks">Ranks</Label>
+                <Input
+                  type="select"
+                  name="ranks"
+                  id="selectRanks"
+                  multiple
+                  value={formik.values.ranks}
+                  onChange={formik.handleChange}
+                  invalid={
+                    formik.touched.ranks &&
+                    formik.errors.ranks &&
+                    formik.errors.ranks !== ''
+                  }
+                  disabled={formik.isSubmitting}
+                >
+                  {ranks.map(rank => {
+                    return (
+                      <option value={rank.get('_id')} key={rank.get('_id')}>
+                        {rank.get('name')}
+                      </option>
+                    );
+                  })}
+                </Input>
+                <FormGroup check>
+                  <Label check>
+                    <Input
+                      type="checkbox"
+                      onChange={handleSelectAllRanks}
+                      disabled={formik.isSubmitting}
+                      checked={formik.values.ranks.length === ranks.size}
+                    />{' '}
+                    All Ranks
+                  </Label>
+                </FormGroup>
+                {formik.touched.ranks && formik.errors.ranks ? (
+                  <FormFeedback>{formik.errors.ranks}</FormFeedback>
+                ) : null}
+              </FormGroup>
+
+              <FormGroup>
+                <Label for="selectStatuses">Statuses not allowed</Label>
+                <Input
+                  type="select"
+                  name="statusNotAllowed"
+                  id="selectStatuses"
+                  multiple
+                  value={formik.values.statusNotAllowed}
+                  onChange={formik.handleChange}
+                  disabled={formik.isSubmitting}
+                >
+                  {statuses.map(status => {
+                    return (
+                      <option value={status.get('_id')} key={status.get('_id')}>
+                        {status.get('name')}
+                      </option>
+                    );
+                  })}
+                </Input>
+              </FormGroup>
+              <FormGroup check>
+                <Label check>
+                  <Input
+                    type="checkbox"
+                    onChange={handleExcludeStatus}
+                    disabled={formik.isSubmitting}
+                    checked={
+                      formik.values.statusNotAllowed.length === statuses.size
+                    }
+                  />{' '}
+                  Exclude All Status
+                </Label>
+              </FormGroup>
+              <FormGroup check>
+                <Label check>
+                  <Input
+                    type="checkbox"
+                    name="onlyStatus"
+                    disabled={formik.isSubmitting}
+                    onChange={handleStatusesOnly}
+                    checked={formik.values.onlyStatus}
+                  />{' '}
+                  Statuses Only
+                </Label>
+              </FormGroup>
+            </Col>
+          </Row>
+          {errors.length > 0 && (
+            <Row>
+              <Col>
+                {errors.map(error => {
+                  return (
+                    <p className="text-danger" key={error}>
+                      {error}
+                    </p>
+                  );
+                })}
+              </Col>
+            </Row>
+          )}
+        </ModalBody>
+        <ModalFooter>{footer}</ModalFooter>
+      </Modal>
+    </>
   );
 };
 
@@ -432,7 +427,8 @@ GenerateForm.propTypes = {
   statuses: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
   setSelectedPersonnels: PropTypes.func.isRequired,
   date: PropTypes.string.isRequired,
-  pointSystem: PropTypes.string.isRequired
+  pointSystem: PropTypes.string.isRequired,
+  handleLogout: PropTypes.func.isRequired
 };
 
-export default GenerateForm;
+export default memo(GenerateForm);

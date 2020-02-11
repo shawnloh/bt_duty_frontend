@@ -1,19 +1,19 @@
-import React, { PureComponent, Suspense, lazy } from 'react';
+import React, { memo, Suspense, lazy, useCallback, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect
 } from 'react-router-dom';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux';
 import { checkAuth } from './actions/authActions';
 import { loadApp } from './pages/loading/actions';
 
 import AuthRoute from './AuthRoute';
 
-import Loading from './components/commons/Loading';
-import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
+import LoadingFallback from './components/commons/Loading';
+import NotFoundPage from './pages/NotFoundPage';
+import LogoutPage from './pages/logout/LogoutPage';
 
 const LoginPage = lazy(() => import('./pages/login'));
 const LoadingPage = lazy(() => import('./pages/loading'));
@@ -25,64 +25,50 @@ const StatusesPage = lazy(() => import('./pages/statuses'));
 const PersonnelsPage = lazy(() => import('./pages/personnels'));
 const EventsPage = lazy(() => import('./pages/events'));
 
-class App extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+function App() {
+  const isAuthenticated = useSelector(state =>
+    state.auth.get('isAuthenticated')
+  );
+  const appLoaded = useSelector(state => state.pages.loading.get('appLoaded'));
+  const dispatch = useDispatch();
 
-  componentDidMount() {
-    const { checkAuthenticated } = this.props;
+  const checkAuthenticated = useCallback(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+  const reloadApp = useCallback(() => {
+    dispatch(loadApp());
+  }, [dispatch]);
+
+  useEffect(() => {
     checkAuthenticated();
-  }
+  }, [checkAuthenticated]);
 
-  static getDerivedStateFromProps(props) {
-    if (props.isAuthenticated && !props.appLoaded) {
-      props.reloadApp();
+  useEffect(() => {
+    if (isAuthenticated && !appLoaded) {
+      reloadApp();
     }
+  }, [appLoaded, isAuthenticated, reloadApp]);
 
-    return {};
-  }
-
-  render() {
-    return (
-      <Router>
-        <Suspense fallback={<Loading />}>
-          <Switch>
-            <Redirect from="/" to="/login" exact />
-            <Route path="/login" component={LoginPage} />
-            <AuthRoute path="/app" component={LoadingPage} />
-            <AuthRoute path="/dashboard" component={DashboardPage} />
-            <AuthRoute path="/events" component={EventsPage} />
-            <AuthRoute path="/ranks" component={RanksPage} />
-            <AuthRoute path="/platoons" component={PlatoonsPage} />
-            <AuthRoute path="/points" component={PointsPage} />
-            <AuthRoute path="/statuses" component={StatusesPage} />
-            <AuthRoute path="/personnels" component={PersonnelsPage} />
-            <Route path="*" component={NotFoundPage} />
-          </Switch>
-        </Suspense>
-      </Router>
-    );
-  }
+  return (
+    <Router>
+      <Suspense fallback={<LoadingFallback />}>
+        <Switch>
+          <Redirect from="/" to="/login" exact />
+          <Route path="/login" component={LoginPage} />
+          <AuthRoute path="/app" component={LoadingPage} />
+          <AuthRoute path="/dashboard" component={DashboardPage} />
+          <AuthRoute path="/events" component={EventsPage} />
+          <AuthRoute path="/ranks" component={RanksPage} />
+          <AuthRoute path="/platoons" component={PlatoonsPage} />
+          <AuthRoute path="/points" component={PointsPage} />
+          <AuthRoute path="/statuses" component={StatusesPage} />
+          <AuthRoute path="/personnels" component={PersonnelsPage} />
+          <AuthRoute path="/logout" component={LogoutPage} />
+          <Route path="*" component={NotFoundPage} />
+        </Switch>
+      </Suspense>
+    </Router>
+  );
 }
 
-App.propTypes = {
-  checkAuthenticated: PropTypes.func.isRequired,
-  isAuthenticated: PropTypes.bool.isRequired,
-  appLoaded: PropTypes.bool.isRequired,
-  reloadApp: PropTypes.func.isRequired
-};
-
-const mapStateToProps = state => {
-  return {
-    isAuthenticated: state.auth.get('isAuthenticated'),
-    appLoaded: state.pages.loading.get('appLoaded')
-  };
-};
-const mapDispatchToProps = {
-  checkAuthenticated: checkAuth,
-  reloadApp: loadApp
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default memo(App);

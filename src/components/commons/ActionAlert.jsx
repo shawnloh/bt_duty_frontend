@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Alert, Spinner } from 'reactstrap';
 import PropTypes from 'prop-types';
 
@@ -14,4 +14,4 @@ ActionAlert.propTypes = {
   name: PropTypes.string.isRequired
 };
 
-export default ActionAlert;
+export default memo(ActionAlert);

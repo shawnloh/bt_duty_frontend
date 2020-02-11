@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Table, Button } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
@@ -16,20 +16,16 @@ const StatusesTable = ({ statuses, handleUpdate, handleDelete }) => {
       </thead>
       <tbody>
         {statuses.map(status => {
+          const id = status.get('_id');
+          const name = status.get('name');
           return (
-            <tr key={status.get('_id')}>
-              <td className="text-center">{status.get('name')}</td>
+            <tr key={id}>
+              <td className="text-center">{name}</td>
               <td className="text-center">
-                <Button
-                  color="primary"
-                  onClick={() => handleUpdate(status.get('_id'))}
-                >
+                <Button color="primary" onClick={() => handleUpdate(id, name)}>
                   Edit
                 </Button>{' '}
-                <Button
-                  onClick={() => handleDelete(status.get('_id'))}
-                  color="danger"
-                >
+                <Button onClick={() => handleDelete(id, name)} color="danger">
                   Delete
                 </Button>
               </td>
@@ -47,4 +43,4 @@ StatusesTable.propTypes = {
   handleDelete: PropTypes.func.isRequired
 };
 
-export default StatusesTable;
+export default memo(StatusesTable);

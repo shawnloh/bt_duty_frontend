@@ -1,4 +1,4 @@
-import { takeLatest, call, put, all, delay } from 'redux-saga/effects';
+import { call, put, all, delay, takeEvery } from 'redux-saga/effects';
 import { ADD_RANK, DELETE_RANK, UPDATE_RANK } from './constants';
 import {
   addRankSuccess,
@@ -121,9 +121,9 @@ function* updateRank(action) {
 
 function* ranksWatcher() {
   yield all([
-    takeLatest(ADD_RANK, addRank),
-    takeLatest(DELETE_RANK, deleteRank),
-    takeLatest(UPDATE_RANK, updateRank)
+    takeEvery(ADD_RANK, addRank),
+    takeEvery(DELETE_RANK, deleteRank),
+    takeEvery(UPDATE_RANK, updateRank)
   ]);
 }
 

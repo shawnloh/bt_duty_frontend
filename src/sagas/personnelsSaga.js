@@ -132,7 +132,9 @@ function* deleteEventUpdatePoints(action) {
       let personnels = yield select(state =>
         state.personnels.get('personnels')
       );
-      const personnelIds = event.get('personnels').map(person => person._id);
+      const personnelIds = event
+        .get('personnels')
+        .map(person => person.get('_id'));
 
       personnelIds.forEach(id => {
         const person = personnels.get(id);
@@ -150,12 +152,61 @@ function* deleteEventUpdatePoints(action) {
           }
           return currPoint;
         });
+        const newEventsDate = person
+          .get('blockOutDates')
+          .indexOf(event.get('date') >= 0)
+          ? person
+              .get('eventsDate')
+              .delete(person.get('eventsDate').indexOf(event.get('date')))
+          : null;
 
         personnels = personnels.setIn([id, 'points'], newPoints);
+
+        if (newEventsDate) {
+          personnels = personnels.setIn([id, 'eventsDate'], newEventsDate);
+        }
       });
       yield put(personnelsUpdateEventPoints(personnels));
     }
   }
+}
+
+function* createEventUpdatePoints(action) {
+  const { _id: id } = action.payload;
+  const event = yield select(state => state.events.get('events').get(id));
+  let personnels = yield select(state => state.personnels.get('personnels'));
+  const personnelIds = event.get('personnels').map(person => person.get('_id'));
+
+  personnelIds.forEach(pId => {
+    const person = personnels.get(pId);
+    const newPoints = person.get('points').map(point => {
+      let currPoint = point;
+      if (
+        point.getIn(['pointSystem', '_id']) ===
+        event.getIn(['pointSystem', '_id'])
+      ) {
+        currPoint = currPoint.set(
+          'points',
+          currPoint.get('points') + event.get('pointsAllocation')
+        );
+        return currPoint;
+      }
+      return currPoint;
+    });
+
+    const newEventsDate = person
+      .get('eventsDate')
+      .indexOf(event.get('date') < 0)
+      ? person.get('eventsDate').push(event.get('date'))
+      : null;
+
+    personnels = personnels.setIn([pId, 'points'], newPoints);
+
+    if (newEventsDate) {
+      personnels = personnels.setIn([pId, 'eventsDate'], newEventsDate);
+    }
+  });
+  yield put(personnelsUpdateEventPoints(personnels));
 }
 
 function* updatePersonnelsPlatoonName(action) {
@@ -232,14 +283,15 @@ function* updateStatusesName(action) {
 
 function* personnelsSagaWatcher() {
   yield all([
-    takeLatest(UPDATE_POINT_SUCCESS, updatePersonnelsPointSystemName),
+    takeEvery(UPDATE_POINT_SUCCESS, updatePersonnelsPointSystemName),
+    takeLatest(ADD_POINT_SUCCESS, refreshPersonnelsFromServer),
+    takeEvery(DELETE_POINT, deletePersonnelsPointsSystem),
     takeEvery(UPDATE_PLATOON, updatePersonnelsPlatoonName),
     takeEvery(UPDATE_RANK, updatePersonnelsRankName),
     takeEvery(UPDATE_STATUS, updateStatusesName),
-    takeEvery(DELETE_POINT, deletePersonnelsPointsSystem),
     takeEvery(DELETE_EVENT, deleteEventUpdatePoints),
-    takeLatest(ADD_POINT_SUCCESS, refreshPersonnelsFromServer),
-    takeLatest(CREATE_EVENT_SUCCESS, refreshPersonnelsFromServer)
+    // takeLatest(CREATE_EVENT_SUCCESS, refreshPersonnelsFromServer)
+    takeEvery(CREATE_EVENT_SUCCESS, createEventUpdatePoints)
   ]);
 }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Table, Button } from 'reactstrap';
 import { Link, useRouteMatch } from 'react-router-dom';
@@ -63,4 +63,4 @@ Details.propTypes = {
   eventsDate: PropTypes.oneOfType([PropTypes.instanceOf(List)])
 };
 
-export default Details;
+export default memo(Details);

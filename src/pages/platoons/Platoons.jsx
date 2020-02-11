@@ -1,131 +1,59 @@
-import React, { useCallback, memo } from 'react';
+import React, { memo } from 'react';
 import { Container, Col, Row, Button, Alert, Spinner } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
-import Swal from 'sweetalert2';
 import { getPlatoons } from './selectors';
 
 import Layout from '../shared/AppLayout';
 import PlatoonsTable from '../../components/platoons/PlatoonsTable';
 
 import { addPlatoon, deletePlatoon, updatePlatoon } from './actions';
+import useReduxPageSelector from '../../hooks/useReduxPageSelector';
+import useUpdateModal from '../../hooks/useUpdateModal';
+import useDeleteModal from '../../hooks/useDeleteModal';
+import useAddModal from '../../hooks/useAddModal';
 
 export function Platoons() {
   const dispatch = useDispatch();
-  const platoonsById = useSelector(state => state.platoons.get('platoons'));
   const platoons = useSelector(getPlatoons);
-  const errors = useSelector(state => state.pages.platoons.get('errors'));
-  const actionInProgress = useSelector(state =>
-    state.pages.platoons.get('actionInProgress')
-  );
-  const handleUpdate = useCallback(
-    id => {
-      async function showModal() {
-        const selectedPlatoon = platoonsById.get(id);
-        const result = await Swal.fire({
-          title: `Enter a new platoon name for ${selectedPlatoon.get('name')}`,
-          input: 'text',
-          inputValue: '',
-          inputPlaceholder: selectedPlatoon.get('name'),
-          showCancelButton: true,
-          confirmButtonText: 'Update',
-          confirmButtonColor: '#28a745',
-          cancelButtonText: 'Cancel',
-          cancelButtonColor: '#007bff',
-          reverseButtons: true,
-          inputValidator: value => {
-            if (!value) {
-              return 'Updating a platoon name cannot be empty';
-            }
-            return null;
-          }
-        });
-        if (result.value) {
-          dispatch(updatePlatoon(id, result.value));
-        }
-      }
-      showModal();
-    },
-    [dispatch, platoonsById]
-  );
-
-  const handleDelete = useCallback(
-    id => {
-      async function showModal() {
-        const selectedPlatoon = platoonsById.get(id);
-        const result = await Swal.fire({
-          title: `Are you sure you want to delete ${selectedPlatoon.get(
-            'name'
-          )}?`,
-          text: "You won't be able to revert this!",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#dc3545',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Yes, delete it!',
-          reverseButtons: true
-        });
-        if (result.value) {
-          dispatch(deletePlatoon(id));
-        }
-      }
-      showModal();
-    },
-    [dispatch, platoonsById]
-  );
-
-  const handleAdd = useCallback(() => {
-    async function showModal() {
-      const result = await Swal.fire({
-        title: 'Enter a new platoon name',
-        input: 'text',
-        inputValue: '',
-        showCancelButton: true,
-        confirmButtonText: 'Add',
-        confirmButtonColor: '#28a745',
-        cancelButtonText: 'Cancel',
-        cancelButtonColor: '#007bff',
-        reverseButtons: true,
-        inputValidator: value => {
-          if (!value) {
-            return 'Name cannot be empty';
-          }
-          return null;
-        }
-      });
-      if (result.value) {
-        dispatch(addPlatoon(result.value));
-      }
-    }
-    showModal();
-  }, [dispatch]);
+  const errors = useReduxPageSelector('platoons', 'errors');
+  const actionInProgress = useReduxPageSelector('platoons', 'actionInProgress');
+  const handleAdd = useAddModal(dispatch, addPlatoon, 'platoon');
+  const handleUpdate = useUpdateModal(dispatch, updatePlatoon, 'platoon');
+  const handleDelete = useDeleteModal(dispatch, deletePlatoon);
 
   return (
     <Layout>
       <Helmet>
         <title>Platoons</title>
       </Helmet>
-      <Container>
+      <Container className="py-2">
         {errors.size > 0 && (
           <Row>
-            {errors.map(error => {
-              return (
-                <Alert key={error} color="danger" className="w-100">
-                  {error}
-                </Alert>
-              );
-            })}
+            <Col>
+              <Alert color="danger" className="w-100">
+                {errors.map(error => {
+                  return (
+                    <p className="mb-0" key={error}>
+                      {error}
+                    </p>
+                  );
+                })}
+              </Alert>
+            </Col>
           </Row>
         )}
         {actionInProgress !== 0 && (
           <Row>
-            <Alert color="primary" className="w-100">
-              {actionInProgress} action(s) in progress{' '}
-              <Spinner color="primary" size="sm" />
-            </Alert>
+            <Col>
+              <Alert color="primary" className="w-100">
+                {actionInProgress} action(s) in progress{' '}
+                <Spinner color="primary" size="sm" />
+              </Alert>
+            </Col>
           </Row>
         )}
-        <Row className="my-2 d-flex justify-content-center align-items-center">
+        <Row className="justify-content-center align-items-center">
           <Col xs="9">
             <h1>Platoons</h1>
           </Col>
@@ -136,7 +64,7 @@ export function Platoons() {
           </Col>
         </Row>
         <Row>
-          <Col md="12">
+          <Col>
             <PlatoonsTable
               platoons={platoons}
               handleUpdate={handleUpdate}

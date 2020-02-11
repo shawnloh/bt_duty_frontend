@@ -1,4 +1,4 @@
-import { put, call, takeLatest, all } from 'redux-saga/effects';
+import { put, call, takeLatest, all, select } from 'redux-saga/effects';
 import { LOG_OUT, CHECK_AUTH } from '../actions/constants';
 import {
   logoutSuccess,
@@ -11,8 +11,13 @@ import AccountService from '../services/accounts';
 
 function* logout() {
   try {
-    yield call(AccountService.logout);
-    yield put(logoutSuccess());
+    const isAuthenticated = yield select(state =>
+      state.auth.get('isAuthenticated')
+    );
+    if (isAuthenticated) {
+      yield call(AccountService.logout);
+      yield put(logoutSuccess());
+    }
   } catch (error) {
     yield put(logoutFailure());
   }

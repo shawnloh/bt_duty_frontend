@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Nav, NavItem, NavLink } from 'reactstrap';
 
@@ -54,4 +54,4 @@ Tabs.propTypes = {
   activeTab: PropTypes.string.isRequired
 };
 
-export default Tabs;
+export default memo(Tabs);

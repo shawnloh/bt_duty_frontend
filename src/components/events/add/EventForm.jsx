@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback, memo } from 'react';
 import {
   Form,
   Row,
@@ -7,7 +7,6 @@ import {
   Label,
   Input,
   FormText,
-  Spinner,
   Button,
   FormFeedback
 } from 'reactstrap';
@@ -16,11 +15,16 @@ import moment from 'moment-timezone';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Map, List } from 'immutable';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
+import Swal from 'sweetalert2';
 import GenerateForm from './GenerateForm';
+
+const animatedComponents = makeAnimated();
 
 const EventFormSchema = Yup.object().shape({
   name: Yup.string()
-    .min(3)
+    .min(1)
     .max(50)
     .required('Name is required'),
   date: Yup.string()
@@ -44,7 +48,8 @@ const EventForm = ({
   statuses,
   personnels,
   isAdding,
-  handleSubmit
+  handleSubmit,
+  handleLogout
 }) => {
   const formik = useFormik({
     initialValues: {
@@ -58,9 +63,106 @@ const EventForm = ({
     onSubmit: handleSubmit
   });
 
-  const setSelectedPersonnels = personnelsToSet => {
-    formik.setFieldValue('selectedPersonnels', personnelsToSet);
-  };
+  const setSelectedPersonnels = useCallback(
+    personnelsToSet => {
+      formik.setFieldValue('selectedPersonnels', personnelsToSet);
+    },
+    [formik]
+  );
+
+  const personnelsDefault = useMemo(() => {
+    return personnels.toList().map(person => {
+      return {
+        value: person.get('_id'),
+        label: `${person.getIn(['platoon', 'name'])} ${person.getIn([
+          'rank',
+          'name'
+        ])} ${person.get('name')}`
+      };
+    });
+  }, [personnels]);
+
+  const personnelsToSelect = useMemo(() => {
+    if (
+      formik.values.date !== '' &&
+      moment(formik.values.date, 'DDMMYY', true).isValid()
+    ) {
+      const currEventDate = moment(formik.values.date, 'DDMMYY', true).format(
+        'DD-MM-YYYY'
+      );
+      return personnels
+        .toList()
+        .filter(person => {
+          const blockoutDates = person.get('blockOutDates');
+          if (blockoutDates.includes(currEventDate)) {
+            return false;
+          }
+          const eventsDate = person.get('eventsDate');
+
+          const dayBeforeEventDate = moment(currEventDate, 'DD-MM-YYYY', true)
+            .subtract(1, 'd')
+            .format('DD-MM-YYYY');
+          const dayAfterEventDate = moment(currEventDate, 'DD-MM-YYYY', true)
+            .add(1, 'd')
+            .format('DD-MM-YYYY');
+
+          if (
+            eventsDate.includes(currEventDate) ||
+            eventsDate.includes(dayBeforeEventDate) ||
+            eventsDate.includes(dayAfterEventDate)
+          ) {
+            return false;
+          }
+          return true;
+        })
+        .map(person => {
+          return {
+            value: person.get('_id'),
+            label: `${person.getIn(['platoon', 'name'])} ${person.getIn([
+              'rank',
+              'name'
+            ])} ${person.get('name')}`
+          };
+        });
+    }
+
+    return personnelsDefault;
+  }, [formik.values.date, personnels, personnelsDefault]);
+
+  const handleChangePersonnels = useCallback(
+    selectedPersonnels => {
+      if (
+        formik.values.date === '' ||
+        !moment(formik.values.date, 'DDMMYY', true).isValid()
+      ) {
+        return Swal.fire({
+          title: 'Please set a date',
+          text: ' Please assign a valid date before selecting personnels'
+        });
+      }
+      if (!selectedPersonnels) {
+        return formik.setFieldValue('selectedPersonnels', []);
+      }
+      const values = selectedPersonnels.map(person => person.value);
+      return formik.setFieldValue('selectedPersonnels', values);
+    },
+    [formik]
+  );
+
+  const getSelectedPersonnelsValues = useMemo(
+    () =>
+      formik.values.selectedPersonnels.map(id => {
+        const person = personnels.get(id);
+        return {
+          value: person.get('_id'),
+          label: `${person.getIn(['platoon', 'name'])} ${person.getIn([
+            'rank',
+            'name'
+          ])} ${person.get('name')}`
+        };
+      }),
+    [formik.values.selectedPersonnels, personnels]
+  );
 
   return (
     <Form onSubmit={formik.handleSubmit}>
@@ -153,7 +255,7 @@ const EventForm = ({
               }
             />
             <FormText color="muted">
-              Min of 1 is needed to create event
+              Min of 1 point is required to create event
             </FormText>
             {formik.touched.pointAllocation && formik.errors.pointAllocation ? (
               <FormFeedback>{formik.errors.pointAllocation}</FormFeedback>
@@ -161,7 +263,9 @@ const EventForm = ({
           </FormGroup>
         </Col>
       </Row>
-
+      <Row>
+        <Col />
+      </Row>
       {formik.touched.selectedPersonnels && formik.errors.selectedPersonnels ? (
         <Row>
           <Col>
@@ -171,12 +275,26 @@ const EventForm = ({
       ) : null}
 
       <Row>
-        <Col className="d-flex justify-content-start align-items-center">
-          <p className="font-weight-bold">
-            Total Selected: {formik.values.selectedPersonnels.length}
-          </p>
+        <Col className="w-100">
+          <FormGroup>
+            <Label for="selectedPersonnels">
+              Personnels Selected: [{formik.values.selectedPersonnels.length}]
+            </Label>
+            <Select
+              options={personnelsToSelect}
+              components={animatedComponents}
+              isMulti
+              id="selectedPersonnels"
+              name="selectedPersonnels"
+              placeholder="Select Personnels.."
+              value={getSelectedPersonnelsValues}
+              onChange={handleChangePersonnels}
+            />
+          </FormGroup>
         </Col>
-        <Col className="d-flex justify-content-end align-items-center">
+      </Row>
+      <Row className="mt-2">
+        <Col>
           <GenerateForm
             platoons={platoons}
             ranks={ranks}
@@ -184,44 +302,21 @@ const EventForm = ({
             setSelectedPersonnels={setSelectedPersonnels}
             pointSystem={formik.values.pointSystem}
             date={formik.values.date}
+            handleLogout={handleLogout}
           />
         </Col>
       </Row>
       <Row className="my-2">
-        <Col className="overflow-auto" style={{ maxHeight: '150px' }}>
-          {formik.values.selectedPersonnels.map(id => {
-            const person = personnels.get(id);
-            return (
-              <Row key={id}>
-                <Col>
-                  <p>
-                    {person.getIn(['platoon', 'name'])}{' '}
-                    {person.getIn(['rank', 'name'])} {person.get('name')}
-                  </p>
-                </Col>
-              </Row>
-            );
-          })}
-        </Col>
-      </Row>
-      <Row>
         <Col className="text-center">
-          {formik.isSubmitting || isAdding ? (
-            <>
-              <Spinner color="primary" />
-              <p>Adding...</p>
-            </>
-          ) : (
-            <Button
-              size="lg"
-              className="w-100"
-              color="success"
-              type="submit"
-              disabled={formik.isSubmitting}
-            >
-              Create
-            </Button>
-          )}
+          <Button
+            size="lg"
+            className="w-100"
+            color="success"
+            type="submit"
+            disabled={formik.isSubmitting || isAdding}
+          >
+            {formik.isSubmitting || isAdding ? `Creating...` : `Create Event`}
+          </Button>
         </Col>
       </Row>
     </Form>
@@ -235,7 +330,8 @@ EventForm.propTypes = {
   statuses: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
   personnels: PropTypes.oneOfType([PropTypes.instanceOf(Map)]).isRequired,
   isAdding: PropTypes.bool.isRequired,
-  handleSubmit: PropTypes.func.isRequired
+  handleSubmit: PropTypes.func.isRequired,
+  handleLogout: PropTypes.func.isRequired
 };
 
-export default EventForm;
+export default memo(EventForm);

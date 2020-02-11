@@ -1,13 +1,17 @@
-/* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-props-no-spreading */
-import React from 'react';
+import React, { memo } from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 
-function AuthRoute({ component: Component, isAuthenticated, ...rest }) {
+function AuthRoute({ component: Component, path }) {
+  const isAuthenticated = useSelector(state =>
+    state.auth.get('isAuthenticated')
+  );
+
   return (
     <Route
-      {...rest}
+      path={path}
       render={props => {
         if (isAuthenticated === undefined) {
           return null;
@@ -22,10 +26,13 @@ function AuthRoute({ component: Component, isAuthenticated, ...rest }) {
   );
 }
 
-const mapStateToProps = state => ({
-  isAuthenticated: state.auth.get('isAuthenticated')
-});
+AuthRoute.propTypes = {
+  component: PropTypes.oneOfType([
+    PropTypes.element,
+    PropTypes.node,
+    PropTypes.object
+  ]).isRequired,
+  path: PropTypes.string.isRequired
+};
 
-export default connect(mapStateToProps)(AuthRoute);
-
-// export default AuthRoute;
+export default memo(AuthRoute);

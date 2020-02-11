@@ -1,4 +1,4 @@
-import { fromJS, Map, List } from 'immutable';
+import { fromJS, List } from 'immutable';
 import { LOAD_EVENTS_FAILURE, LOAD_EVENTS_SUCCESS } from '../actions/constants';
 import {
   DELETE_EVENT_SUCCESS,
@@ -27,7 +27,7 @@ export default (state = initialState, { type, payload }) => {
     case CREATE_EVENT_SUCCESS:
       return state.merge({
         ids: state.get('ids').push(payload._id),
-        events: state.get('events').set(payload._id, Map(payload))
+        events: state.get('events').set(payload._id, fromJS(payload))
       });
     case DELETE_EVENT_SUCCESS:
       return state.merge({

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   Label,
   FormGroup,
@@ -124,4 +124,4 @@ EditForm.propTypes = {
   isUpdating: PropTypes.bool.isRequired
 };
 
-export default EditForm;
+export default memo(EditForm);

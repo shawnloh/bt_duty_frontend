@@ -107,12 +107,12 @@ const AddBlockout = ({ handleAdd, handleDelete }) => {
             <CardBody>
               <Form onSubmit={addBlockoutFormik.handleSubmit}>
                 <FormGroup>
-                  <Label for="dateInput">Date</Label>
+                  <Label for="addDateInput">Date</Label>
                   <Input
                     type="text"
                     value={addBlockoutFormik.values.startDate}
                     name="startDate"
-                    id="dateInput"
+                    id="addDateInput"
                     placeholder={`e.g. ${today}`}
                     invalid={
                       addBlockoutFormik.touched.startDate &&
@@ -133,12 +133,12 @@ const AddBlockout = ({ handleAdd, handleDelete }) => {
                 </FormGroup>
 
                 <FormGroup>
-                  <Label for="untilDateInput">Until</Label>
+                  <Label for="addUntilDateInput">Until</Label>
                   <Input
                     type="text"
                     value={addBlockoutFormik.values.endDate}
                     name="endDate"
-                    id="untilDateInput"
+                    id="addUntilDateInput"
                     placeholder={`*OPTIONAL* e.g. ${tomorrow}`}
                     invalid={
                       addBlockoutFormik.touched.endDate &&
@@ -171,12 +171,12 @@ const AddBlockout = ({ handleAdd, handleDelete }) => {
             <CardBody>
               <Form onSubmit={deleteBlockoutFormik.handleSubmit}>
                 <FormGroup>
-                  <Label for="dateInput">Date</Label>
+                  <Label for="deleteDateInput">Date</Label>
                   <Input
                     type="text"
                     value={deleteBlockoutFormik.values.startDate}
                     name="startDate"
-                    id="dateInput"
+                    id="deleteDateInput"
                     placeholder={`e.g. ${today}`}
                     invalid={
                       deleteBlockoutFormik.touched.startDate &&
@@ -197,12 +197,12 @@ const AddBlockout = ({ handleAdd, handleDelete }) => {
                 </FormGroup>
 
                 <FormGroup>
-                  <Label for="untilDateInput">Until</Label>
+                  <Label for="deleteUntilDateInput">Until</Label>
                   <Input
                     type="text"
                     value={deleteBlockoutFormik.values.endDate}
                     name="endDate"
-                    id="untilDateInput"
+                    id="deleteUntilDateInput"
                     placeholder={`*OPTIONAL* e.g. ${tomorrow}`}
                     invalid={
                       deleteBlockoutFormik.touched.endDate &&
