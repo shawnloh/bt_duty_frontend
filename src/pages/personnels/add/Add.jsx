@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { memo, useEffect, useCallback, useMemo } from 'react';
 import {
   Container,
   Row,
@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import usePrevious from '../../../hooks/usePrevious';
 import useReduxPageSelector from '../../../hooks/useReduxPageSelector';
+import useIsMounted from '../../../hooks/useIsMounted';
 import { addPersonnel } from './actions';
 import { getPlatoons, getRanks } from './selectors';
 
@@ -21,7 +22,7 @@ import ActionAlert from '../../../components/commons/ActionAlert';
 
 export function Add() {
   const history = useHistory();
-  const isMounted = useRef(false);
+  const isMounted = useIsMounted();
 
   const pages = useMemo(() => ['personnels', 'add'], []);
   const actionInProgress = useReduxPageSelector(pages, 'actionInProgress');
@@ -31,14 +32,6 @@ export function Add() {
   const ranks = useSelector(getRanks);
   const platoons = useSelector(getPlatoons);
   const dispatch = useDispatch();
-
-  // effects to see if component is mounted
-  useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
 
   // handle redirect to personnels page after creating person
   useEffect(() => {
@@ -50,7 +43,7 @@ export function Add() {
     ) {
       history.replace('/personnels');
     }
-  }, [actionInProgress, errors.size, history, prevActionInProgress]);
+  }, [actionInProgress, errors.size, history, isMounted, prevActionInProgress]);
 
   const handleSubmit = useCallback(
     ({ name, platoon, rank }) => {

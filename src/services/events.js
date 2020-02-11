@@ -28,6 +28,15 @@ class EventsService {
       .then(response => response)
       .catch(error => error);
   }
+
+  static updateEvent(eventId, newPersonnels) {
+    return api
+      .post(`/events/${eventId}/changepersonnels`, {
+        personnels: newPersonnels
+      })
+      .then(response => response)
+      .catch(error => error);
+  }
 }
 
 export default EventsService;

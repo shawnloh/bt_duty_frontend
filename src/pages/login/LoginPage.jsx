@@ -60,7 +60,7 @@ export function LoginPage() {
       <Row className="h-100">
         <Col className="my-auto">
           {errors.size !== 0 && (
-            <Row className="w-100">
+            <Row className="w-100 mx-auto">
               <Col>
                 <UncontrolledAlert color="danger">
                   {errors.map(error => {
@@ -75,7 +75,7 @@ export function LoginPage() {
             </Row>
           )}
           {loggedOut && (
-            <Row className="w-100">
+            <Row className="w-100 mx-auto">
               <Col>
                 <UncontrolledAlert color="success">
                   You have successfully logged out
@@ -83,7 +83,7 @@ export function LoginPage() {
               </Col>
             </Row>
           )}
-          <Row className="w-100">
+          <Row className="w-100 mx-auto">
             <Col>
               <Form onSubmit={formik.handleSubmit} className="w-100">
                 <FormGroup row className="mx-auto">

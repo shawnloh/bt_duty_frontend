@@ -5,6 +5,7 @@ function usePrevious(value) {
   useEffect(() => {
     ref.current = value;
   });
+  // This will return value before the useEffect update the value
   return ref.current;
 }
 

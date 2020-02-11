@@ -8,6 +8,7 @@ import {
   takeEvery,
   call
 } from 'redux-saga/effects';
+import { fromJS } from 'immutable';
 
 import {
   loadPersonnelsFailure,
@@ -31,6 +32,9 @@ import {
 } from '../pages/platoons/constants';
 
 import {
+  UPDATE_EVENT,
+  UPDATE_EVENT_SUCCESS,
+  UPDATE_EVENT_FAILURE,
   CREATE_EVENT_SUCCESS,
   DELETE_EVENT,
   DELETE_EVENT_FAILURE,
@@ -118,62 +122,44 @@ function* deletePersonnelsPointsSystem(action) {
   }
 }
 
-function* deleteEventUpdatePoints(action) {
-  const { revert, eventId } = action.payload;
-  if (revert) {
-    const event = yield select(state =>
-      state.events.get('events').get(eventId)
-    );
-    const { success } = yield race({
-      success: take(DELETE_EVENT_SUCCESS),
-      failure: take(DELETE_EVENT_FAILURE)
+function* revertPersonnelPoints(event) {
+  let personnels = yield select(state => state.personnels.get('personnels'));
+  const personnelIds = event.get('personnels').map(person => person.get('_id'));
+
+  personnelIds.forEach(id => {
+    const person = personnels.get(id);
+    const newPoints = person.get('points').map(point => {
+      let currPoint = point;
+      if (
+        point.getIn(['pointSystem', '_id']) ===
+        event.getIn(['pointSystem', '_id'])
+      ) {
+        currPoint = currPoint.set(
+          'points',
+          currPoint.get('points') - event.get('pointsAllocation')
+        );
+        return currPoint;
+      }
+      return currPoint;
     });
-    if (success) {
-      let personnels = yield select(state =>
-        state.personnels.get('personnels')
-      );
-      const personnelIds = event
-        .get('personnels')
-        .map(person => person.get('_id'));
+    const newEventsDate = person
+      .get('blockOutDates')
+      .indexOf(event.get('date') >= 0)
+      ? person
+          .get('eventsDate')
+          .delete(person.get('eventsDate').indexOf(event.get('date')))
+      : null;
 
-      personnelIds.forEach(id => {
-        const person = personnels.get(id);
-        const newPoints = person.get('points').map(point => {
-          let currPoint = point;
-          if (
-            point.getIn(['pointSystem', '_id']) ===
-            event.getIn(['pointSystem', '_id'])
-          ) {
-            currPoint = currPoint.set(
-              'points',
-              currPoint.get('points') - event.get('pointsAllocation')
-            );
-            return currPoint;
-          }
-          return currPoint;
-        });
-        const newEventsDate = person
-          .get('blockOutDates')
-          .indexOf(event.get('date') >= 0)
-          ? person
-              .get('eventsDate')
-              .delete(person.get('eventsDate').indexOf(event.get('date')))
-          : null;
+    personnels = personnels.setIn([id, 'points'], newPoints);
 
-        personnels = personnels.setIn([id, 'points'], newPoints);
-
-        if (newEventsDate) {
-          personnels = personnels.setIn([id, 'eventsDate'], newEventsDate);
-        }
-      });
-      yield put(personnelsUpdateEventPoints(personnels));
+    if (newEventsDate) {
+      personnels = personnels.setIn([id, 'eventsDate'], newEventsDate);
     }
-  }
+  });
+  return personnels;
 }
 
-function* createEventUpdatePoints(action) {
-  const { _id: id } = action.payload;
-  const event = yield select(state => state.events.get('events').get(id));
+function* addPersonnelPoints(event) {
   let personnels = yield select(state => state.personnels.get('personnels'));
   const personnelIds = event.get('personnels').map(person => person.get('_id'));
 
@@ -206,7 +192,49 @@ function* createEventUpdatePoints(action) {
       personnels = personnels.setIn([pId, 'eventsDate'], newEventsDate);
     }
   });
+  return personnels;
+}
+
+function* deleteEventUpdatePoints(action) {
+  const { revert, eventId } = action.payload;
+  if (revert) {
+    const event = yield select(state =>
+      state.events.get('events').get(eventId)
+    );
+    const { success } = yield race({
+      success: take(DELETE_EVENT_SUCCESS),
+      failure: take(DELETE_EVENT_FAILURE)
+    });
+    if (success) {
+      const personnels = yield call(revertPersonnelPoints, event);
+      yield put(personnelsUpdateEventPoints(personnels));
+    }
+  }
+}
+
+function* createEventUpdatePoints(action) {
+  const { _id: id } = action.payload;
+  const event = yield select(state => state.events.get('events').get(id));
+  const personnels = yield call(addPersonnelPoints, event);
   yield put(personnelsUpdateEventPoints(personnels));
+}
+
+function* updateEventUpdatePoints(action) {
+  const { eventId } = action.payload;
+  const oldEvent = yield select(state =>
+    state.events.get('events').get(eventId)
+  );
+  const { successAction } = yield race({
+    successAction: take(UPDATE_EVENT_SUCCESS),
+    failure: take(UPDATE_EVENT_FAILURE)
+  });
+  if (successAction) {
+    let personnels = yield call(revertPersonnelPoints, oldEvent);
+    yield put(personnelsUpdateEventPoints(personnels));
+    const newEvent = fromJS(successAction.payload);
+    personnels = yield call(addPersonnelPoints, newEvent);
+    yield put(personnelsUpdateEventPoints(personnels));
+  }
 }
 
 function* updatePersonnelsPlatoonName(action) {
@@ -291,7 +319,8 @@ function* personnelsSagaWatcher() {
     takeEvery(UPDATE_STATUS, updateStatusesName),
     takeEvery(DELETE_EVENT, deleteEventUpdatePoints),
     // takeLatest(CREATE_EVENT_SUCCESS, refreshPersonnelsFromServer)
-    takeEvery(CREATE_EVENT_SUCCESS, createEventUpdatePoints)
+    takeEvery(CREATE_EVENT_SUCCESS, createEventUpdatePoints),
+    takeEvery(UPDATE_EVENT, updateEventUpdatePoints)
   ]);
 }
 

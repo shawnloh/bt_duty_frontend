@@ -26,4 +26,12 @@ const getPlatoons = createSelector(
   (ids, byPlatoonIds) => ids.map(id => byPlatoonIds.get(id))
 );
 
-export { getPoints, getStatuses, getRanks, getPlatoons };
+const personnelIds = state => state.personnels.get('ids');
+const allPersonnels = state => state.personnels.get('personnels');
+const getPersonnels = createSelector(
+  personnelIds,
+  allPersonnels,
+  (ids, byIds) => ids.map(id => byIds.get(id))
+);
+
+export { getPoints, getStatuses, getRanks, getPlatoons, getPersonnels };

@@ -12,7 +12,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment-timezone';
 import Layout from '../../shared/AppLayout';
 import EventForm from '../../../components/events/add/EventForm';
-import { getPlatoons, getPoints, getRanks, getStatuses } from './selectors';
+import {
+  getPlatoons,
+  getPoints,
+  getRanks,
+  getStatuses,
+  getPersonnels
+} from './selectors';
 import { createEvent } from './actions';
 import { logout } from '../../../actions/authActions';
 import useReduxPageSelector from '../../../hooks/useReduxPageSelector';
@@ -29,7 +35,7 @@ export function Add() {
   const pages = useMemo(() => ['events', 'add'], []);
   const isAdding = useReduxPageSelector(pages, 'isAdding');
   const errors = useReduxPageSelector(pages, 'errors');
-  const personnels = useSelector(state => state.personnels.get('personnels'));
+  const personnels = useSelector(getPersonnels);
 
   const handleSubmit = useCallback(
     ({ name, date, pointSystem, pointAllocation, selectedPersonnels }) => {
@@ -38,7 +44,7 @@ export function Add() {
         date: moment(date, 'DDMMYY', true).format('DD-MM-YYYY'),
         pointSystemId: pointSystem,
         pointAllocation,
-        personnels: selectedPersonnels
+        personnels: selectedPersonnels.map(person => person.value)
       };
       dispatch(createEvent(data));
       setSubmit(true);

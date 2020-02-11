@@ -53,6 +53,15 @@ export function Single() {
           <Col xs="3" className="d-flex justify-content-end">
             <Button
               size="md"
+              color="primary"
+              tag={Link}
+              className="mr-1"
+              to={`/events/${event.get('_id')}/edit`}
+            >
+              Edit
+            </Button>
+            <Button
+              size="md"
               color="danger"
               tag={Link}
               to={`/events/${event.get('_id')}/delete`}

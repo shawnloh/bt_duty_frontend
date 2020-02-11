@@ -69,11 +69,13 @@ export function Delete() {
           <Col>
             {revert ? (
               <Alert color="danger">
-                Removing this event will deduct points from personnels
+                Removing this event will deduct points and remove event date
+                from personnels
               </Alert>
             ) : (
               <Alert color="success">
-                Removing this event will not deduct points
+                Removing this event will not affect points and event date in
+                personnels
               </Alert>
             )}
           </Col>
@@ -85,9 +87,10 @@ export function Delete() {
                 <p className="font-weight-bold mb-0">Deleting</p>
               </CardTitle>
               <CardText>
-                <p>Name: {event.get('name')}</p>
-                <p>Point System: {event.getIn(['pointSystem', 'name'])}</p>
-                <p>Points: {event.get('pointsAllocation')}</p>
+                Name: {event.get('name')} <br />
+                Point System: {event.getIn(['pointSystem', 'name'])}
+                <br />
+                Points: {event.get('pointsAllocation')}
               </CardText>
             </Card>
           </Col>
@@ -102,7 +105,7 @@ export function Delete() {
                 onChange={handleRevert}
                 disabled={isDeleting}
               />
-              <Label for="revertCheckBox">Revert Points</Label>
+              <Label for="revertCheckBox">Revert Points and Event Date</Label>
             </FormGroup>
           </Col>
           <Col sm={12} md={4} className="my-2">

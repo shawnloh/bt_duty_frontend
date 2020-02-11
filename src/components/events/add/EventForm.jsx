@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, memo } from 'react';
+import React, { useCallback, memo } from 'react';
 import {
   Form,
   Row,
@@ -14,11 +14,12 @@ import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { Map, List } from 'immutable';
+import { List } from 'immutable';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
-import Swal from 'sweetalert2';
 import GenerateForm from './GenerateForm';
+import useSelectPersonnelsOptionsByDate from '../../../pages/events/hooks/useSelectPersonnelsOptionsByDate';
+import useHandleSetPersonnels from '../../../pages/events/hooks/useHandleSetPersonnels';
 
 const animatedComponents = makeAnimated();
 
@@ -63,105 +64,25 @@ const EventForm = ({
     onSubmit: handleSubmit
   });
 
-  const setSelectedPersonnels = useCallback(
+  /**
+   * Use by generation form
+   */
+  const setPersonnelsByGenerate = useCallback(
     personnelsToSet => {
       formik.setFieldValue('selectedPersonnels', personnelsToSet);
     },
     [formik]
   );
 
-  const personnelsDefault = useMemo(() => {
-    return personnels.toList().map(person => {
-      return {
-        value: person.get('_id'),
-        label: `${person.getIn(['platoon', 'name'])} ${person.getIn([
-          'rank',
-          'name'
-        ])} ${person.get('name')}`
-      };
-    });
-  }, [personnels]);
-
-  const personnelsToSelect = useMemo(() => {
-    if (
-      formik.values.date !== '' &&
-      moment(formik.values.date, 'DDMMYY', true).isValid()
-    ) {
-      const currEventDate = moment(formik.values.date, 'DDMMYY', true).format(
-        'DD-MM-YYYY'
-      );
-      return personnels
-        .toList()
-        .filter(person => {
-          const blockoutDates = person.get('blockOutDates');
-          if (blockoutDates.includes(currEventDate)) {
-            return false;
-          }
-          const eventsDate = person.get('eventsDate');
-
-          const dayBeforeEventDate = moment(currEventDate, 'DD-MM-YYYY', true)
-            .subtract(1, 'd')
-            .format('DD-MM-YYYY');
-          const dayAfterEventDate = moment(currEventDate, 'DD-MM-YYYY', true)
-            .add(1, 'd')
-            .format('DD-MM-YYYY');
-
-          if (
-            eventsDate.includes(currEventDate) ||
-            eventsDate.includes(dayBeforeEventDate) ||
-            eventsDate.includes(dayAfterEventDate)
-          ) {
-            return false;
-          }
-          return true;
-        })
-        .map(person => {
-          return {
-            value: person.get('_id'),
-            label: `${person.getIn(['platoon', 'name'])} ${person.getIn([
-              'rank',
-              'name'
-            ])} ${person.get('name')}`
-          };
-        });
-    }
-
-    return personnelsDefault;
-  }, [formik.values.date, personnels, personnelsDefault]);
-
-  const handleChangePersonnels = useCallback(
-    selectedPersonnels => {
-      if (
-        formik.values.date === '' ||
-        !moment(formik.values.date, 'DDMMYY', true).isValid()
-      ) {
-        return Swal.fire({
-          title: 'Please set a date',
-          text: ' Please assign a valid date before selecting personnels'
-        });
-      }
-      if (!selectedPersonnels) {
-        return formik.setFieldValue('selectedPersonnels', []);
-      }
-      const values = selectedPersonnels.map(person => person.value);
-      return formik.setFieldValue('selectedPersonnels', values);
-    },
-    [formik]
+  const selectPersonnelsOptions = useSelectPersonnelsOptionsByDate(
+    formik.values.date,
+    personnels
   );
 
-  const getSelectedPersonnelsValues = useMemo(
-    () =>
-      formik.values.selectedPersonnels.map(id => {
-        const person = personnels.get(id);
-        return {
-          value: person.get('_id'),
-          label: `${person.getIn(['platoon', 'name'])} ${person.getIn([
-            'rank',
-            'name'
-          ])} ${person.get('name')}`
-        };
-      }),
-    [formik.values.selectedPersonnels, personnels]
+  const handleChangePersonnels = useHandleSetPersonnels(
+    formik.values.date,
+    formik.setFieldValue,
+    'selectedPersonnels'
   );
 
   return (
@@ -281,13 +202,14 @@ const EventForm = ({
               Personnels Selected: [{formik.values.selectedPersonnels.length}]
             </Label>
             <Select
-              options={personnelsToSelect}
+              options={selectPersonnelsOptions}
               components={animatedComponents}
               isMulti
               id="selectedPersonnels"
               name="selectedPersonnels"
               placeholder="Select Personnels.."
-              value={getSelectedPersonnelsValues}
+              // value={getSelectedPersonnelsValues}
+              value={formik.values.selectedPersonnels}
               onChange={handleChangePersonnels}
             />
           </FormGroup>
@@ -299,7 +221,7 @@ const EventForm = ({
             platoons={platoons}
             ranks={ranks}
             statuses={statuses}
-            setSelectedPersonnels={setSelectedPersonnels}
+            setSelectedPersonnels={setPersonnelsByGenerate}
             pointSystem={formik.values.pointSystem}
             date={formik.values.date}
             handleLogout={handleLogout}
@@ -328,7 +250,8 @@ EventForm.propTypes = {
   ranks: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
   platoons: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
   statuses: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
-  personnels: PropTypes.oneOfType([PropTypes.instanceOf(Map)]).isRequired,
+  personnels: PropTypes.oneOfType([PropTypes.instanceOf(List)]).isRequired,
+  // personnels: PropTypes.arrayOf(PropTypes.instanceOf(Map)).isRequired,
   isAdding: PropTypes.bool.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleLogout: PropTypes.func.isRequired

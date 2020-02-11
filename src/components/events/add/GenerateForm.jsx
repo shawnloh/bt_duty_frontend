@@ -21,6 +21,7 @@ import Swal from 'sweetalert2';
 import { List } from 'immutable';
 
 import EventsService from '../../../services/events';
+import useIsMounted from '../../../hooks/useIsMounted';
 
 const checkDateValid = date => {
   return moment(date, 'DDMMYY', true).isValid();
@@ -47,44 +48,20 @@ const GenerationFormSchema = Yup.object().shape({
   wspecs: Yup.number()
 });
 
-const GenerateForm = ({
-  ranks,
-  platoons,
-  statuses,
-  pointSystem,
+function useHandleGenerateFormSubmission({
   date,
+  handle401,
+  pointSystem,
   setSelectedPersonnels,
-  handleLogout
-}) => {
-  const [modal, setModal] = useState(false);
-  const toggle = useCallback(() => {
-    if (date === '') {
-      return Swal.fire({
-        title: 'Assign Date First',
-        text: 'Please assign a date first before using generate personnels',
-        confirmButtonText: 'Okay!'
-      });
-    }
-
-    if (!checkDateValid(date)) {
-      return Swal.fire({
-        title: 'Invalid Date Format',
-        text: 'Please make sure that your date is DDMMYY format',
-        confirmButtonText: 'Okay!'
-      });
-    }
-
-    return setModal(!modal);
-  }, [date, modal]);
-
-  const [prevExcludeStatuses, setPrevExcludeStatuses] = useState([]);
-
+  toggle
+}) {
+  const isMounted = useIsMounted();
   const [errors, setErrors] = useState([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleFormSubmission = useCallback(
+  const handler = useCallback(
     async values => {
-      setIsGenerating(true);
+      if (isMounted.current) setIsGenerating(true);
       const {
         ranks: selectedRanks,
         platoons: selectedPlatoons,
@@ -117,12 +94,18 @@ const GenerateForm = ({
       try {
         const response = await EventsService.generateName(data);
         if (response.ok) {
-          const personnels = response.data.map(person => person._id);
-          setSelectedPersonnels(personnels);
-          toggle();
+          const personnels = response.data.map(person => {
+            return {
+              value: person._id,
+              label: `${person.platoon} ${person.rank} ${person.name}`
+            };
+          });
+          if (isMounted.current) {
+            setSelectedPersonnels(personnels);
+            toggle();
+          }
         } else if (response.status === 401) {
-          handleLogout();
-          // setErrors(['Unauthenticated, please refresh the page or logout']);
+          if (isMounted.current) handle401();
         } else {
           let responseErrors = [];
           if (response.data.message) {
@@ -130,17 +113,66 @@ const GenerateForm = ({
           }
 
           if (response.data.errors) {
-            responseErrors = errors.concat(response.data.errors);
+            responseErrors = responseErrors.concat(response.data.errors);
           }
-          setErrors(responseErrors);
+          if (isMounted.current) setErrors(responseErrors);
         }
       } catch (error) {
-        setErrors([error.message || 'Unable to generate names']);
+        if (isMounted.current)
+          setErrors([error.message || 'Unable to generate names']);
       }
-      setIsGenerating(false);
+      if (isMounted.current) setIsGenerating(false);
     },
-    [date, errors, handleLogout, pointSystem, setSelectedPersonnels, toggle]
+    [date, handle401, isMounted, pointSystem, setSelectedPersonnels, toggle]
   );
+
+  return { handleFormSubmission: handler, isGenerating, errors };
+}
+
+const GenerateForm = ({
+  ranks,
+  platoons,
+  statuses,
+  pointSystem,
+  date,
+  setSelectedPersonnels,
+  handleLogout
+}) => {
+  const [modal, setModal] = useState(false);
+
+  const toggle = useCallback(() => {
+    if (date === '') {
+      return Swal.fire({
+        title: 'Assign Date First',
+        text: 'Please assign a date first before using generate personnels',
+        confirmButtonText: 'Okay!'
+      });
+    }
+
+    if (!checkDateValid(date)) {
+      return Swal.fire({
+        title: 'Invalid Date Format',
+        text: 'Please make sure that your date is DDMMYY format',
+        confirmButtonText: 'Okay!'
+      });
+    }
+
+    return setModal(!modal);
+  }, [date, modal]);
+
+  const [prevExcludeStatuses, setPrevExcludeStatuses] = useState([]);
+
+  const {
+    handleFormSubmission,
+    isGenerating,
+    errors
+  } = useHandleGenerateFormSubmission({
+    date,
+    handle401: handleLogout,
+    pointSystem,
+    setSelectedPersonnels,
+    toggle
+  });
 
   const formik = useFormik({
     initialValues: {

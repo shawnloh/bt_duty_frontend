@@ -2,7 +2,8 @@ import { fromJS, List } from 'immutable';
 import { LOAD_EVENTS_FAILURE, LOAD_EVENTS_SUCCESS } from '../actions/constants';
 import {
   DELETE_EVENT_SUCCESS,
-  CREATE_EVENT_SUCCESS
+  CREATE_EVENT_SUCCESS,
+  UPDATE_EVENT_SUCCESS
 } from '../pages/events/constants';
 
 const initialState = fromJS({
@@ -34,6 +35,8 @@ export default (state = initialState, { type, payload }) => {
         ids: state.get('ids').delete(state.get('ids').indexOf(payload._id)),
         events: state.get('events').delete(payload._id)
       });
+    case UPDATE_EVENT_SUCCESS:
+      return state.setIn(['events', payload._id], fromJS(payload));
     default:
       return state;
   }
