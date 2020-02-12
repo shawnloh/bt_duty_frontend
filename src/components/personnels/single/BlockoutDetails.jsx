@@ -7,12 +7,9 @@ import BlockoutTable from './blockout/BlockoutTable';
 import AddBlockout from './blockout/AddBlockout';
 import Pagination from '../../commons/Pagination';
 
-function BlockoutDetails({ blockoutDates, handleDelete, handleAdd }) {
-  const [rowsPerPage] = useState(5);
-  const [page, setPage] = useState(1);
+function useSortedBlockoutDate(dates) {
   const sortedBlockoutDate = useMemo(() => {
-    const dates = blockoutDates;
-    dates.sort((a, b) => {
+    return dates.sort((a, b) => {
       const date1 = moment(a, 'DD-MM-YYYY', true);
       const date2 = moment(b, 'DD-MM-YYYY', true);
 
@@ -25,9 +22,14 @@ function BlockoutDetails({ blockoutDates, handleDelete, handleAdd }) {
 
       return 0;
     });
-    return dates;
-  }, [blockoutDates]);
+  }, [dates]);
+  return sortedBlockoutDate;
+}
 
+function BlockoutDetails({ blockoutDates, handleDelete, handleAdd }) {
+  const [rowsPerPage] = useState(5);
+  const [page, setPage] = useState(1);
+  const sortedBlockoutDate = useSortedBlockoutDate(blockoutDates);
   const lastIndex = page * rowsPerPage;
   const firstIndex = lastIndex - rowsPerPage;
   const shownDates = sortedBlockoutDate.slice(firstIndex, lastIndex);

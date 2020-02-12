@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
-import { Table, Button } from 'reactstrap';
+import { Table } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
+import SingleStatus from './SingleStatus';
 
 const StatusesTable = ({ statuses, handleUpdate, handleDelete }) => {
   return (
@@ -15,23 +16,14 @@ const StatusesTable = ({ statuses, handleUpdate, handleDelete }) => {
         </tr>
       </thead>
       <tbody>
-        {statuses.map(status => {
-          const id = status.get('_id');
-          const name = status.get('name');
-          return (
-            <tr key={id}>
-              <td className="text-center">{name}</td>
-              <td className="text-center">
-                <Button color="primary" onClick={() => handleUpdate(id, name)}>
-                  Edit
-                </Button>{' '}
-                <Button onClick={() => handleDelete(id, name)} color="danger">
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          );
-        })}
+        {statuses.map(status => (
+          <SingleStatus
+            key={status.get('_id')}
+            status={status}
+            handleDelete={handleDelete}
+            handleUpdate={handleUpdate}
+          />
+        ))}
       </tbody>
     </Table>
   );

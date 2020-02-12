@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
-import { Table, Button } from 'reactstrap';
+import { Table } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
+import SinglePlatoon from './SinglePlatoon';
 
 const PlatoonTable = ({ platoons, handleUpdate, handleDelete }) => {
   return (
@@ -16,20 +17,13 @@ const PlatoonTable = ({ platoons, handleUpdate, handleDelete }) => {
       </thead>
       <tbody>
         {platoons.map(platoon => {
-          const name = platoon.get('name');
-          const id = platoon.get('_id');
           return (
-            <tr key={id}>
-              <td className="text-center">{name}</td>
-              <td className="text-center">
-                <Button color="primary" onClick={() => handleUpdate(id, name)}>
-                  Edit
-                </Button>{' '}
-                <Button onClick={() => handleDelete(id, name)} color="danger">
-                  Delete
-                </Button>
-              </td>
-            </tr>
+            <SinglePlatoon
+              key={platoon.get('_id')}
+              platoon={platoon}
+              handleUpdate={handleUpdate}
+              handleDelete={handleDelete}
+            />
           );
         })}
       </tbody>

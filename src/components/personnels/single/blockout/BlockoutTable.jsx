@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
-import { Table, Button } from 'reactstrap';
+import { Table } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
+import SingleBlockout from './SingleBlockout';
 
 const BlockoutTable = ({ handleDelete, blockoutDates }) => {
   return (
@@ -15,17 +16,11 @@ const BlockoutTable = ({ handleDelete, blockoutDates }) => {
       <tbody>
         {blockoutDates.map(date => {
           return (
-            <tr key={date}>
-              <td className="text-center">{date}</td>
-              <td className="text-center">
-                <Button
-                  color="danger"
-                  onClick={() => handleDelete({ startDate: date })}
-                >
-                  Delete
-                </Button>
-              </td>
-            </tr>
+            <SingleBlockout
+              key={date}
+              date={date}
+              handleDelete={handleDelete}
+            />
           );
         })}
       </tbody>

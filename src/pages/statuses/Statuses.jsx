@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { Container, Col, Row, Button, Alert, Spinner } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
@@ -10,18 +10,27 @@ import useReduxPageSelector from '../../hooks/useReduxPageSelector';
 
 import Layout from '../shared/AppLayout';
 import StatusesTable from '../../components/statuses/StatusesTable';
+import Pagination from '../../components/commons/Pagination';
 
 import { getStatuses } from './selectors';
 import { addStatus, deleteStatus, updateStatus } from './actions';
 
 export function Statuses() {
+  const [rowsPerPage] = useState(10);
+  const [page, setPage] = useState(1);
+
   const dispatch = useDispatch();
   const statuses = useSelector(getStatuses);
   const errors = useReduxPageSelector('statuses', 'errors');
   const actionInProgress = useReduxPageSelector('statuses', 'actionInProgress');
+
   const handleAdd = useAddModal(dispatch, addStatus, 'status');
   const handleUpdate = useUpdateModal(dispatch, updateStatus, 'status');
   const handleDelete = useDeleteModal(dispatch, deleteStatus);
+
+  const lastIndex = page * rowsPerPage;
+  const firstIndex = lastIndex - rowsPerPage;
+  const shownStatuses = statuses.slice(firstIndex, lastIndex);
 
   return (
     <Layout>
@@ -69,7 +78,16 @@ export function Statuses() {
             <StatusesTable
               handleUpdate={handleUpdate}
               handleDelete={handleDelete}
-              statuses={statuses}
+              statuses={shownStatuses}
+            />
+          </Col>
+        </Row>
+        <Row className="justify-content-center align-items-center">
+          <Col>
+            <Pagination
+              rowsPerPage={rowsPerPage}
+              setPage={setPage}
+              totalPosts={statuses.size}
             />
           </Col>
         </Row>

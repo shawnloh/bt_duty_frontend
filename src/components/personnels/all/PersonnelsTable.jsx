@@ -1,8 +1,8 @@
 import React, { memo } from 'react';
-import { Table, Button } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import { Table } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
+import SinglePersonnel from './SinglePersonnel';
 
 const PersonnelsTable = ({ personnels, onDelete }) => {
   return (
@@ -16,25 +16,13 @@ const PersonnelsTable = ({ personnels, onDelete }) => {
         </tr>
       </thead>
       <tbody>
-        {personnels.map(person => {
-          const rank = person.getIn(['rank', 'name']);
-          const platoon = person.getIn(['platoon', 'name']);
-          const id = person.get('_id');
-          const name = person.get('name');
-          return (
-            <tr key={id}>
-              <td className="text-center">{`${platoon} ${rank} ${name}`}</td>
-              <td className="text-center">
-                <Button color="primary" tag={Link} to={`/personnels/${id}`}>
-                  Edit
-                </Button>{' '}
-                <Button color="danger" onClick={() => onDelete(id, name)}>
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          );
-        })}
+        {personnels.map(person => (
+          <SinglePersonnel
+            key={person.get('_id')}
+            handleDelete={onDelete}
+            person={person}
+          />
+        ))}
       </tbody>
     </Table>
   );

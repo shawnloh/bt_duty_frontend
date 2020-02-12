@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
-import { Table, Button } from 'reactstrap';
+import { Table } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
+import SingleRank from './SingleRank';
 
 const RankTable = ({ ranks, handleUpdate, handleDelete }) => {
   return (
@@ -16,20 +17,13 @@ const RankTable = ({ ranks, handleUpdate, handleDelete }) => {
       </thead>
       <tbody>
         {ranks.map(rank => {
-          const name = rank.get('name');
-          const id = rank.get('_id');
           return (
-            <tr key={id}>
-              <td className="text-center">{name}</td>
-              <td className="text-center">
-                <Button color="primary" onClick={() => handleUpdate(id, name)}>
-                  Edit
-                </Button>{' '}
-                <Button onClick={() => handleDelete(id, name)} color="danger">
-                  Delete
-                </Button>
-              </td>
-            </tr>
+            <SingleRank
+              key={rank.get('_id')}
+              handleDelete={handleDelete}
+              handleUpdate={handleUpdate}
+              rank={rank}
+            />
           );
         })}
       </tbody>

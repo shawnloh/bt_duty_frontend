@@ -12,6 +12,7 @@ import {
 import { Helmet } from 'react-helmet';
 import { Link, Redirect, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import './styles.css';
 
 import {
   addStatus,

@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import ReactPaginate from 'react-paginate';
+import './pagination.css';
 
 const PaginationComponent = ({ rowsPerPage, totalPosts, setPage }) => {
   const pageNumbers = useMemo(() => {

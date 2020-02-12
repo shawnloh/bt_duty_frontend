@@ -1,0 +1,7 @@
+.page-item.active .page-link {
+  cursor: pointer;
+}
+
+.page-item .page-link {
+  cursor: pointer;
+}

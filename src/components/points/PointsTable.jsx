@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
-import { Table, Button } from 'reactstrap';
+import { Table } from 'reactstrap';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
+import SinglePoint from './SinglePoint';
 
 const PointTable = ({ points, handleUpdate, handleDelete }) => {
   return (
@@ -16,20 +17,13 @@ const PointTable = ({ points, handleUpdate, handleDelete }) => {
       </thead>
       <tbody>
         {points.map(point => {
-          const name = point.get('name');
-          const id = point.get('_id');
           return (
-            <tr key={id}>
-              <td className="text-center">{name}</td>
-              <td className="text-center">
-                <Button color="primary" onClick={() => handleUpdate(id, name)}>
-                  Edit
-                </Button>{' '}
-                <Button onClick={() => handleDelete(id, name)} color="danger">
-                  Delete
-                </Button>
-              </td>
-            </tr>
+            <SinglePoint
+              key={point.get('_id')}
+              point={point}
+              handleUpdate={handleUpdate}
+              handleDelete={handleDelete}
+            />
           );
         })}
       </tbody>
